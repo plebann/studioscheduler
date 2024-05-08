@@ -26,7 +26,7 @@ Absolutely! Here’s an updated summary of the key functionalities and features 
 
 ### Pass Management
 1. **Pass Types and Utilization**
-   - Various pass options are available, such as passes allowing for 1, 2, 3, or 4 classes per week, and an unlimited pass.
+   - Various pass options are available, such as passes allowing for 1, 2, 3, 4 or 5 classes per week, and an unlimited pass.
    - Passes have a 4-week validity, automatically extending for holidays, with an option for students to suspend their pass once for up to two weeks.
    - If a student attends more classes than their pass allows in a week, future class entitlements are adjusted accordingly, reducing the number of classes they can attend in later weeks within the pass duration.
 
