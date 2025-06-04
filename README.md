@@ -1,81 +1,109 @@
-## Table of Contents
-- [Core Functionalities](#core-functionalities)
-  - [Pass Management](#pass-management)
-  - [Advanced Functionalities](#advanced-functionalities)
-- [Passes](#passes)
-  - [Types of Passes](#types-of-passes)
-  - [Pass Duration and Management](#pass-duration-and-management)
-  - [Reservation System and Dynamic Attendance Adjustments](#reservation-system-and-dynamic-attendance-adjustments)
-  - [Adjustments for Missed Classes](#adjustments-for-missed-classes)
-  - [Management Features](#management-features)
-  - [System Integration and Notifications](#system-integration-and-notifications)
+# Studio Scheduler
 
-Absolutely! Here’s an updated summary of the key functionalities and features for your dance studio app, reflecting the additional details and new functionalities:
+## Project Overview
+Studio Scheduler is a cloud-hosted web application for managing dance/fitness studio classes, with both desktop (admin/operator) and mobile (student) interfaces.
 
-## Core Functionalities
-1. **Class Management**
-   - Admins can create and update course information including descriptions, instructors, and class schedules aligned with the studio’s operational hours.
-   - Classes are assigned to time slots, with the potential for future adjustments in class duration and breaks.
+## Technical Stack
 
-2. **User Management**
-   - Admins can manage student profiles and staff accounts, including creating and configuring roles for Desk Persons.
+### Frontend
+- Blazor WebAssembly (.NET 9, upgrade to .NET 10 LTS planned)
+- MudBlazor for UI components
+- Fluxor for state management
+- PWA capabilities for mobile
 
-3. **Reservation and Attendance System**
-   - Students can reserve spots in classes according to their pass type.
-   - Desk Persons and instructors can check attendance, marking students present or absent, directly impacting pass usage calculations.
+### Backend
+- ASP.NET Core 9 API
+- Entity Framework Core 9
+- SignalR for real-time features
+- JWT-based authentication (simple, role-based)
 
-### Pass Management
-1. **Pass Types and Utilization**
-   - Various pass options are available, such as passes allowing for 1, 2, 3, 4 or 5 classes per week, and an unlimited pass.
-   - Passes have a 4-week validity, automatically extending for holidays, with an option for students to suspend their pass once for up to two weeks.
-   - If a student attends more classes than their pass allows in a week, future class entitlements are adjusted accordingly, reducing the number of classes they can attend in later weeks within the pass duration.
+### Infrastructure
+- Azure hosting (App Service)
+- PostgreSQL on Azure
+- Azure Application Insights
+- Azure Blob Storage
 
-2. **Front Desk Operations (New Role: Desk Person)**
-   - Desk Persons can verify if a student is eligible to attend an upcoming class and manage pass-related transactions (selling, suspending, adjusting reservations).
-   - They can also adjust the use of future class reservations for current classes, managing both standard and extra attendances.
+## Solution Structure
+```
+StudioScheduler/
+├── src/
+│   ├── StudioScheduler.Client/           # Blazor WASM
+│   ├── StudioScheduler.Server/           # ASP.NET Core API
+│   ├── StudioScheduler.Core/             # Domain Models & Interfaces
+│   ├── StudioScheduler.Infrastructure/    # Data Access & External Services
+│   └── StudioScheduler.Shared/           # DTOs & Shared Models
+├── tests/
+│   ├── StudioScheduler.UnitTests/
+│   └── StudioScheduler.IntegrationTests/
+└── tools/                                # DB migrations, scripts
+```
 
-### Advanced Functionalities
-1. **Dynamic Pass Adjustment**
-   - The system adjusts the number of classes available in future weeks if a student attends more than their weekly quota, ensuring total pass usage remains constant.
+## Implementation Plan
 
-2. **Role-Based Access Control**
-   - Different access levels for Admins and Desk Persons, ensuring that each user has appropriate permissions for their role’s responsibilities.
+Based on the requirements and technical specifications, here's a structured plan for implementing the Studio Scheduler project:
 
-3. **Eligibility Checks and Pass Adjustments**
-   - Real-time checks for student eligibility for classes, with functionality to handle substitutions using future reservations if a student with a limited pass wishes to attend an unplanned class.
+### Phase 1: Project Setup and Core Infrastructure (First Steps)
+```mermaid
+graph TB
+    A[Create Solution Structure] --> B[Setup Projects]
+    B --> C[Configure Azure DevOps Pipeline]
+    B --> D[Setup Base Projects]
+    D --> E[Configure Entity Framework]
+    D --> F[Setup Authentication]
+```
 
-4. **System Notifications and Reporting**
-   - Automated notifications to students about pass adjustments and class availability.
-   - Detailed reporting for Admins and Desk Persons on pass utilization and class attendance patterns.
+1. Create the solution structure following the specified pattern:
+   - StudioScheduler.Client (Blazor WASM)
+   - StudioScheduler.Server (ASP.NET Core API)
+   - StudioScheduler.Core (Domain Models)
+   - StudioScheduler.Infrastructure (Data Access)
+   - StudioScheduler.Shared (DTOs)
 
-## Passes
-### Types of Passes
-1. **Limited Passes (1, 2, 3, 4, 5 classes per week)**
-   - Students with these passes must select specific classes to attend during the validity period of 4 weeks (28 days). This ensures that they are committed to a consistent schedule that matches their dance level and progression.
-   - Each pass specifies the number of classes a student can attend each week.
+2. Initial project setup:
+   - Create GitFlow structure (main/develop branches)
+   - Setup .gitignore and solution files
+   - Configure NuGet packages
+   - Setup development environment
 
-2. **Full Pass (Unlimited classes)**
-   - Offers unrestricted access to classes, allowing students to participate in any class according to their preference and availability within the 28-day validity period.
+3. Setup Core Data Models:
+   - User entity
+   - Class entity
+   - Schedule entity
+   - Pass entity
+   - Reservation entity
 
-### Pass Duration and Management
-- **Holiday Extensions:** Pass durations extend automatically in the event of public holidays, ensuring students don't miss out on classes due to studio closures.
-- **One-time Suspension:** Passes can be suspended once for up to two weeks, with the validity period extended accordingly, accommodating unexpected changes in a student's ability to attend classes.
+4. Configure Entity Framework:
+   - PostgreSQL connection
+   - Initial migrations
+   - Repository patterns
 
-### Reservation System and Dynamic Attendance Adjustments
-- **Mandatory Class Selection for Limited Pass Holders:** Students must choose their classes at the time of pass purchase, promoting structured learning paths.
-- **Flexibility for Rescheduling in Advance:** If students know they will miss a scheduled class, they can adjust their reservations in advance to attend a different class, allowing them to manage their attendance proactively without missing out on their learning goals.
+5. Authentication Infrastructure:
+   - JWT configuration
+   - Basic user service
+   - Role-based authorization
 
-### Adjustments for Missed Classes
-- **Make-up Opportunities:** If a student misses a class unexpectedly, they can use their class credit to attend another class within the next 7 days. This flexibility ensures that students maintain their progress even when their schedules change unexpectedly.
-- **Dynamic Class Attendance:** Should students attend more classes than their weekly limit on a limited pass, their remaining class credits for the 28-day period adjust accordingly. This mechanism ensures they can make up for missed classes without disrupting their overall class count for the period.
+### Phase 2: Basic Backend Implementation
+- API endpoints for CRUD operations
+- Business logic implementation
+- Service layer setup
+- Basic error handling
+- Logging setup
 
-### Management Features
-- **Roles and Permissions:**
-   - **Admins** control overall operations including the creation and management of passes, user roles, and studio scheduling.
-   - **Desk Person** handles daily check-ins, pass transactions, and assists with reservation adjustments and tracking class attendances.
+### Phase 3: Frontend Foundation
+- Blazor project setup with MudBlazor
+- Authentication UI
+- Basic layouts and navigation
+- Core components structure
 
-### System Integration and Notifications
-- **Database Management:** Efficiently tracks pass start and expiration dates, number of classes attended, classes remaining, and specific classes booked. This ensures accurate monitoring of student commitments and attendance.
-- **Automated Notifications:** Sends reminders and updates to students about class bookings, upcoming class changes, and pass expiration notices.
+### Phase 4: Feature Implementation
+- Class management module
+- User management module
+- Pass system
+- Reservation system
+- Real-time updates with SignalR
 
-This system not only promotes consistency and commitment in students' dance education but also provides ample flexibility to adapt to their dynamic schedules. The structure supports continuous engagement and progression in dance training by accommodating both planned and unplanned changes in attendance.****
+### Phase 5: Azure Infrastructure
+- App Service setup
+- Database deployment
+- Application Insights integration
+- CI/CD pipeline completion

@@ -1,0 +1,6 @@
+@StudioScheduler.Server_HostAddress = http://localhost:5224
+
+GET {{StudioScheduler.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
