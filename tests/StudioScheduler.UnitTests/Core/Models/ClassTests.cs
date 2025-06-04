@@ -28,15 +28,14 @@ public class ClassTests
 
     [Theory]
     [InlineData("")]
-    [InlineData(null)]
     [InlineData("   ")]
-    public void Class_Name_Cannot_Be_Empty(string? invalidName)
+    public void Class_Name_Cannot_Be_Empty_Or_Whitespace(string emptyName)
     {
         // Arrange
         var validator = new ClassValidator();
         var @class = new Class
         {
-            Name = invalidName,
+            Name = emptyName,
             Description = "Test description",
             Capacity = 15,
             InstructorId = Guid.NewGuid()
@@ -51,18 +50,37 @@ public class ClassTests
             error.ErrorMessage.Contains("Name is required"));
     }
 
+    [Fact]
+    public void Class_Name_Cannot_Be_Null()
+    {
+        // Arrange
+        var validator = new ClassValidator();
+        var @class = new Class
+        {
+            Name = "Initial Name",
+            Description = "Test description",
+            Capacity = 15,
+            InstructorId = Guid.NewGuid()
+        };
+
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() => 
+        {
+            @class.Name = default!;
+        });
+    }
+
     [Theory]
     [InlineData("")]
-    [InlineData(null)]
     [InlineData("   ")]
-    public void Class_Description_Cannot_Be_Empty(string? invalidDescription)
+    public void Class_Description_Cannot_Be_Empty_Or_Whitespace(string emptyDescription)
     {
         // Arrange
         var validator = new ClassValidator();
         var @class = new Class
         {
             Name = "Test Class",
-            Description = invalidDescription,
+            Description = emptyDescription,
             Capacity = 15,
             InstructorId = Guid.NewGuid()
         };
@@ -74,6 +92,26 @@ public class ClassTests
         Assert.False(result.IsValid);
         Assert.Contains(result.Errors, error => 
             error.ErrorMessage.Contains("Description is required"));
+    }
+
+    [Fact]
+    public void Class_Description_Cannot_Be_Null()
+    {
+        // Arrange
+        var validator = new ClassValidator();
+        var @class = new Class
+        {
+            Name = "Test Class",
+            Description = "Initial Description",
+            Capacity = 15,
+            InstructorId = Guid.NewGuid()
+        };
+
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() => 
+        {
+            @class.Description = default!;
+        });
     }
 
     [Theory]
