@@ -3,8 +3,20 @@ namespace StudioScheduler.Core.Models;
 public class Class
 {
     public Guid Id { get; set; }
-    public required string Name { get; set; }
-    public required string Description { get; set; }
+    private string _name = null!;
+    private string _description = null!;
+    
+    public required string Name 
+    { 
+        get => _name;
+        set => _name = value ?? throw new ArgumentNullException(nameof(Name));
+    }
+    
+    public required string Description 
+    { 
+        get => _description;
+        set => _description = value ?? throw new ArgumentNullException(nameof(Description));
+    }
     public required int Capacity { get; set; }
     public required Guid InstructorId { get; set; }
     public User? Instructor { get; set; }
