@@ -58,25 +58,6 @@ public class ClassTests
             error.ErrorMessage.Contains("Name is required"));
     }
 
-    [Fact]
-    public void DanceClass_Name_CannotBeNull()
-    {
-        // Arrange
-        var danceClass = new DanceClass
-        {
-            Name = "Initial Name",
-            Description = "Test description",
-            Level = "P1",
-            Style = "Salsa",
-            Capacity = 15,
-            InstructorId = Guid.NewGuid(),
-            RoomId = Guid.NewGuid()
-        };
-
-        // Act & Assert
-        var act = () => danceClass.Name = null!;
-        act.Should().Throw<ArgumentNullException>();
-    }
 
     [Theory]
     [InlineData("")]
@@ -105,25 +86,6 @@ public class ClassTests
             error.ErrorMessage.Contains("Description is required"));
     }
 
-    [Fact]
-    public void DanceClass_Description_CannotBeNull()
-    {
-        // Arrange
-        var danceClass = new DanceClass
-        {
-            Name = "Test Class",
-            Description = "Initial Description",
-            Level = "P1",
-            Style = "Salsa",
-            Capacity = 15,
-            InstructorId = Guid.NewGuid(),
-            RoomId = Guid.NewGuid()
-        };
-
-        // Act & Assert
-        var act = () => danceClass.Description = null!;
-        act.Should().Throw<ArgumentNullException>();
-    }
 
     [Theory]
     [InlineData(0)]

@@ -5,10 +5,10 @@ namespace StudioScheduler.Core.Models;
 public class User
 {
     public Guid Id { get; set; }
-    public required string Email { get; set; }
-    public required string FirstName { get; set; }
-    public required string LastName { get; set; }
-    public required string PasswordHash { get; set; }
+    public required string Email { get; init; }
+    public required string FirstName { get; init; }
+    public required string LastName { get; init; }
+    public required string PasswordHash { get; init; }
     public string? Gender { get; set; }
     public DateTime? DateOfBirth { get; set; }
     public UserRole Role { get; set; } = UserRole.Student;

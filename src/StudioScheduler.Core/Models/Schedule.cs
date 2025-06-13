@@ -3,13 +3,8 @@ namespace StudioScheduler.Core.Models;
 public class Schedule
 {
     public Guid Id { get; set; } = Guid.NewGuid();
-    private string _name = null!;
     
-    public required string Name 
-    { 
-        get => _name;
-        set => _name = value ?? throw new ArgumentNullException(nameof(Name));
-    }
+    public required string Name { get; init; }
     
     public required Guid LocationId { get; set; }
     public Location? Location { get; set; }

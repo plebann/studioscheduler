@@ -3,27 +3,10 @@ namespace StudioScheduler.Core.Models;
 public class Location
 {
     public Guid Id { get; set; } = Guid.NewGuid();
-    private string _name = null!;
-    private string _address = null!;
-    private string _description = null!;
 
-    public required string Name
-    {
-        get => _name;
-        set => _name = value ?? throw new ArgumentNullException(nameof(Name));
-    }
-
-    public required string Address
-    {
-        get => _address;
-        set => _address = value ?? throw new ArgumentNullException(nameof(Address));
-    }
-
-    public string Description
-    {
-        get => _description;
-        set => _description = value ?? throw new ArgumentNullException(nameof(Description));
-    }
+    public required string Name { get; init; }
+    public required string Address { get; init; }
+    public string Description { get; init; } = string.Empty;
 
     public required int Capacity { get; set; }
     public required TimeSpan OpeningTime { get; set; }

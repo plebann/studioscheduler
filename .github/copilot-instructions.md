@@ -122,11 +122,102 @@ StudioScheduler/
 - Load testing for critical paths
 - End-to-end testing for critical flows
 
+## Property Patterns
+
+### Required String Properties
+
+For required string properties in domain models, use the following pattern:
+
+```csharp
+public required string PropertyName { get; init; }
+```
+
+**Benefits:**
+- Clean, concise syntax
+- Immutable after object initialization (good for domain models)
+- Compiler enforces initialization through `required` modifier
+- No need for explicit null checking in setters
+- Follows modern C# best practices
+
+**Example:**
+```csharp
+public class Location
+{
+    public required string Name { get; init; }
+    public required string Address { get; init; }
+    public string Description { get; init; } = string.Empty;
+}
+```
+
+**When to use:**
+- Domain models where properties shouldn't change after creation
+- Required properties that must be set during object initialization
+- Properties that don't need complex validation logic
+
+**When NOT to use:**
+- Properties that need to be modified after object creation
+- Properties requiring complex validation logic in setters
+- DTOs or other objects that need mutable properties
+
+### Optional String Properties
+
+For optional string properties, provide a default value:
+
+```csharp
+public string Description { get; init; } = string.Empty;
+```
+
+This avoids nullable reference type warnings while maintaining the init-only pattern.
+
+## Terminal Commands Guidelines
+
+### Windows PowerShell Commands
+When running commands in Windows PowerShell, be aware of these common issues:
+
+**❌ WRONG - Don't use these patterns:**
+```bash
+# Unix-style command chaining (doesn't work in PowerShell)
+cd tests/StudioScheduler.UnitTests && dotnet test
+
+# Single ampersand (reserved for future use)
+cd tests\StudioScheduler.UnitTests & dotnet test
+```
+
+**✅ CORRECT - Use these patterns instead:**
+```powershell
+# Use semicolon for command chaining
+cd tests\StudioScheduler.UnitTests; dotnet test
+
+# Or run commands separately
+cd tests\StudioScheduler.UnitTests
+dotnet test
+
+# Or use full paths from current directory
+dotnet test tests\StudioScheduler.UnitTests\StudioScheduler.UnitTests.csproj
+
+# For building the entire solution
+dotnet build
+
+# For running specific test projects
+dotnet test tests\StudioScheduler.UnitTests
+dotnet test tests\StudioScheduler.IntegrationTests
+```
+
+**Key Rules:**
+- Use backslashes `\` for Windows paths
+- Use semicolons `;` for command chaining in PowerShell
+- Prefer full paths when possible to avoid directory navigation issues
+- Always test commands in a Windows environment before documenting
+
 ## Deployment Strategy
 - CI/CD through Azure DevOps
 - Automated testing in pipeline
 - Staged deployments
 - Zero-downtime updates when possible
 - Regular database backups
+
+## Implementation Notes
+
+The init-only property pattern was implemented in the Location model to replace the previous custom getter/setter pattern that included explicit null checking. The `required` modifier ensures properties are initialized, eliminating the need for runtime null validation.
 
 Remember: Keep It Simple! Start with core features and expand based on user feedback.
