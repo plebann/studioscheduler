@@ -3,9 +3,9 @@ using StudioScheduler.Core.Models;
 
 namespace StudioScheduler.Core.Validators;
 
-public class ClassValidator : AbstractValidator<Class>
+public class DanceClassValidator : AbstractValidator<DanceClass>
 {
-    public ClassValidator()
+    public DanceClassValidator()
     {
         RuleFor(x => x.Name)
             .NotEmpty()
@@ -15,6 +15,14 @@ public class ClassValidator : AbstractValidator<Class>
             .NotEmpty()
             .WithMessage("Description is required");
 
+        RuleFor(x => x.Level)
+            .NotEmpty()
+            .WithMessage("Level is required");
+
+        RuleFor(x => x.Style)
+            .NotEmpty()
+            .WithMessage("Style is required");
+
         RuleFor(x => x.Capacity)
             .GreaterThan(0)
             .WithMessage("Capacity must be positive");
@@ -22,5 +30,9 @@ public class ClassValidator : AbstractValidator<Class>
         RuleFor(x => x.InstructorId)
             .NotEqual(System.Guid.Empty)
             .WithMessage("Instructor is required");
+
+        RuleFor(x => x.RoomId)
+            .NotEqual(System.Guid.Empty)
+            .WithMessage("Room is required");
     }
 }

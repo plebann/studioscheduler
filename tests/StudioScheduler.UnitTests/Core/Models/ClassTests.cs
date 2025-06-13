@@ -1,4 +1,4 @@
-using Xunit;
+using FluentAssertions;
 using StudioScheduler.Core.Models;
 using StudioScheduler.Core.Validators;
 
@@ -7,174 +7,219 @@ namespace StudioScheduler.UnitTests.Core.Models;
 public class ClassTests
 {
     [Fact]
-    public void Class_Creation_Sets_Default_Values()
+    public void DanceClass_ShouldSetDefaultValues()
     {
         // Arrange & Act
-        var @class = new Class
+        var danceClass = new DanceClass
         {
-            Name = "Yoga Basics",
-            Description = "Introduction to yoga",
+            Name = "Salsa Basics",
+            Description = "Introduction to salsa",
+            Level = "P1",
+            Style = "Salsa",
             Capacity = 15,
-            InstructorId = Guid.NewGuid()
+            InstructorId = Guid.NewGuid(),
+            RoomId = Guid.NewGuid()
         };
 
         // Assert
-        Assert.True(@class.IsActive);
-        Assert.NotEqual(default, @class.CreatedAt);
-        Assert.Null(@class.UpdatedAt);
-        Assert.NotEmpty(@class.Name);
-        Assert.NotEmpty(@class.Description);
+        danceClass.IsActive.Should().BeTrue();
+        danceClass.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        danceClass.UpdatedAt.Should().BeNull();
+        danceClass.Name.Should().NotBeEmpty();
+        danceClass.Description.Should().NotBeEmpty();
+        danceClass.Level.Should().NotBeEmpty();
+        danceClass.Style.Should().NotBeEmpty();
     }
 
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
-    public void Class_Name_Cannot_Be_Empty_Or_Whitespace(string emptyName)
+    public void DanceClass_Name_CannotBeEmptyOrWhitespace(string emptyName)
     {
         // Arrange
-        var validator = new ClassValidator();
-        var @class = new Class
+        var validator = new DanceClassValidator();
+        var danceClass = new DanceClass
         {
             Name = emptyName,
             Description = "Test description",
+            Level = "P1",
+            Style = "Salsa",
             Capacity = 15,
-            InstructorId = Guid.NewGuid()
+            InstructorId = Guid.NewGuid(),
+            RoomId = Guid.NewGuid()
         };
 
         // Act
-        var result = validator.Validate(@class);
+        var result = validator.Validate(danceClass);
 
         // Assert
-        Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, error => 
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().Contain(error => 
             error.ErrorMessage.Contains("Name is required"));
     }
 
     [Fact]
-    public void Class_Name_Cannot_Be_Null()
+    public void DanceClass_Name_CannotBeNull()
     {
         // Arrange
-        var validator = new ClassValidator();
-        var @class = new Class
+        var danceClass = new DanceClass
         {
             Name = "Initial Name",
             Description = "Test description",
+            Level = "P1",
+            Style = "Salsa",
             Capacity = 15,
-            InstructorId = Guid.NewGuid()
+            InstructorId = Guid.NewGuid(),
+            RoomId = Guid.NewGuid()
         };
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => 
-        {
-            @class.Name = default!;
-        });
+        var act = () => danceClass.Name = null!;
+        act.Should().Throw<ArgumentNullException>();
     }
 
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
-    public void Class_Description_Cannot_Be_Empty_Or_Whitespace(string emptyDescription)
+    public void DanceClass_Description_CannotBeEmptyOrWhitespace(string emptyDescription)
     {
         // Arrange
-        var validator = new ClassValidator();
-        var @class = new Class
+        var validator = new DanceClassValidator();
+        var danceClass = new DanceClass
         {
             Name = "Test Class",
             Description = emptyDescription,
+            Level = "P1",
+            Style = "Salsa",
             Capacity = 15,
-            InstructorId = Guid.NewGuid()
+            InstructorId = Guid.NewGuid(),
+            RoomId = Guid.NewGuid()
         };
 
         // Act
-        var result = validator.Validate(@class);
+        var result = validator.Validate(danceClass);
 
         // Assert
-        Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, error => 
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().Contain(error => 
             error.ErrorMessage.Contains("Description is required"));
     }
 
     [Fact]
-    public void Class_Description_Cannot_Be_Null()
+    public void DanceClass_Description_CannotBeNull()
     {
         // Arrange
-        var validator = new ClassValidator();
-        var @class = new Class
+        var danceClass = new DanceClass
         {
             Name = "Test Class",
             Description = "Initial Description",
+            Level = "P1",
+            Style = "Salsa",
             Capacity = 15,
-            InstructorId = Guid.NewGuid()
+            InstructorId = Guid.NewGuid(),
+            RoomId = Guid.NewGuid()
         };
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => 
-        {
-            @class.Description = default!;
-        });
+        var act = () => danceClass.Description = null!;
+        act.Should().Throw<ArgumentNullException>();
     }
 
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
     [InlineData(-10)]
-    public void Class_Capacity_Must_Be_Positive(int invalidCapacity)
+    public void DanceClass_Capacity_MustBePositive(int invalidCapacity)
     {
         // Arrange
-        var validator = new ClassValidator();
-        var @class = new Class
+        var validator = new DanceClassValidator();
+        var danceClass = new DanceClass
         {
             Name = "Test Class",
             Description = "Test description",
+            Level = "P1",
+            Style = "Salsa",
             Capacity = invalidCapacity,
-            InstructorId = Guid.NewGuid()
+            InstructorId = Guid.NewGuid(),
+            RoomId = Guid.NewGuid()
         };
 
         // Act
-        var result = validator.Validate(@class);
+        var result = validator.Validate(danceClass);
 
         // Assert
-        Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, error => 
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().Contain(error => 
             error.ErrorMessage.Contains("Capacity must be positive"));
     }
 
     [Fact]
-    public void Class_Must_Have_Instructor()
+    public void DanceClass_MustHaveInstructor()
     {
         // Arrange
-        var validator = new ClassValidator();
-        var @class = new Class
+        var validator = new DanceClassValidator();
+        var danceClass = new DanceClass
         {
             Name = "Test Class",
             Description = "Test description",
+            Level = "P1",
+            Style = "Salsa",
             Capacity = 15,
-            InstructorId = default
+            InstructorId = default,
+            RoomId = Guid.NewGuid()
         };
 
         // Act
-        var result = validator.Validate(@class);
+        var result = validator.Validate(danceClass);
 
         // Assert
-        Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, error => 
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().Contain(error => 
             error.ErrorMessage.Contains("Instructor is required"));
     }
 
     [Fact]
-    public void Class_Schedule_Collection_Is_Initialized()
+    public void DanceClass_MustHaveRoom()
     {
-        // Arrange & Act
-        var @class = new Class
+        // Arrange
+        var validator = new DanceClassValidator();
+        var danceClass = new DanceClass
         {
             Name = "Test Class",
             Description = "Test description",
+            Level = "P1",
+            Style = "Salsa",
             Capacity = 15,
-            InstructorId = Guid.NewGuid()
+            InstructorId = Guid.NewGuid(),
+            RoomId = default
+        };
+
+        // Act
+        var result = validator.Validate(danceClass);
+
+        // Assert
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().Contain(error => 
+            error.ErrorMessage.Contains("Room is required"));
+    }
+
+    [Fact]
+    public void DanceClass_ScheduleCollection_ShouldBeInitialized()
+    {
+        // Arrange & Act
+        var danceClass = new DanceClass
+        {
+            Name = "Test Class",
+            Description = "Test description",
+            Level = "P1",
+            Style = "Salsa",
+            Capacity = 15,
+            InstructorId = Guid.NewGuid(),
+            RoomId = Guid.NewGuid()
         };
 
         // Assert
-        Assert.NotNull(@class.Schedules);
-        Assert.Empty(@class.Schedules);
+        danceClass.Schedules.Should().NotBeNull();
+        danceClass.Schedules.Should().BeEmpty();
     }
 }

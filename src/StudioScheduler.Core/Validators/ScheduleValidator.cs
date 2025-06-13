@@ -7,9 +7,21 @@ public class ScheduleValidator : AbstractValidator<Schedule>
 {
     public ScheduleValidator()
     {
-        RuleFor(x => x.ClassId)
+        RuleFor(x => x.Name)
+            .NotEmpty()
+            .WithMessage("Schedule name is required");
+
+        RuleFor(x => x.LocationId)
             .NotEqual(System.Guid.Empty)
-            .WithMessage("Class ID is required");
+            .WithMessage("Location ID is required");
+
+        RuleFor(x => x.DanceClassId)
+            .NotEqual(System.Guid.Empty)
+            .WithMessage("Dance Class ID is required");
+
+        RuleFor(x => x.EffectiveFrom)
+            .NotEmpty()
+            .WithMessage("Effective from date is required");
 
         RuleFor(x => x.StartTime)
             .Must(startTime => startTime > System.DateTime.UtcNow)
