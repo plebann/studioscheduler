@@ -1,0 +1,93 @@
+@baseUrl = http://localhost:5224
+
+###############################################################################
+# Complete API Test Suite
+# 
+# This file provides a quick way to test all major endpoints and verify that:
+# 1. Mock repositories are properly registered
+# 2. All services are working
+# 3. SalsaMe Dance Studio data is loaded correctly
+# 
+# Run these tests in order to verify the complete system functionality.
+###############################################################################
+
+### 1. Test Classes - Should return 27+ dance classes from SalsaMe
+GET {{baseUrl}}/api/classes
+Accept: application/json
+
+###
+
+### 2. Test Locations - Should return SalsaMe Dance Studio
+GET {{baseUrl}}/api/locations
+Accept: application/json
+
+###
+
+### 3. Test Specific Class by ID - SALSA LADIES STYLING P3
+GET {{baseUrl}}/api/classes/c1a2b3c4-1234-5678-9abc-def012345601
+Accept: application/json
+
+###
+
+### 4. Test Specific Location by ID - SalsaMe Studio
+GET {{baseUrl}}/api/locations/e8f3d8c1-2a82-4f6e-b846-4ad35182e7f1
+Accept: application/json
+
+###
+
+### 5. Test Location Rooms - Should return Studio A and Studio B
+GET {{baseUrl}}/api/locations/e8f3d8c1-2a82-4f6e-b846-4ad35182e7f1/rooms
+Accept: application/json
+
+###
+
+### 6. Test Location Schedules - Should return 32+ scheduled classes
+GET {{baseUrl}}/api/locations/e8f3d8c1-2a82-4f6e-b846-4ad35182e7f1/schedules
+Accept: application/json
+
+###
+
+### 7. Create Test Class
+POST {{baseUrl}}/api/classes
+Content-Type: application/json
+
+{
+  "name": "Test API Class",
+  "description": "A class created via API test",
+  "level": "P1",
+  "style": "SALSA",
+  "capacity": 15,
+  "instructorId": null,
+  "roomId": null
+}
+
+###
+
+###############################################################################
+# Success Indicators:
+# 
+# ✅ GET /api/classes returns:
+#    - Multiple classes with names like "SALSA LADIES STYLING", "BACHATA", etc.
+#    - Different skill levels (P1, P2, P3, S1, S2, S3)
+#    - Various dance styles (SALSA, BACHATA, ZOUK, KIZOMBA, etc.)
+# 
+# ✅ GET /api/locations returns:
+#    - Location with name "SalsaMe Dance Studio"
+#    - Address "Nadbystrzycka 25 str., 20-618 Lublin"
+# 
+# ✅ GET /api/locations/{id}/rooms returns:
+#    - Two rooms: "Studio A" and "Studio B"
+#    - Capacity and features information
+# 
+# ✅ GET /api/locations/{id}/schedules returns:
+#    - 32+ schedule entries
+#    - Classes distributed across Monday-Sunday
+#    - Times from 16:45 to 21:20
+# 
+# ✅ POST /api/classes returns:
+#    - Status 201 Created
+#    - New class with generated ID
+#    - Location header with new resource URL
+# 
+# If all these work, your mock repository system is functioning perfectly!
+###############################################################################

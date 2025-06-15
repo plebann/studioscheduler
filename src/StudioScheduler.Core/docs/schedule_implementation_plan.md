@@ -86,8 +86,8 @@ classDiagram
 ### Phase 2: Student Registration System
 - Student registration functionality
 - Class capacity management
-- Email notifications
-- Payment integration
+- Email notifications - skip for now
+- Payment integration - skip for now
 
 ### Phase 3: Attendance Tracking
 - Check-in system

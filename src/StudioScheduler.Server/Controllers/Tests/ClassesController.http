@@ -1,0 +1,87 @@
+@baseUrl = http://localhost:5224
+
+###############################################################################
+# Classes Controller Tests
+# 
+# This file tests all endpoints for the Classes controller to verify:
+# 1. Mock repositories are working
+# 2. SalsaMe dance studio data is loaded
+# 3. CRUD operations work correctly
+###############################################################################
+
+### 1. Get All Classes (Test Mock Data Loading)
+# Expected: Should return 27+ dance classes from SalsaMe studio
+# Look for: SALSA LADIES STYLING, BACHATA, SALSA KUBAŃSKA, etc.
+GET {{baseUrl}}/api/classes
+Accept: application/json
+
+###
+
+### 2. Get Specific Class by ID
+# This uses one of the known IDs from our mock data
+GET {{baseUrl}}/api/classes/c1a2b3c4-1234-5678-9abc-def012345601
+Accept: application/json
+
+###
+
+### 3. Create New Class
+POST {{baseUrl}}/api/classes
+Content-Type: application/json
+
+{
+  "name": "Test Salsa Class",
+  "description": "A test salsa class for API testing",
+  "level": "P1",
+  "style": "SALSA",
+  "capacity": 20,
+  "instructorId": null,
+  "roomId": null
+}
+
+###
+
+### 4. Update Existing Class
+# First run the create test above, then use the returned ID here
+PUT {{baseUrl}}/api/classes/c1a2b3c4-1234-5678-9abc-def012345601
+Content-Type: application/json
+
+{
+  "name": "Updated SALSA LADIES STYLING",
+  "description": "Updated description for ladies styling class",
+  "level": "P3",
+  "style": "SALSA",
+  "capacity": 18,
+  "instructorId": null,
+  "roomId": null,
+  "isActive": true
+}
+
+###
+
+### 5. Get Non-Existent Class (Error Test)
+GET {{baseUrl}}/api/classes/00000000-0000-0000-0000-000000000000
+Accept: application/json
+
+###
+
+### 6. Delete Class (Use with caution - will modify mock data)
+# DELETE {{baseUrl}}/api/classes/c1a2b3c4-1234-5678-9abc-def012345601
+
+###
+
+###############################################################################
+# Expected Results for Mock Data Verification:
+# 
+# GET /api/classes should return classes including:
+# - "SALSA LADIES STYLING" (P1 and P3 levels)
+# - "BACHATA" (multiple levels: P1, P2, P3, S1, S3)
+# - "SALSA KUBAŃSKA" (P1, P2, P3, S3/Z levels)
+# - "SALSA on1" and "SALSA on2"
+# - "RUEDA DE CASINO"
+# - "ZOUK"
+# - "KIZOMBA i SEMBA"
+# - "HIGH HEELS SEXY DANCE"
+# - "BACHATA LADIES STYLING"
+#
+# If you see these classes, your mock repositories are working correctly!
+###############################################################################

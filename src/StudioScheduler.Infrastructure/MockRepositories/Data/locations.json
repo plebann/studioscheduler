@@ -1,0 +1,18 @@
+{
+  "Locations": [
+    {
+      "Id": "e8f3d8c1-2a82-4f6e-b846-4ad35182e7f1",
+      "Name": "SalsaMe Dance Studio - Updated",
+      "Address": "Nadbystrzycka 25 str., 20-618 Lublin",
+      "Description": "Updated description for SalsaMe Dance Studio",
+      "Capacity": 150,
+      "OpeningTime": "10:00:00",
+      "ClosingTime": "23:00:00",
+      "IsActive": true,
+      "CreatedAt": "2025-01-01T00:00:00Z",
+      "UpdatedAt": "2025-06-15T09:14:54.8435083Z",
+      "Rooms": [],
+      "Schedules": []
+    }
+  ]
+}

@@ -1,6 +1,27 @@
 @StudioScheduler.Server_HostAddress = http://localhost:5224
+@StudioScheduler.Server_HostAddress_Http = http://localhost:5224
 
-GET {{StudioScheduler.Server_HostAddress}}/weatherforecast/
+###############################################################################
+# Studio Scheduler API Tests
+# 
+# This file contains basic tests for all endpoints.
+# For detailed tests, see the individual controller test files:
+# - Controllers/Tests/ClassesController.http
+# - Controllers/Tests/LocationsController.http
+# - Controllers/Tests/RoomsController.http
+# - Controllers/Tests/SchedulesController.http
+###############################################################################
+
+### Health Check - Test if server is running
+GET {{StudioScheduler.Server_HostAddress}}/api/classes
 Accept: application/json
+
+### Check if mock data is loaded (should return SalsaMe classes)
+GET {{StudioScheduler.Server_HostAddress}}/api/classes
+Accept: application/json
+
+### Quick test to verify mock repositories are working
+# This should return classes with names like "SALSA LADIES STYLING", "BACHATA", etc.
+# If it returns empty array or error, mock repositories are not registered properly
 
 ###

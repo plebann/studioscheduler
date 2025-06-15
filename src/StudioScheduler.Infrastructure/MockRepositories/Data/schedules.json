@@ -1,0 +1,38 @@
+{
+  "schedules": [
+    {
+      "id": "31a2b3c4-1234-5678-9abc-def012345601",
+      "name": "SALSA LADIES STYLING P3 Monday 16:45",
+      "locationId": "e8f3d8c1-2a82-4f6e-b846-4ad35182e7f1",
+      "effectiveFrom": "2024-09-23T00:00:00Z",
+      "effectiveTo": null,
+      "isActive": true,
+      "danceClassId": "c1a2b3c4-1234-5678-9abc-def012345601",
+      "startTime": "2024-09-23T16:45:00Z",
+      "duration": "00:55:00",
+      "isRecurring": true,
+      "recurrencePattern": "WEEKLY",
+      "recurrenceEndDate": null,
+      "isCancelled": false,
+      "createdAt": "2024-09-01T00:00:00Z",
+      "updatedAt": null
+    },
+    {
+      "id": "31a2b3c4-1234-5678-9abc-def012345602",
+      "name": "SALSA KUBAŃSKA P3 Monday 17:40",
+      "locationId": "e8f3d8c1-2a82-4f6e-b846-4ad35182e7f1",
+      "effectiveFrom": "2024-09-23T00:00:00Z",
+      "effectiveTo": null,
+      "isActive": true,
+      "danceClassId": "c1a2b3c4-1234-5678-9abc-def012345612",
+      "startTime": "2024-09-23T17:40:00Z",
+      "duration": "00:55:00",
+      "isRecurring": true,
+      "recurrencePattern": "WEEKLY",
+      "recurrenceEndDate": null,
+      "isCancelled": false,
+      "createdAt": "2024-09-01T00:00:00Z",
+      "updatedAt": null
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+@baseUrl = http://localhost:5224
+
+###############################################################################
+# Locations Controller Tests
+# 
+# This file tests all endpoints for the Locations controller to verify:
+# 1. Mock repositories are working
+# 2. SalsaMe Dance Studio location data is loaded
+# 3. CRUD operations work correctly
+###############################################################################
+
+### 1. Get All Locations (Test Mock Data Loading)
+# Expected: Should return SalsaMe Dance Studio location
+# Look for: "SalsaMe Dance Studio", "Nadbystrzycka 25 str., 20-618 Lublin"
+GET {{baseUrl}}/api/locations
+Accept: application/json
+
+###
+
+### 2. Get Specific Location by ID
+# This uses the known ID from our mock data
+GET {{baseUrl}}/api/locations/e8f3d8c1-2a82-4f6e-b846-4ad35182e7f1
+Accept: application/json
+
+###
+
+### 3. Get Location Rooms
+# Should return the dance studio rooms (Studio A, Studio B)
+GET {{baseUrl}}/api/locations/e8f3d8c1-2a82-4f6e-b846-4ad35182e7f1/rooms
+Accept: application/json
+
+###
+
+### 4. Get Location Schedules
+# Should return all scheduled classes for SalsaMe studio
+GET {{baseUrl}}/api/locations/e8f3d8c1-2a82-4f6e-b846-4ad35182e7f1/schedules
+Accept: application/json
+
+###
+
+### 5. Create New Location
+POST {{baseUrl}}/api/locations
+Content-Type: application/json
+
+{
+  "name": "Test Dance Studio",
+  "address": "Test Address 123, Test City",
+  "description": "A test dance studio for API testing",
+  "capacity": 100,
+  "openingTime": "09:00:00",
+  "closingTime": "22:00:00"
+}
+
+###
+
+### 6. Update Existing Location
+# Updates the SalsaMe studio information
+PUT {{baseUrl}}/api/locations/e8f3d8c1-2a82-4f6e-b846-4ad35182e7f1
+Content-Type: application/json
+
+{
+  "name": "SalsaMe Dance Studio - Updated",
+  "address": "Nadbystrzycka 25 str., 20-618 Lublin",
+  "description": "Updated description for SalsaMe Dance Studio",
+  "capacity": 150,
+  "openingTime": "10:00:00",
+  "closingTime": "23:00:00",
+  "isActive": true
+}
+
+###
+
+### 7. Get Non-Existent Location (Error Test)
+GET {{baseUrl}}/api/locations/00000000-0000-0000-0000-000000000000
+Accept: application/json
+
+###
+
+### 8. Delete Location (Use with caution - will modify mock data)
+# DELETE {{baseUrl}}/api/locations/e8f3d8c1-2a82-4f6e-b846-4ad35182e7f1
+
+###
+
+###############################################################################
+# Expected Results for Mock Data Verification:
+# 
+# GET /api/locations should return:
+# - Location name: "SalsaMe Dance Studio"
+# - Address: "Nadbystrzycka 25 str., 20-618 Lublin"
+# - IsActive: true
+# 
+# GET /api/locations/{id}/rooms should return:
+# - "Studio A" and "Studio B" rooms
+# 
+# GET /api/locations/{id}/schedules should return:
+# - 32+ schedule entries with various dance classes
+# - Classes from Monday through Sunday
+# - Times ranging from 16:45 to 21:20
+#
+# If you see this data, your mock repositories are working correctly!
+###############################################################################

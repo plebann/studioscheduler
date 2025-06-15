@@ -1,12 +1,18 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using StudioScheduler.Core.Validators;
+using StudioScheduler.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddControllers();
+
+// Add OpenAPI/Swagger
 builder.Services.AddOpenApi();
+
+// Add Mock Repositories
+builder.Services.AddMockRepositories();
 
 // Add FluentValidation
 builder.Services.AddFluentValidationAutoValidation();
@@ -21,5 +27,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Map controllers
+app.MapControllers();
 
 app.Run();

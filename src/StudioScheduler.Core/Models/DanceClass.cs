@@ -9,9 +9,9 @@ public class DanceClass
     public required string Level { get; init; }
     public required string Style { get; init; }
     public required int Capacity { get; set; }
-    public required Guid InstructorId { get; set; }
+    public Guid? InstructorId { get; set; }
     public User? Instructor { get; set; }
-    public required Guid RoomId { get; set; }
+    public Guid? RoomId { get; set; }
     public Room? Room { get; set; }
     public bool IsActive { get; set; } = true;
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;

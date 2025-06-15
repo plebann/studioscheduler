@@ -1,0 +1,40 @@
+{
+  "rooms": [
+    {
+      "id": "11a2b3c4-1234-5678-9abc-def012345601",
+      "name": "Studio A",
+      "description": "Main dance studio room with large mirrors and professional sound system",
+      "locationId": "e8f3d8c1-2a82-4f6e-b846-4ad35182e7f1",
+      "capacity": 30,
+      "area": 80.5,
+      "features": {
+        "hasAirConditioning": true,
+        "hasMirrors": true,
+        "hasSpecialFlooring": true,
+        "hasSoundSystem": true,
+        "hasWaterDispenser": true
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00Z",
+      "updatedAt": null
+    },
+    {
+      "id": "21a2b3c4-1234-5678-9abc-def012345602",
+      "name": "Studio B",
+      "description": "Secondary dance studio room perfect for smaller groups",
+      "locationId": "e8f3d8c1-2a82-4f6e-b846-4ad35182e7f1",
+      "capacity": 20,
+      "area": 60.0,
+      "features": {
+        "hasAirConditioning": true,
+        "hasMirrors": true,
+        "hasSpecialFlooring": true,
+        "hasSoundSystem": true,
+        "hasWaterDispenser": false
+      },
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00Z",
+      "updatedAt": null
+    }
+  ]
+}

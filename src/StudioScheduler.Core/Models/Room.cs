@@ -11,6 +11,7 @@ public class Room
     public required Guid LocationId { get; set; }
     public Location? Location { get; set; }
     public bool IsActive { get; set; } = true;
+    public List<string> Equipment { get; set; } = new();
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
 

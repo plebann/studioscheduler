@@ -13,6 +13,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\StudioScheduler.Core\StudioScheduler.Core.csproj" />
+    <ProjectReference Include="..\StudioScheduler.Infrastructure\StudioScheduler.Infrastructure.csproj" />
+    <ProjectReference Include="..\StudioScheduler.Shared\StudioScheduler.Shared.csproj" />
   </ItemGroup>
 
 </Project>
