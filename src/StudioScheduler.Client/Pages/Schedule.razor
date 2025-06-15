@@ -1,0 +1,162 @@
+@page "/schedule"
+@using StudioScheduler.Shared.Dtos
+@using System.Net.Http.Json
+@inject HttpClient Http
+
+<PageTitle>Schedule 2025</PageTitle>
+
+@if (weeklySchedule == null)
+{
+    <div class="schedule-container">
+        <div class="schedule-header">
+            <h2 class="schedule-title">SCHEDULE 2025</h2>
+        </div>
+        <div style="text-align: center; padding: 40px;">
+            <p>Loading schedule...</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="schedule-container">
+        <div class="schedule-header">
+            <h2 class="schedule-title">SCHEDULE 2025</h2>
+        </div>
+
+        <div class="schedule-wrapper">
+            <!-- Desktop View -->
+            <div class="schedule-table desktop-view">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="time-header">Time</th>
+                            <th>Monday</th>
+                            <th>Tuesday</th>
+                            <th>Wednesday</th>
+                            <th>Thursday</th>
+                            <th>Friday</th>
+                            <th>Saturday</th>
+                            <th>Sunday</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var timeSlot in GetAllTimeSlots())
+                        {
+                            <tr>
+                                <td style="background: #f8f8f8;">@timeSlot</td>
+                                @foreach (var day in new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" })
+                                {
+                                    <td>
+                                        @{
+                                            var classForSlot = GetClassForTimeSlot(day, timeSlot);
+                                        }
+                                        @if (classForSlot != null)
+                                        {
+                                            <div style="background: @classForSlot.BackgroundColor; color: #fff; padding: 5px;">
+                                                <strong>@classForSlot.Style</strong><br>
+                                                @classForSlot.Level<br>
+                                                From @classForSlot.EffectiveFrom
+                                            </div>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile View -->
+            <div class="schedule-mobile mobile-view">
+                @foreach (var day in new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" })
+                {
+                    <div class="day-block">
+                        <h3>@day</h3>
+                        @if (weeklySchedule.Schedule[day].Any())
+                        {
+                            @foreach (var slot in weeklySchedule.Schedule[day])
+                            {
+                                <div class="time-block" style="background: @slot.BackgroundColor; color: #fff;">
+                                    <div class="time-range">@slot.TimeSlot</div>
+                                    <div class="dance-name"><strong>@slot.Style</strong></div>
+                                    <div class="level">@slot.Level</div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="no-classes">No classes scheduled</div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<div class="action-buttons">
+    <button class="btn btn-primary">Sign Up</button>
+    <button class="btn btn-secondary">Check Price List</button>
+</div>
+
+<div class="level-info">
+    <h5>Skill Levels:</h5>
+    <p>Discover our dance class levels from beginner to advanced, including an open level for all. 
+       Learn at your pace, improve technique, and enjoy the rhythm.</p>
+</div>
+
+@code {
+    private WeeklyScheduleDto? weeklySchedule;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var response = await Http.GetFromJsonAsync<WeeklyScheduleDto>("api/schedules/weekly");
+            weeklySchedule = response;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading schedule: {ex.Message}");
+            // Create empty schedule as fallback
+            weeklySchedule = new WeeklyScheduleDto 
+            { 
+                Schedule = new Dictionary<string, List<ScheduleSlotDto>>
+                {
+                    ["Monday"] = new List<ScheduleSlotDto>(),
+                    ["Tuesday"] = new List<ScheduleSlotDto>(),
+                    ["Wednesday"] = new List<ScheduleSlotDto>(),
+                    ["Thursday"] = new List<ScheduleSlotDto>(),
+                    ["Friday"] = new List<ScheduleSlotDto>(),
+                    ["Saturday"] = new List<ScheduleSlotDto>(),
+                    ["Sunday"] = new List<ScheduleSlotDto>()
+                }
+            };
+        }
+    }
+
+    private List<string> GetAllTimeSlots()
+    {
+        if (weeklySchedule == null) return new List<string>();
+
+        var allTimeSlots = new HashSet<string>();
+        
+        foreach (var day in weeklySchedule.Schedule.Values)
+        {
+            foreach (var slot in day)
+            {
+                allTimeSlots.Add(slot.TimeSlot);
+            }
+        }
+
+        return allTimeSlots.OrderBy(t => DateTime.ParseExact(t.Split(" - ")[0], "HH:mm", null)).ToList();
+    }
+
+    private ScheduleSlotDto? GetClassForTimeSlot(string day, string timeSlot)
+    {
+        if (weeklySchedule == null || !weeklySchedule.Schedule.ContainsKey(day))
+            return null;
+
+        return weeklySchedule.Schedule[day].FirstOrDefault(s => s.TimeSlot == timeSlot);
+    }
+}

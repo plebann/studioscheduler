@@ -178,4 +178,111 @@ public class SchedulesController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpGet("weekly")]
+    public async Task<ActionResult<WeeklyScheduleDto>> GetWeeklySchedule()
+    {
+        var schedules = await _scheduleService.GetAllAsync();
+        var activeSchedules = schedules.Where(s => s.IsActive && !s.IsCancelled).ToList();
+
+        var weeklySchedule = new Dictionary<string, List<ScheduleSlotDto>>();
+        var daysOfWeek = new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
+
+        // Initialize each day with empty lists
+        foreach (var day in daysOfWeek)
+        {
+            weeklySchedule[day] = new List<ScheduleSlotDto>();
+        }
+
+        // Group schedules by day of week
+        foreach (var schedule in activeSchedules)
+        {
+            var dayOfWeek = schedule.StartTime.DayOfWeek;
+            var dayName = dayOfWeek switch
+            {
+                DayOfWeek.Monday => "Monday",
+                DayOfWeek.Tuesday => "Tuesday", 
+                DayOfWeek.Wednesday => "Wednesday",
+                DayOfWeek.Thursday => "Thursday",
+                DayOfWeek.Friday => "Friday",
+                DayOfWeek.Saturday => "Saturday",
+                DayOfWeek.Sunday => "Sunday",
+                _ => "Monday"
+            };
+
+            var endTime = schedule.StartTime.Add(schedule.Duration);
+            var timeSlot = $"{schedule.StartTime:HH:mm} - {endTime:HH:mm}";
+
+            // Determine background color based on dance style
+            var backgroundColor = GetBackgroundColorByStyle(schedule.DanceClass?.Name ?? "");
+
+            var slot = new ScheduleSlotDto
+            {
+                Id = schedule.Id,
+                TimeSlot = timeSlot,
+                DanceName = schedule.DanceClass?.Name ?? schedule.Name,
+                Level = ExtractLevel(schedule.DanceClass?.Name ?? ""),
+                Style = ExtractStyle(schedule.DanceClass?.Name ?? ""),
+                BackgroundColor = backgroundColor,
+                EffectiveFrom = schedule.EffectiveFrom.ToString("dd.MM.yyyy"),
+                IsCancelled = schedule.IsCancelled,
+                IsActive = schedule.IsActive
+            };
+
+            weeklySchedule[dayName].Add(slot);
+        }
+
+        // Sort each day's schedules by start time
+        foreach (var day in weeklySchedule.Keys)
+        {
+            weeklySchedule[day] = weeklySchedule[day]
+                .OrderBy(s => DateTime.ParseExact(s.TimeSlot.Split(" - ")[0], "HH:mm", null))
+                .ToList();
+        }
+
+        return Ok(new WeeklyScheduleDto { Schedule = weeklySchedule });
+    }
+
+    private static string GetBackgroundColorByStyle(string className)
+    {
+        return className.ToUpper() switch
+        {
+            var name when name.Contains("SALSA LADIES STYLING") || name.Contains("HIGH HEELS") || name.Contains("BACHATA LADIES STYLING") => "#E40046",
+            var name when name.Contains("SALSA KUBAŃSKA") || name.Contains("SALSA CUBANA") => "#B08A47",
+            var name when name.Contains("SALSA ON1") || name.Contains("SALSA ON2") => "#333333",
+            var name when name.Contains("BACHATA") => "#166693",
+            var name when name.Contains("RUEDA") => "#DFAF29",
+            var name when name.Contains("ZOUK") => "#6A1B9A",
+            var name when name.Contains("KIZOMBA") || name.Contains("SEMBA") => "#007C5A",
+            _ => "#999999"
+        };
+    }
+
+    private static string ExtractLevel(string className)
+    {
+        if (className.Contains("P1")) return "Level P1";
+        if (className.Contains("P2")) return "Level P2";
+        if (className.Contains("P3")) return "Level P3";
+        if (className.Contains("S1")) return "Level S1";
+        if (className.Contains("S2")) return "Level S2";
+        if (className.Contains("S3")) return "Level S3";
+        if (className.Contains("Z")) return "Level Z";
+        if (className.Contains("OPEN")) return "OPEN level";
+        return "Level P1";
+    }
+
+    private static string ExtractStyle(string className)
+    {
+        if (className.Contains("SALSA LADIES STYLING")) return "SALSA LADIES STYLING";
+        if (className.Contains("HIGH HEELS")) return "HIGH HEELS SEXY DANCE";
+        if (className.Contains("BACHATA LADIES STYLING")) return "BACHATA LADIES STYLING";
+        if (className.Contains("SALSA KUBAŃSKA") || className.Contains("SALSA CUBANA")) return "SALSA CUBANA";
+        if (className.Contains("SALSA ON1")) return "SALSA on1";
+        if (className.Contains("SALSA ON2")) return "SALSA on2";
+        if (className.Contains("BACHATA")) return "BACHATA";
+        if (className.Contains("RUEDA")) return "RUEDA DE CASINO";
+        if (className.Contains("ZOUK")) return "ZOUK";
+        if (className.Contains("KIZOMBA") && className.Contains("SEMBA")) return "KIZOMBA & SEMBA";
+        return className;
+    }
 }

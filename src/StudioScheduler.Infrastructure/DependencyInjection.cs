@@ -20,6 +20,7 @@ public static class DependencyInjection
         services.AddScoped<IDanceClassService, DanceClassService>();
         services.AddScoped<ILocationService, LocationService>();
         services.AddScoped<IRoomService, RoomService>();
+        services.AddScoped<IScheduleService, ScheduleService>();
 
         return services;
     }
