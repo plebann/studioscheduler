@@ -18,6 +18,7 @@ public class PassTests
             EndDate = DateTime.UtcNow.AddDays(30),
             Type = PassType.SingleClass,
             ClassesPerWeek = 1,
+            TotalClasses = 1,
             RemainingClasses = 1
         };
 
@@ -43,6 +44,7 @@ public class PassTests
             EndDate = endDate,
             Type = PassType.Weekly,
             ClassesPerWeek = 3,
+            TotalClasses = 12,
             RemainingClasses = 12
         };
 
@@ -67,6 +69,7 @@ public class PassTests
             EndDate = DateTime.UtcNow.AddDays(30),
             Type = passType,
             ClassesPerWeek = classesPerWeek,
+            TotalClasses = expectedClasses,
             RemainingClasses = expectedClasses
         };
 
@@ -88,6 +91,7 @@ public class PassTests
             EndDate = DateTime.UtcNow.AddDays(30),
             Type = PassType.Weekly,
             ClassesPerWeek = invalidClassesPerWeek,
+            TotalClasses = 12,
             RemainingClasses = 12
         };
 
@@ -114,6 +118,7 @@ public class PassTests
             EndDate = endDate,
             Type = PassType.Weekly,
             ClassesPerWeek = 3,
+            TotalClasses = 12,
             RemainingClasses = 12
         };
 

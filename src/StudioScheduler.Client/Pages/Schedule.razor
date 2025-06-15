@@ -2,6 +2,7 @@
 @using StudioScheduler.Shared.Dtos
 @using System.Net.Http.Json
 @inject HttpClient Http
+@inject IDialogService DialogService
 
 <PageTitle>Schedule 2025</PageTitle>
 
@@ -21,6 +22,9 @@ else
     <div class="schedule-container">
         <div class="schedule-header">
             <h2 class="schedule-title">SCHEDULE 2025</h2>
+            <MudText Typo="Typo.body2" Class="mb-2">
+                Click on any class to manage attendance
+            </MudText>
         </div>
 
         <div class="schedule-wrapper">
@@ -52,7 +56,10 @@ else
                                         }
                                         @if (classForSlot != null)
                                         {
-                                            <div style="background: @classForSlot.BackgroundColor; color: #fff; padding: 5px;">
+                                            <div class="schedule-slot clickable" 
+                                                 style="background: @classForSlot.BackgroundColor; color: #fff; padding: 5px; cursor: pointer;"
+                                                 @onclick="() => OpenAttendanceModal(classForSlot.Id.ToString())"
+                                                 title="Click to manage attendance">
                                                 <strong>@classForSlot.Style</strong><br>
                                                 @classForSlot.Level<br>
                                                 From @classForSlot.EffectiveFrom
@@ -76,7 +83,10 @@ else
                         {
                             @foreach (var slot in weeklySchedule.Schedule[day])
                             {
-                                <div class="time-block" style="background: @slot.BackgroundColor; color: #fff;">
+                                <div class="time-block clickable" 
+                                     style="background: @slot.BackgroundColor; color: #fff; cursor: pointer;"
+                                     @onclick="() => OpenAttendanceModal(slot.Id.ToString())"
+                                     title="Click to manage attendance">
                                     <div class="time-range">@slot.TimeSlot</div>
                                     <div class="dance-name"><strong>@slot.Style</strong></div>
                                     <div class="level">@slot.Level</div>
@@ -105,6 +115,26 @@ else
        Learn at your pace, improve technique, and enjoy the rhythm.</p>
 </div>
 
+<style>
+    .clickable:hover {
+        opacity: 0.8;
+        transform: scale(1.02);
+        transition: all 0.2s ease;
+    }
+    
+    .schedule-slot {
+        border-radius: 4px;
+        transition: all 0.2s ease;
+    }
+    
+    .time-block {
+        border-radius: 8px;
+        margin-bottom: 8px;
+        padding: 12px;
+        transition: all 0.2s ease;
+    }
+</style>
+
 @code {
     private WeeklyScheduleDto? weeklySchedule;
 
@@ -132,6 +162,31 @@ else
                     ["Sunday"] = new List<ScheduleSlotDto>()
                 }
             };
+        }
+    }
+
+    private async Task OpenAttendanceModal(string scheduleId)
+    {
+        var parameters = new DialogParameters
+        {
+            ["ScheduleId"] = scheduleId
+        };
+
+        var options = new DialogOptions() 
+        { 
+            MaxWidth = MaxWidth.Large, 
+            FullWidth = true,
+            CloseButton = true,
+            Position = DialogPosition.Center
+        };
+
+        var dialog = await DialogService.ShowAsync<ClassAttendanceModal>("Class Attendance", parameters, options);
+        var result = await dialog.Result;
+        
+        // Optionally refresh schedule data after attendance changes
+        if (result != null && !result.Canceled)
+        {
+            // Could refresh data here if needed
         }
     }
 

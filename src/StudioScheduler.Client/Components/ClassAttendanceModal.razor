@@ -1,0 +1,169 @@
+@using StudioScheduler.Shared.Dtos
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudContainer MaxWidth="MaxWidth.Large">
+            @if (IsLoading)
+            {
+                <div class="d-flex justify-center pa-4">
+                    <MudProgressCircular Indeterminate="true" />
+                </div>
+            }
+            else if (ClassAttendance != null)
+            {
+                <!-- Class Info Header -->
+                <MudPaper Class="pa-4 mb-4" Elevation="2">
+                    <MudText Typo="Typo.h5" Class="mb-2">@ClassAttendance.ClassName</MudText>
+                    <MudText Typo="Typo.body2" Class="mb-1">
+                        @ClassAttendance.DayOfWeek, @ClassAttendance.StartTime.ToString("HH:mm")
+                    </MudText>
+                    <MudText Typo="Typo.body2">
+                        Level: @ClassAttendance.Level | Instructor: @ClassAttendance.Instructor
+                    </MudText>
+                    <MudChip T="string" Color="Color.Info" Size="Size.Small" Class="mt-2">
+                        @ClassAttendance.EnrolledStudents.Count students enrolled
+                    </MudChip>
+                </MudPaper>
+
+                <!-- Student Search -->
+                <MudTextField @bind-Value="searchTerm" 
+                             Placeholder="Search students by name..." 
+                             @oninput="OnSearchInput"
+                             Adornment="Adornment.Start" 
+                             AdornmentIcon="Icons.Material.Filled.Search"
+                             Class="mb-4"
+                             FullWidth="true" />
+
+                <!-- Student List -->
+                <MudPaper Class="pa-2" Elevation="1">
+                    @if (FilteredStudents.Any())
+                    {
+                        <MudList T="string">
+                            @foreach (var student in FilteredStudents)
+                            {
+                                <StudentAttendanceRow Student="student" 
+                                                    ScheduleId="@ScheduleId"
+                                                    OnAttendanceChanged="OnAttendanceChanged" />
+                                <MudDivider />
+                            }
+                        </MudList>
+                    }
+                    else
+                    {
+                        <MudText Typo="Typo.body2" Class="pa-4 text-center">
+                            @(string.IsNullOrEmpty(searchTerm) ? "No students enrolled in this class" : "No students found matching your search")
+                        </MudText>
+                    }
+                </MudPaper>
+            }
+            else
+            {
+                <MudAlert Severity="Severity.Error">
+                    Failed to load class attendance data. Please try again.
+                </MudAlert>
+            }
+        </MudContainer>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Close">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public string ScheduleId { get; set; } = string.Empty;
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+
+    private ClassAttendanceDto? ClassAttendance;
+    private bool IsLoading = true;
+    private string searchTerm = string.Empty;
+
+    private IEnumerable<StudentAttendanceDto> FilteredStudents =>
+        ClassAttendance?.EnrolledStudents?.Where(s => 
+            string.IsNullOrEmpty(searchTerm) || 
+            s.FullName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ?? 
+        Enumerable.Empty<StudentAttendanceDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadClassAttendance();
+    }
+
+    private async Task LoadClassAttendance()
+    {
+        try
+        {
+            IsLoading = true;
+            var response = await Http.GetAsync($"api/attendance/class/{ScheduleId}");
+            if (response.IsSuccessStatusCode)
+            {
+                ClassAttendance = await response.Content.ReadFromJsonAsync<ClassAttendanceDto>();
+            }
+            else
+            {
+                Snackbar.Add($"Failed to load class attendance: {response.StatusCode}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading class attendance: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private async Task OnAttendanceChanged((string StudentId, bool IsPresent) attendanceData)
+    {
+        try
+        {
+            var request = new MarkAttendanceRequestDto
+            {
+                ScheduleId = ScheduleId,
+                StudentId = attendanceData.StudentId,
+                IsPresent = attendanceData.IsPresent
+            };
+
+            var response = await Http.PostAsJsonAsync("api/attendance/mark", request);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<MarkAttendanceResponseDto>();
+                if (result?.Success == true)
+                {
+                    Snackbar.Add(result.Message, Severity.Success);
+                    // Update the student in our local data
+                    if (result.UpdatedStudent != null && ClassAttendance != null)
+                    {
+                        var studentIndex = ClassAttendance.EnrolledStudents.ToList()
+                            .FindIndex(s => s.StudentId == attendanceData.StudentId);
+                        if (studentIndex >= 0)
+                        {
+                            ClassAttendance.EnrolledStudents.ToList()[studentIndex] = result.UpdatedStudent;
+                        }
+                    }
+                }
+                else
+                {
+                    Snackbar.Add(result?.Message ?? "Failed to mark attendance", Severity.Error);
+                }
+            }
+            else
+            {
+                Snackbar.Add($"Failed to mark attendance: {response.StatusCode}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error marking attendance: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private void OnSearchInput(ChangeEventArgs e)
+    {
+        searchTerm = e.Value?.ToString() ?? string.Empty;
+    }
+
+    private void Close() => MudDialog.Close(DialogResult.Ok(true));
+}

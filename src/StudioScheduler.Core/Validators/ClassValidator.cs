@@ -28,10 +28,14 @@ public class DanceClassValidator : AbstractValidator<DanceClass>
             .WithMessage("Capacity must be positive");
 
         RuleFor(x => x.InstructorId)
+            .NotNull()
+            .WithMessage("Instructor is required")
             .NotEqual(System.Guid.Empty)
             .WithMessage("Instructor is required");
 
         RuleFor(x => x.RoomId)
+            .NotNull()
+            .WithMessage("Room is required")
             .NotEqual(System.Guid.Empty)
             .WithMessage("Room is required");
     }

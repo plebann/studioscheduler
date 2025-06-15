@@ -3,6 +3,8 @@
 ## Overview
 StudioScheduler is a cloud-hosted web application for managing dance/fitness studio classes, supporting both admin/operator (desktop) and student (mobile) interfaces. The solution is modular, scalable, and designed for Azure deployment.
 
+**Based on SalsaMe Dance Studio** - A real-world dance studio in Lublin, Poland, with 32+ weekly classes across multiple dance styles and a comprehensive pass system.
+
 ---
 
 ## Solution Structure
@@ -80,6 +82,48 @@ StudioScheduler/
 
 ---
 
+## Business Model Analysis (Updated 2025-06-15)
+
+### Real-World Pass System (SalsaMe Studio)
+Based on analysis of https://salsame.pl/en/price-list/, our system models a real dance studio with:
+
+#### Pass Types & Pricing (PLN)
+- **Monthly Passes (28 days validity):**
+  - 1 course/week (4 classes) - 130 PLN
+  - 2 courses/week (8 classes) - 200 PLN
+  - 3 courses/week (12 classes) - 240 PLN
+  - 4 courses/week (16 classes) - 280 PLN
+  - 5 courses/week (20 classes) - 320 PLN
+
+- **FLEXI Passes (28 days validity):**
+  - 4 different classes - 140 PLN
+  - 8 different classes - 220 PLN
+
+- **Other Options:**
+  - Single class (P2+ only) - 40 PLN
+  - FULLPASS (unlimited) - 350 PLN
+  - Private lessons - 180-200 PLN/hour
+
+#### Business Rules
+- **28-day validity** (not calendar months)
+- **Make-up classes** allowed within validity period
+- **Pass freezing** available once per 6 months (2-week max, additional cost)
+- **Level restrictions** for single classes (no P1/beginners)
+- **No extensions** - passes expire regardless of usage
+
+### Current Implementation Status
+- ✅ **Basic pass model** with core fields
+- ✅ **PassType enum** (needs expansion for SalsaMe types)
+- ❌ **Pricing system** not implemented
+- ❌ **28-day validity calculation** not implemented
+- ❌ **Make-up class tracking** not implemented
+- ❌ **Pass freezing system** not implemented
+- ❌ **Level restrictions** not implemented
+
+**See `SALSAME_BUSINESS_ANALYSIS.md` for detailed comparison and implementation recommendations.**
+
+---
+
 ## Implementation Phases
 1. **Project Setup & Core Infrastructure**: Solution structure, project setup, EF Core, authentication
 2. **Backend Implementation**: API endpoints, business logic, service layer, error handling, logging
@@ -150,6 +194,15 @@ StudioScheduler/
 - Real-time updates (SignalR)
 - Role-based authentication
 - Azure-ready deployment
+- **Real-world business model** based on operational dance studio
+
+---
+
+## Documentation Files
+- **`SOLUTION_STRUCTURE.md`** - This file (architecture overview)
+- **`SALSAME_BUSINESS_ANALYSIS.md`** - Detailed business model analysis and pass system comparison
+- **`SCHEDULE_SYSTEM_FIXES.md`** - Technical fixes for schedule display issues
+- **`COPILOT_INSTRUCTIONS.md`** - Development guidelines and coding standards
 
 ---
 
@@ -158,7 +211,8 @@ StudioScheduler/
 - Use REST Client extension for API tests
 - Add more controllers/tests as needed
 - Integration and Swagger/OpenAPI support available
+- **Priority:** Implement enhanced pass system based on SalsaMe analysis
 
 ---
 
-*Last updated: 2025-06-15 - Added schedule system implementation details and data integration fixes*
+*Last updated: 2025-06-15 - Added SalsaMe business model analysis and pass system requirements*

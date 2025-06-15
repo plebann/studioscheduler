@@ -1,0 +1,143 @@
+@using StudioScheduler.Shared.Dtos
+
+<MudListItem T="string">
+    <div class="d-flex align-center justify-space-between w-100 pa-2">
+        <!-- Student Name -->
+        <div class="flex-grow-1">
+            <MudText Typo="Typo.body1" Class="font-weight-medium">
+                @Student.FullName
+            </MudText>
+            @if (!string.IsNullOrEmpty(Student.AttendanceNote))
+            {
+                <MudText Typo="Typo.caption" Color="Color.Warning">
+                    @Student.AttendanceNote
+                </MudText>
+            }
+        </div>
+        
+        <!-- Attendance History and Controls -->
+        <div class="d-flex align-center gap-2">
+            <!-- Historical Attendance -->
+            @foreach (var record in Student.AttendanceHistory.OrderBy(r => r.WeekOffset))
+            {
+                <MudTooltip Text="@GetTooltipText(record)">
+                    <MudChip T="string" 
+                             Color="@GetAttendanceColor(record)" 
+                             Size="Size.Small" 
+                             Variant="Variant.Filled">
+                        @record.WeekLabel
+                    </MudChip>
+                </MudTooltip>
+            }
+            
+            <!-- Today's Attendance Checkbox -->
+            <MudTooltip Text="Mark present/absent for today">
+                <MudCheckBox T="bool"
+                            Value="@Student.IsMarkedPresentToday" 
+                            ValueChanged="OnAttendanceToggle"
+                            Color="Color.Primary"
+                            Size="Size.Medium"
+                            Disabled="@(!Student.CanAttendToday && !Student.IsMarkedPresentToday)" />
+            </MudTooltip>
+            
+            <!-- Pass Information -->
+            @if (Student.CurrentPass != null)
+            {
+                <MudTooltip Text="@GetPassTooltip()">
+                    <MudChip T="string"
+                             Color="@GetPassColor()" 
+                             Size="Size.Small"
+                             Variant="Variant.Outlined">
+                        @Student.CurrentPass.PassUsageDisplay
+                    </MudChip>
+                </MudTooltip>
+            }
+            else
+            {
+                <MudChip T="string" Color="Color.Error" Size="Size.Small" Variant="Variant.Outlined">
+                    No Pass
+                </MudChip>
+            }
+            
+            <!-- Warning Icon -->
+            @if (!Student.CanAttendToday)
+            {
+                <MudTooltip Text="@GetWarningTooltip()">
+                    <MudIcon Icon="Icons.Material.Filled.Warning" 
+                             Color="Color.Error" 
+                             Size="Size.Medium" />
+                </MudTooltip>
+            }
+        </div>
+    </div>
+</MudListItem>
+
+@code {
+    [Parameter] public StudentAttendanceDto Student { get; set; } = null!;
+    [Parameter] public string ScheduleId { get; set; } = string.Empty;
+    [Parameter] public EventCallback<(string StudentId, bool IsPresent)> OnAttendanceChanged { get; set; }
+
+    private async Task OnAttendanceToggle(bool isChecked)
+    {
+        await OnAttendanceChanged.InvokeAsync((Student.StudentId, isChecked));
+    }
+
+    private Color GetAttendanceColor(AttendanceRecordDto record)
+    {
+        if (record.WeekOffset == 0) // Today
+        {
+            return Color.Primary;
+        }
+        
+        return record.WasPresent ? Color.Success : Color.Default;
+    }
+
+    private Color GetPassColor()
+    {
+        if (Student.CurrentPass == null)
+            return Color.Error;
+            
+        if (Student.CurrentPass.IsExpired)
+            return Color.Error;
+            
+        if (Student.CurrentPass.RemainingClasses <= 1)
+            return Color.Warning;
+            
+        return Color.Success;
+    }
+
+    private string GetTooltipText(AttendanceRecordDto record)
+    {
+        var status = record.WasPresent ? "Present" : "Absent";
+        return $"{record.WeekLabel}: {status} ({record.ClassDate:dd/MM/yyyy})";
+    }
+
+    private string GetPassTooltip()
+    {
+        if (Student.CurrentPass == null)
+            return "No active pass";
+            
+        var passInfo = $"Pass Type: {Student.CurrentPass.PassType}\n";
+        passInfo += $"Valid: {Student.CurrentPass.StartDate:dd/MM/yyyy} - {Student.CurrentPass.EndDate:dd/MM/yyyy}\n";
+        passInfo += $"Classes Remaining: {Student.CurrentPass.RemainingClasses}";
+        
+        if (Student.CurrentPass.IsExpired)
+            passInfo += "\n⚠️ EXPIRED";
+            
+        return passInfo;
+    }
+
+    private string GetWarningTooltip()
+    {
+        if (Student.CurrentPass == null)
+            return "Student has no active pass";
+            
+        if (Student.CurrentPass.IsExpired)
+            return "Student's pass has expired";
+            
+        if (Student.CurrentPass.RemainingClasses <= 0)
+            return "No classes remaining on current pass";
+            
+        return "Cannot attend today";
+    }
+}

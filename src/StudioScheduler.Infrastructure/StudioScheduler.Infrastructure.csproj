@@ -17,6 +17,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\StudioScheduler.Core\StudioScheduler.Core.csproj" />
+    <ProjectReference Include="..\StudioScheduler.Shared\StudioScheduler.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="MockRepositories\Data\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
