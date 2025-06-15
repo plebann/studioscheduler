@@ -1,0 +1,16 @@
+@baseUrl = http://localhost:5224
+
+###############################################################################
+# Schedules Controller Tests
+#
+# This file tests the /api/schedules/weekly endpoint used by the client Schedule page.
+###############################################################################
+
+### 1. Get Weekly Schedule
+# Expected: Should return a WeeklyScheduleDto with a dictionary of days and class slots
+GET {{baseUrl}}/api/schedules/weekly
+Accept: application/json
+
+###
+# You can run this request using the REST Client extension in VS Code.
+# This endpoint returns the weekly schedule as used by the client Schedule page.

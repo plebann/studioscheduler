@@ -10,10 +10,12 @@ namespace StudioScheduler.Server.Controllers;
 public class SchedulesController : ControllerBase
 {
     private readonly IScheduleService _scheduleService;
+    private readonly IDanceClassService _danceClassService;
 
-    public SchedulesController(IScheduleService scheduleService)
+    public SchedulesController(IScheduleService scheduleService, IDanceClassService danceClassService)
     {
         _scheduleService = scheduleService;
+        _danceClassService = danceClassService;
     }
 
     [HttpGet]
@@ -185,6 +187,10 @@ public class SchedulesController : ControllerBase
         var schedules = await _scheduleService.GetAllAsync();
         var activeSchedules = schedules.Where(s => s.IsActive && !s.IsCancelled).ToList();
 
+        // Load all dance classes to get the proper information
+        var danceClasses = await _danceClassService.GetAllAsync();
+        var danceClassDict = danceClasses.ToDictionary(dc => dc.Id, dc => dc);
+
         var weeklySchedule = new Dictionary<string, List<ScheduleSlotDto>>();
         var daysOfWeek = new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
 
@@ -213,16 +219,31 @@ public class SchedulesController : ControllerBase
             var endTime = schedule.StartTime.Add(schedule.Duration);
             var timeSlot = $"{schedule.StartTime:HH:mm} - {endTime:HH:mm}";
 
+            // Get the dance class information
+            DanceClass? danceClass = null;
+            danceClassDict.TryGetValue(schedule.DanceClassId, out danceClass);
+
+            // Use dance class information for accurate data
+            var danceName = danceClass?.Name ?? schedule.Name;
+            var level = danceClass?.Level ?? "P1";
+            var style = danceClass?.Style ?? "UNKNOWN";
+
             // Determine background color based on dance style
-            var backgroundColor = GetBackgroundColorByStyle(schedule.DanceClass?.Name ?? "");
+            var backgroundColor = GetBackgroundColorByStyle(style, danceName);
+
+            // Format level properly
+            var formattedLevel = FormatLevel(level);
+
+            // Format dance name for display
+            var displayStyle = FormatDanceStyle(danceName, style);
 
             var slot = new ScheduleSlotDto
             {
                 Id = schedule.Id,
                 TimeSlot = timeSlot,
-                DanceName = schedule.DanceClass?.Name ?? schedule.Name,
-                Level = ExtractLevel(schedule.DanceClass?.Name ?? ""),
-                Style = ExtractStyle(schedule.DanceClass?.Name ?? ""),
+                DanceName = danceName,
+                Level = formattedLevel,
+                Style = displayStyle,
                 BackgroundColor = backgroundColor,
                 EffectiveFrom = schedule.EffectiveFrom.ToString("dd.MM.yyyy"),
                 IsCancelled = schedule.IsCancelled,
@@ -243,46 +264,65 @@ public class SchedulesController : ControllerBase
         return Ok(new WeeklyScheduleDto { Schedule = weeklySchedule });
     }
 
-    private static string GetBackgroundColorByStyle(string className)
+    private static string GetBackgroundColorByStyle(string style, string danceName)
     {
-        return className.ToUpper() switch
+        var upperName = danceName.ToUpper();
+        
+        // Check for specific styling classes first
+        if (upperName.Contains("LADIES STYLING") || upperName.Contains("HIGH HEELS"))
+            return "#E40046";
+            
+        // Then check by style
+        return style.ToUpper() switch
         {
-            var name when name.Contains("SALSA LADIES STYLING") || name.Contains("HIGH HEELS") || name.Contains("BACHATA LADIES STYLING") => "#E40046",
-            var name when name.Contains("SALSA KUBAŃSKA") || name.Contains("SALSA CUBANA") => "#B08A47",
-            var name when name.Contains("SALSA ON1") || name.Contains("SALSA ON2") => "#333333",
-            var name when name.Contains("BACHATA") => "#166693",
-            var name when name.Contains("RUEDA") => "#DFAF29",
-            var name when name.Contains("ZOUK") => "#6A1B9A",
-            var name when name.Contains("KIZOMBA") || name.Contains("SEMBA") => "#007C5A",
+            "CUBANA" => "#B08A47",
+            "SALSA" => "#333333", 
+            "BACHATA" => "#166693",
+            "RUEDA" => "#DFAF29",
+            "ZOUK" => "#6A1B9A",
+            "KIZOMBA" => "#007C5A",
+            "STYLE" => "#E40046", // For styling classes
             _ => "#999999"
         };
     }
 
-    private static string ExtractLevel(string className)
+    private static string FormatLevel(string level)
     {
-        if (className.Contains("P1")) return "Level P1";
-        if (className.Contains("P2")) return "Level P2";
-        if (className.Contains("P3")) return "Level P3";
-        if (className.Contains("S1")) return "Level S1";
-        if (className.Contains("S2")) return "Level S2";
-        if (className.Contains("S3")) return "Level S3";
-        if (className.Contains("Z")) return "Level Z";
-        if (className.Contains("OPEN")) return "OPEN level";
-        return "Level P1";
+        if (string.IsNullOrEmpty(level))
+            return "Level P1";
+            
+        if (level.ToUpper() == "OPEN")
+            return "OPEN level";
+            
+        if (level.StartsWith("Level "))
+            return level;
+            
+        return $"Level {level}";
     }
 
-    private static string ExtractStyle(string className)
+    private static string FormatDanceStyle(string danceName, string style)
     {
-        if (className.Contains("SALSA LADIES STYLING")) return "SALSA LADIES STYLING";
-        if (className.Contains("HIGH HEELS")) return "HIGH HEELS SEXY DANCE";
-        if (className.Contains("BACHATA LADIES STYLING")) return "BACHATA LADIES STYLING";
-        if (className.Contains("SALSA KUBAŃSKA") || className.Contains("SALSA CUBANA")) return "SALSA CUBANA";
-        if (className.Contains("SALSA ON1")) return "SALSA on1";
-        if (className.Contains("SALSA ON2")) return "SALSA on2";
-        if (className.Contains("BACHATA")) return "BACHATA";
-        if (className.Contains("RUEDA")) return "RUEDA DE CASINO";
-        if (className.Contains("ZOUK")) return "ZOUK";
-        if (className.Contains("KIZOMBA") && className.Contains("SEMBA")) return "KIZOMBA & SEMBA";
-        return className;
+        var upperName = danceName.ToUpper();
+        
+        // Handle specific dance names
+        if (upperName.Contains("SALSA LADIES STYLING"))
+            return "SALSA LADIES STYLING";
+        if (upperName.Contains("HIGH HEELS"))
+            return "HIGH HEELS SEXY DANCE";
+        if (upperName.Contains("BACHATA LADIES STYLING"))
+            return "BACHATA LADIES STYLING";
+        if (upperName.Contains("SALSA KUBAŃSKA"))
+            return "SALSA KUBAŃSKA";
+        if (upperName.Contains("SALSA ON1"))
+            return "SALSA on1";
+        if (upperName.Contains("SALSA ON2"))
+            return "SALSA on2";
+        if (upperName.Contains("RUEDA"))
+            return "RUEDA DE CASINO";
+        if (upperName.Contains("KIZOMBA") && upperName.Contains("SEMBA"))
+            return "KIZOMBA i SEMBA";
+            
+        // Default to the dance name
+        return danceName;
     }
 }
