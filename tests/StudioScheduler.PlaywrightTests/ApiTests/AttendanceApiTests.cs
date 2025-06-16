@@ -3,16 +3,47 @@ namespace StudioScheduler.PlaywrightTests.ApiTests;
 [TestFixture]
 public class AttendanceApiTests : BaseApiTest
 {
-    // Using a known schedule ID from the seeded data
-    private const string ValidScheduleId = "c1a2b3c4-1234-5678-9abc-def012345614";
+    private string? _validScheduleId;
     private const string InvalidScheduleId = "invalid-guid";
     private const string NonExistentScheduleId = "00000000-0000-0000-0000-000000000000";
+
+    private async Task<string> GetValidScheduleIdAsync()
+    {
+        if (_validScheduleId != null)
+            return _validScheduleId;
+
+        // Get a real schedule ID from the weekly schedule endpoint
+        var response = await ApiContext.GetAsync("/api/schedules/weekly");
+        if (response.Status == 200)
+        {
+            var weeklySchedule = await DeserializeResponse<WeeklyScheduleDto>(response);
+            var allSchedules = weeklySchedule?.Schedule?.Values
+                .SelectMany(day => day ?? new List<ScheduleSlotDto>())
+                .Where(slot => slot?.Id != null)
+                .ToList();
+
+            if (allSchedules?.Any() == true)
+            {
+                _validScheduleId = allSchedules.First().Id!.ToString();
+                Console.WriteLine($"DEBUG: Using schedule ID from weekly schedule: {_validScheduleId}");
+                return _validScheduleId;
+            }
+        }
+
+        // Fallback to a hardcoded ID (this will fail, but at least we'll know why)
+        _validScheduleId = "C1A2B3C4-1234-5678-9ABC-DEF012345614";
+        Console.WriteLine($"DEBUG: No schedules found in weekly schedule, using fallback: {_validScheduleId}");
+        return _validScheduleId;
+    }
 
     [Test]
     public async Task GetClassSchedule_WithValidId_ShouldReturnSuccessWithValidStructure()
     {
+        // Arrange
+        var validScheduleId = await GetValidScheduleIdAsync();
+        
         // Act
-        var response = await ApiContext.GetAsync($"/api/attendance/class/{ValidScheduleId}");
+        var response = await ApiContext.GetAsync($"/api/attendance/class/{validScheduleId}");
         
         // Assert
         await AssertSuccessfulResponse(response);
@@ -31,22 +62,28 @@ public class AttendanceApiTests : BaseApiTest
     [Test]
     public async Task GetClassSchedule_WithValidId_ShouldReturnCorrectScheduleId()
     {
+        // Arrange
+        var validScheduleId = await GetValidScheduleIdAsync();
+        
         // Act
-        var response = await ApiContext.GetAsync($"/api/attendance/class/{ValidScheduleId}");
+        var response = await ApiContext.GetAsync($"/api/attendance/class/{validScheduleId}");
         await AssertSuccessfulResponse(response);
         
         var classAttendance = await DeserializeResponse<ClassAttendanceDto>(response);
         
         // Assert
-        Assert.That(classAttendance?.ScheduleId.ToLower(), Is.EqualTo(ValidScheduleId.ToLower()), 
+        Assert.That(classAttendance?.ScheduleId.ToLower(), Is.EqualTo(validScheduleId.ToLower()), 
             "Returned schedule ID should match requested ID");
     }
 
     [Test]
     public async Task GetClassSchedule_WithValidId_ShouldReturnValidStartTime()
     {
+        // Arrange
+        var validScheduleId = await GetValidScheduleIdAsync();
+        
         // Act
-        var response = await ApiContext.GetAsync($"/api/attendance/class/{ValidScheduleId}");
+        var response = await ApiContext.GetAsync($"/api/attendance/class/{validScheduleId}");
         await AssertSuccessfulResponse(response);
         
         var classAttendance = await DeserializeResponse<ClassAttendanceDto>(response);
@@ -64,8 +101,11 @@ public class AttendanceApiTests : BaseApiTest
     [Test]
     public async Task GetClassSchedule_WithValidId_ShouldReturnValidDayOfWeek()
     {
+        // Arrange
+        var validScheduleId = await GetValidScheduleIdAsync();
+        
         // Act
-        var response = await ApiContext.GetAsync($"/api/attendance/class/{ValidScheduleId}");
+        var response = await ApiContext.GetAsync($"/api/attendance/class/{validScheduleId}");
         await AssertSuccessfulResponse(response);
         
         var classAttendance = await DeserializeResponse<ClassAttendanceDto>(response);
@@ -79,8 +119,11 @@ public class AttendanceApiTests : BaseApiTest
     [Test]
     public async Task GetClassSchedule_WithValidId_ShouldReturnValidEnrolledStudents()
     {
+        // Arrange
+        var validScheduleId = await GetValidScheduleIdAsync();
+        
         // Act
-        var response = await ApiContext.GetAsync($"/api/attendance/class/{ValidScheduleId}");
+        var response = await ApiContext.GetAsync($"/api/attendance/class/{validScheduleId}");
         await AssertSuccessfulResponse(response);
         
         var classAttendance = await DeserializeResponse<ClassAttendanceDto>(response);
@@ -111,8 +154,11 @@ public class AttendanceApiTests : BaseApiTest
     [Test]
     public async Task GetClassSchedule_WithValidId_ShouldReturnCorrectDanceStyleAndLevel()
     {
+        // Arrange
+        var validScheduleId = await GetValidScheduleIdAsync();
+        
         // Act
-        var response = await ApiContext.GetAsync($"/api/attendance/class/{ValidScheduleId}");
+        var response = await ApiContext.GetAsync($"/api/attendance/class/{validScheduleId}");
         await AssertSuccessfulResponse(response);
         
         var classAttendance = await DeserializeResponse<ClassAttendanceDto>(response);
@@ -158,8 +204,11 @@ public class AttendanceApiTests : BaseApiTest
     [Test]
     public async Task GetClassSchedule_WithValidId_ShouldHaveCorrectResponseHeaders()
     {
+        // Arrange
+        var validScheduleId = await GetValidScheduleIdAsync();
+        
         // Act
-        var response = await ApiContext.GetAsync($"/api/attendance/class/{ValidScheduleId}");
+        var response = await ApiContext.GetAsync($"/api/attendance/class/{validScheduleId}");
         
         // Assert
         await AssertSuccessfulResponse(response);
@@ -175,8 +224,11 @@ public class AttendanceApiTests : BaseApiTest
     [Test]
     public async Task GetClassSchedule_WithValidId_ShouldReturnValidJson()
     {
+        // Arrange
+        var validScheduleId = await GetValidScheduleIdAsync();
+        
         // Act
-        var response = await ApiContext.GetAsync($"/api/attendance/class/{ValidScheduleId}");
+        var response = await ApiContext.GetAsync($"/api/attendance/class/{validScheduleId}");
         await AssertSuccessfulResponse(response);
         
         var jsonContent = await response.TextAsync();
@@ -192,9 +244,12 @@ public class AttendanceApiTests : BaseApiTest
     [Test]
     public async Task GetClassSchedule_WithValidId_ShouldReturnConsistentData()
     {
+        // Arrange
+        var validScheduleId = await GetValidScheduleIdAsync();
+        
         // Act - Make the same request twice
-        var response1 = await ApiContext.GetAsync($"/api/attendance/class/{ValidScheduleId}");
-        var response2 = await ApiContext.GetAsync($"/api/attendance/class/{ValidScheduleId}");
+        var response1 = await ApiContext.GetAsync($"/api/attendance/class/{validScheduleId}");
+        var response2 = await ApiContext.GetAsync($"/api/attendance/class/{validScheduleId}");
         
         // Assert
         await AssertSuccessfulResponse(response1);
@@ -216,10 +271,11 @@ public class AttendanceApiTests : BaseApiTest
     public async Task GetClassSchedule_ResponseTime_ShouldBeReasonable()
     {
         // Arrange
+        var validScheduleId = await GetValidScheduleIdAsync();
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
         
         // Act
-        var response = await ApiContext.GetAsync($"/api/attendance/class/{ValidScheduleId}");
+        var response = await ApiContext.GetAsync($"/api/attendance/class/{validScheduleId}");
         stopwatch.Stop();
         
         // Assert

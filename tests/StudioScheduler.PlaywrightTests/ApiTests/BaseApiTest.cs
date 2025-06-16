@@ -1,19 +1,17 @@
-using Microsoft.EntityFrameworkCore;
-using StudioScheduler.Infrastructure.Data;
-using StudioScheduler.Infrastructure.Services;
-using StudioScheduler.Server;
+using Microsoft.AspNetCore.Builder;
 
 namespace StudioScheduler.PlaywrightTests.ApiTests;
 
 [TestFixture]
 public abstract class BaseApiTest
 {
-    protected WebApplicationFactory<Program> Factory { get; private set; } = null!;
+    protected WebApplication TestApp { get; private set; } = null!;
     protected HttpClient HttpClient { get; private set; } = null!;
     protected IAPIRequestContext ApiContext { get; private set; } = null!;
     protected IPlaywright Playwright { get; private set; } = null!;
     
     private string _testDatabasePath = null!;
+    private string _testAppBaseUrl = null!;
 
     [OneTimeSetUp]
     public async Task OneTimeSetUp()
@@ -24,71 +22,77 @@ public abstract class BaseApiTest
         // Create unique test database path
         _testDatabasePath = Path.Combine(Path.GetTempPath(), $"studioscheduler-test-{Guid.NewGuid()}.db");
         
-        // Create WebApplicationFactory with test configuration
-        Factory = new WebApplicationFactory<Program>()
-            .WithWebHostBuilder(builder =>
-            {
-                builder.ConfigureAppConfiguration((context, config) =>
-                {
-                    config.AddJsonFile("appsettings.Test.json", optional: false);
-                    config.AddInMemoryCollection(new[]
-                    {
-                        new KeyValuePair<string, string?>("ConnectionStrings:DefaultConnection", 
-                            $"Data Source={_testDatabasePath}")
-                    });
-                });
-
-                builder.ConfigureServices(services =>
-                {
-                    // Remove any existing DbContext registration
-                    var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<ApplicationDbContext>));
-                    if (descriptor != null)
-                        services.Remove(descriptor);
-
-                    // Add test database context
-                    services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseSqlite($"Data Source={_testDatabasePath}"));
-                });
-            });
-
-        // Create HttpClient
-        HttpClient = Factory.CreateClient();
+        // Create test app using modern .NET 9 pattern
+        TestApp = TestAppFactory.CreateTestApp(_testDatabasePath);
+        
+        // Start the test app
+        await TestApp.StartAsync();
+        
+        // Get the actual running URL (with dynamic port)
+        _testAppBaseUrl = TestApp.Urls.First();
+        Console.WriteLine($"DEBUG: Test app running at: {_testAppBaseUrl}");
+        
+        // Create HttpClient that points to the test app
+        HttpClient = new HttpClient();
+        HttpClient.BaseAddress = new Uri(_testAppBaseUrl);
         
         // Setup test database and seed data
-        await SetupTestDatabase();
+        await TestAppFactory.SetupTestDatabaseAsync(TestApp, _testDatabasePath);
         
-        // Create Playwright API context
+        // Create Playwright API context with the real test server URL
         ApiContext = await Playwright.APIRequest.NewContextAsync(new()
         {
-            BaseURL = HttpClient.BaseAddress?.ToString(),
-            IgnoreHTTPSErrors = true
+            BaseURL = _testAppBaseUrl,
+            IgnoreHTTPSErrors = true,
+            ExtraHTTPHeaders = new Dictionary<string, string>
+            {
+                { "Accept", "application/json" },
+                { "Content-Type", "application/json" }
+            }
         });
     }
 
     [OneTimeTearDown]
     public async Task OneTimeTearDown()
     {
-        await ApiContext.DisposeAsync();
-        HttpClient.Dispose();
-        Factory.Dispose();
-        Playwright.Dispose();
+        // Dispose in reverse order
+        if (ApiContext != null)
+            await ApiContext.DisposeAsync();
         
-        // Cleanup test database
+        if (HttpClient != null)
+            HttpClient.Dispose();
+        
+        if (TestApp != null)
+        {
+            await TestApp.StopAsync();
+            await TestApp.DisposeAsync();
+        }
+        
+        if (Playwright != null)
+            Playwright.Dispose();
+        
+        // Cleanup test database with retry logic
         if (File.Exists(_testDatabasePath))
-            File.Delete(_testDatabasePath);
-    }
-
-    private async Task SetupTestDatabase()
-    {
-        using var scope = Factory.Services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        var seedingService = scope.ServiceProvider.GetRequiredService<DataSeedingService>();
-        
-        // Ensure database is created
-        await context.Database.EnsureCreatedAsync();
-        
-        // Seed test data
-        await seedingService.SeedDataAsync();
+        {
+            try
+            {
+                File.Delete(_testDatabasePath);
+            }
+            catch (IOException)
+            {
+                // Database might be locked, wait and try again
+                await Task.Delay(100);
+                try
+                {
+                    File.Delete(_testDatabasePath);
+                }
+                catch (IOException)
+                {
+                    // If still locked, just leave it for cleanup later
+                    Console.WriteLine($"Warning: Could not delete test database {_testDatabasePath}");
+                }
+            }
+        }
     }
 
     protected async Task<T?> DeserializeResponse<T>(IAPIResponse response)

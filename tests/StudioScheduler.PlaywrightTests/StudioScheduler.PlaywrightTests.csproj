@@ -7,6 +7,7 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <PreserveCompilationContext>true</PreserveCompilationContext>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,5 +33,18 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <Target Name="CopyPlaywrightDeps" AfterTargets="Build">
+    <Copy SourceFiles="$(OutputPath)Microsoft.Playwright.deps.json" 
+          DestinationFolder="$(OutputPath)" 
+          SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="CopyPlaywrightDepsJson" AfterTargets="Build">
+    <ItemGroup>
+      <PlaywrightDepsFile Include="$(UserProfile)\.nuget\packages\microsoft.playwright\1.40.0\lib\netstandard2.0\Microsoft.Playwright.deps.json" />
+    </ItemGroup>
+    <Copy SourceFiles="@(PlaywrightDepsFile)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" Condition="Exists('@(PlaywrightDepsFile)')" />
+  </Target>
 
 </Project>
