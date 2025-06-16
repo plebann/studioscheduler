@@ -41,7 +41,6 @@ public class ScheduleTests
         schedule.IsCancelled.Should().BeFalse();
         schedule.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
         schedule.UpdatedAt.Should().BeNull();
-        schedule.Reservations.Should().BeEmpty();
     }
 
     [Fact]
@@ -203,52 +202,4 @@ public class ScheduleTests
             error.ErrorMessage.Contains("Recurrence pattern is required for recurring schedules"));
     }
 
-    [Fact]
-    public void Schedule_Reservations_CollectionShouldBeInitialized()
-    {
-        // Arrange & Act
-        var schedule = new Schedule
-        {
-            Name = "Test Schedule",
-            LocationId = Guid.NewGuid(),
-            EffectiveFrom = DateTime.UtcNow,
-            DanceClassId = Guid.NewGuid(),
-            StartTime = DateTime.UtcNow.AddDays(1),
-            Duration = TimeSpan.FromMinutes(60)
-        };
-
-        // Assert
-        schedule.Reservations.Should().NotBeNull();
-        schedule.Reservations.Should().BeEmpty();
-    }
-
-    [Fact]
-    public void Schedule_ShouldAllowModificationOfReservationsCollection()
-    {
-        // Arrange
-        var schedule = new Schedule
-        {
-            Name = "Test Schedule",
-            LocationId = Guid.NewGuid(),
-            EffectiveFrom = DateTime.UtcNow,
-            DanceClassId = Guid.NewGuid(),
-            StartTime = DateTime.UtcNow.AddDays(1),
-            Duration = TimeSpan.FromMinutes(60)
-        };
-
-        var reservation = new Reservation
-        {
-            UserId = Guid.NewGuid(),
-            ScheduleId = schedule.Id,
-            PassId = Guid.NewGuid(),
-            Status = ReservationStatus.Confirmed
-        };
-
-        // Act
-        schedule.Reservations.Add(reservation);
-
-        // Assert
-        schedule.Reservations.Should().HaveCount(1);
-        schedule.Reservations.Should().Contain(reservation);
-    }
 }

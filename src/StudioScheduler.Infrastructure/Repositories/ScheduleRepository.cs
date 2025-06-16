@@ -22,7 +22,6 @@ public class ScheduleRepository : IScheduleRepository
             .ThenInclude(c => c.Room)
             .Include(s => s.DanceClass)
             .ThenInclude(c => c.Instructor)
-            .Include(s => s.Reservations)
             .FirstOrDefaultAsync(s => s.Id == id);
     }
 
@@ -34,7 +33,6 @@ public class ScheduleRepository : IScheduleRepository
             .ThenInclude(c => c.Room)
             .Include(s => s.DanceClass)
             .ThenInclude(c => c.Instructor)
-            .Include(s => s.Reservations)
             .ToListAsync();
     }
 
@@ -77,7 +75,6 @@ public class ScheduleRepository : IScheduleRepository
             .ThenInclude(c => c.Room)
             .Include(s => s.DanceClass)
             .ThenInclude(c => c.Instructor)
-            .Include(s => s.Reservations)
             .ToListAsync();
     }
 
@@ -90,7 +87,6 @@ public class ScheduleRepository : IScheduleRepository
             .ThenInclude(c => c.Room)
             .Include(s => s.DanceClass)
             .ThenInclude(c => c.Instructor)
-            .Include(s => s.Reservations)
             .ToListAsync();
     }
 
@@ -103,7 +99,6 @@ public class ScheduleRepository : IScheduleRepository
             .ThenInclude(c => c.Room)
             .Include(s => s.DanceClass)
             .ThenInclude(c => c.Instructor)
-            .Include(s => s.Reservations)
             .ToListAsync();
     }
 
@@ -117,7 +112,6 @@ public class ScheduleRepository : IScheduleRepository
             .ThenInclude(c => c.Room)
             .Include(s => s.DanceClass)
             .ThenInclude(c => c.Instructor)
-            .Include(s => s.Reservations)
             .ToListAsync();
     }
 
@@ -130,7 +124,6 @@ public class ScheduleRepository : IScheduleRepository
             .ThenInclude(c => c.Room)
             .Include(s => s.DanceClass)
             .ThenInclude(c => c.Instructor)
-            .Include(s => s.Reservations)
             .ToListAsync();
     }
 

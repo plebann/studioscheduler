@@ -50,8 +50,10 @@ StudioScheduler/
 
 ### StudioScheduler.Infrastructure
 - **Purpose:** Data access, repository implementations, external service integration
-- **Mock Data:** JSON files for classes, locations, rooms, schedules (see `src/StudioScheduler.Infrastructure/MockRepositories/Data/`)
-- **Repositories:** MockDanceClassRepository, MockLocationRepository, MockRoomRepository, MockScheduleRepository
+- **Database:** Entity Framework Core with SQLite (development) / PostgreSQL (production)
+- **Database File:** `src/StudioScheduler.Server/studioscheduler.db`
+- **Repositories:** DanceClassRepository, LocationRepository, RoomRepository, ScheduleRepository, AttendanceRepository, EnrollmentRepository, StudentRepository
+- **Data Seeding:** DataSeedingService loads initial data from JSON files into database during first startup
 
 ### StudioScheduler.Shared
 - **Purpose:** DTOs and models shared between client and server
@@ -145,7 +147,7 @@ Based on analysis of https://salsame.pl/en/price-list/, our system models a real
   - 2 rooms (Studio A, Studio B)
   - 32 schedule entries (real SalsaMe schedule data from 2025)
 - **Architecture:**
-  - API Request → Controller → Service → Repository → JSON Files (mock data)
+  - API Request → Controller → Service → Repository → SQLite Database (Entity Framework)
 
 ---
 
@@ -154,7 +156,7 @@ Based on analysis of https://salsame.pl/en/price-list/, our system models a real
 ### Schedule Page Data Flow
 - **Client:** The Schedule page (`/schedule`) fetches data from `api/schedules/weekly`
 - **Backend:** `SchedulesController.GetWeeklySchedule()` method processes the request:
-  1. Loads all active schedules from `schedules.json`
+  1. Loads all active schedules from SQLite database via Entity Framework
   2. **Loads dance class data** from `DanceClassService` to get accurate style, level, and description
   3. Groups schedules by day of week (Monday-Sunday)
   4. Creates `ScheduleSlotDto` objects with proper formatting

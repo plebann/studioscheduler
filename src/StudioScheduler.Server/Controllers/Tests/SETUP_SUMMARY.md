@@ -60,9 +60,9 @@ The HTTP tests will verify that your mock repositories contain:
 ## 🔧 System Architecture Confirmed
 
 ```
-API Request → Controller → Service → Repository → JSON Files
+API Request → Controller → Service → Repository → SQLite Database
                 ↓
-            Mock Data from SalsaMe Studio Schedule
+            Data from SalsaMe Studio Schedule
 ```
 
 ### Services Created:
@@ -70,10 +70,13 @@ API Request → Controller → Service → Repository → JSON Files
 - ✅ `LocationService` - Handles business logic for locations
 
 ### Repositories Registered:
-- ✅ `MockDanceClassRepository` - Uses classes.json
-- ✅ `MockLocationRepository` - Uses locations.json  
-- ✅ `MockRoomRepository` - Uses rooms.json
-- ✅ `MockScheduleRepository` - Uses schedules.json
+- ✅ `DanceClassRepository` - Entity Framework Core
+- ✅ `LocationRepository` - Entity Framework Core
+- ✅ `RoomRepository` - Entity Framework Core
+- ✅ `ScheduleRepository` - Entity Framework Core
+- ✅ `AttendanceRepository` - Entity Framework Core
+- ✅ `EnrollmentRepository` - Entity Framework Core
+- ✅ `StudentRepository` - Entity Framework Core
 
 ## 🎯 Success Criteria
 
@@ -110,7 +113,7 @@ If you get errors:
 1. **Build the solution**: `dotnet build`
 2. **Check server is running**: Should see "Now listening on: https://localhost:7224"
 3. **Try HTTP instead of HTTPS**: Use the `@baseUrlHttp` variables in tests
-4. **Check mock data files exist**: Verify JSON files in `MockRepositories/Data/`
+4. **Check database exists**: Verify SQLite database at `src/StudioScheduler.Server/studioscheduler.db`
 
 ## 📝 Next Steps
 
@@ -119,4 +122,4 @@ If you get errors:
 3. **Add integration tests**: Use the existing test projects
 4. **Add Swagger**: The OpenAPI is already configured for visual API testing
 
-Your mock repository system with real SalsaMe dance studio data is now fully functional and ready for testing! 🎉
+Your Entity Framework database system with real SalsaMe dance studio data is now fully functional and ready for testing! 🎉

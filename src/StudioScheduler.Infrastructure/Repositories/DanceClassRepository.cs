@@ -131,7 +131,6 @@ public class DanceClassRepository : IDanceClassRepository
             .Where(s => s.DanceClassId == classId)
             .Include(s => s.Location)
             .Include(s => s.DanceClass)
-            .Include(s => s.Reservations)
             .ToListAsync();
     }
 

@@ -19,7 +19,7 @@ Studio Scheduler is a cloud-hosted web application for managing dance/fitness st
 
 ### Infrastructure
 - Azure hosting (App Service)
-- PostgreSQL on Azure
+- PostgreSQL on Azure (SQLite for development)
 - Azure Application Insights
 - Azure Blob Storage
 
@@ -63,11 +63,22 @@ StudioScheduler/
 - Email notifications
 
 ## Database Schema
-- Users (id, email, firstName, lastName, passwordHash, gender, dateOfBirth, role)
-- Classes (id, name, description, capacity, instructorId)
-- Schedule (id, classId, startTime, duration, isRecurring)
-- Passes (id, userId, startDate, endDate, passType, classesPerWeek)
-- Reservations (id, userId, scheduleId, passId, createdAt, status)
+The application uses Entity Framework Core with SQLite for development and PostgreSQL for production. Data is managed through repositories implementing the Repository pattern.
+
+### Core Entities
+- **Users/Students** (id, firstName, lastName, email, passwordHash, phone, dateOfBirth, gender, role, isActive)
+- **Locations** (id, name, address, description, isActive)
+- **Rooms** (id, name, description, locationId, capacity, equipment, isActive)
+- **DanceClasses** (id, name, description, style, level, capacity, roomId, instructorId, isActive)
+- **Schedules** (id, name, locationId, danceClassId, startTime, duration, isRecurring, recurrencePattern)
+- **Passes** (id, userId, type, startDate, endDate, totalClasses, remainingClasses, classesPerWeek, isActive)
+- **Enrollments** (id, studentId, scheduleId, enrolledDate, isActive)
+- **Attendances** (id, studentId, scheduleId, passUsed, attendedAt, isPresent)
+
+### Data Access
+- Entity Framework repositories replace previous mock JSON-based repositories
+- Database seeding from JSON files during initial setup via `DataSeedingService`
+- SQLite database: `src/StudioScheduler.Server/studioscheduler.db`
 
 ## Monitoring
 - Application Insights integration

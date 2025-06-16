@@ -16,7 +16,6 @@ public class ApplicationDbContext : DbContext
     public DbSet<Room> Rooms { get; set; }
     public DbSet<DanceClass> DanceClasses { get; set; }
     public DbSet<Pass> Passes { get; set; }
-    public DbSet<Reservation> Reservations { get; set; }
     public DbSet<Schedule> Schedules { get; set; }
     public DbSet<Enrollment> Enrollments { get; set; }
     public DbSet<Attendance> Attendances { get; set; }
@@ -58,18 +57,6 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(s => s.DanceClassId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Existing relationships
-        modelBuilder.Entity<Reservation>()
-            .HasOne<User>()
-            .WithMany()
-            .HasForeignKey(r => r.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Reservation>()
-            .HasOne<Schedule>()
-            .WithMany(s => s.Reservations)
-            .HasForeignKey(r => r.ScheduleId)
-            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Pass>()
             .HasOne(p => p.User)

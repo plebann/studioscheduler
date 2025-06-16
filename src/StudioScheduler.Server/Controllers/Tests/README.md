@@ -12,8 +12,8 @@ This directory contains HTTP test files for testing the Studio Scheduler API end
 
 ### 🚀 Quick Start: `AllEndpoints.http`
 **Start here!** This file provides a comprehensive test suite that verifies:
-- Mock repositories are working
-- SalsaMe Dance Studio data is loaded
+- Entity Framework repositories are working
+- SalsaMe Dance Studio data is loaded from database
 - All major endpoints respond correctly
 
 **How to use:**
@@ -95,7 +95,7 @@ Should return 32+ schedule entries with classes like:
 ## Troubleshooting
 
 ### ❌ Empty Arrays or 404 Errors
-- Check that mock repositories are registered in `Program.cs`
+- Check that Entity Framework repositories are registered in `Program.cs`
 - Verify the Infrastructure project reference is added
 - Make sure the server is running
 

@@ -23,5 +23,4 @@ public class Schedule
     
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
-    public ICollection<Reservation> Reservations { get; init; } = new List<Reservation>();
 }

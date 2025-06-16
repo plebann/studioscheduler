@@ -156,7 +156,7 @@ Schedule → Look up DanceClass by schedule.DanceClassId → Use DanceClass.Styl
 ## Future Maintenance
 
 ### Adding New Dance Styles
-1. Add the new dance class to `classes.json` with proper `Style` field
+1. Add the new dance class to the database via Entity Framework (or through data seeding)
 2. Update `GetBackgroundColorByStyle()` method if a new color is needed
 3. Test the display in both desktop and mobile views
 
@@ -170,7 +170,7 @@ Schedule → Look up DanceClass by schedule.DanceClassId → Use DanceClass.Styl
 ## Files Modified
 
 1. **`src/StudioScheduler.Server/Controllers/SchedulesController.cs`** - Main fix
-2. **`src/StudioScheduler.Infrastructure/MockRepositories/Data/schedules.json`** - Updated with real schedule data
+2. **SQLite Database** (`src/StudioScheduler.Server/studioscheduler.db`) - Schedule data stored in database
 3. **`SOLUTION_STRUCTURE.md`** - Updated documentation
 4. **`SCHEDULE_SYSTEM_FIXES.md`** - This documentation file
 
