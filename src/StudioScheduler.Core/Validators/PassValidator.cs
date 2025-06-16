@@ -25,8 +25,8 @@ public class PassValidator : AbstractValidator<Pass>
             .GreaterThan(0)
             .WithMessage("Classes per week must be positive");
 
-        RuleFor(x => x.RemainingClasses)
-            .GreaterThanOrEqualTo(0)
-            .WithMessage("Remaining classes cannot be negative");
+        RuleFor(x => x.TotalClasses)
+            .GreaterThan(0)
+            .WithMessage("Total classes must be positive");
     }
 }

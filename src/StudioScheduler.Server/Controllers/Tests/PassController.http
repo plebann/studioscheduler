@@ -1,0 +1,80 @@
+### Test Pass API Endpoints
+
+@baseUrl = http://localhost:5224/api
+
+### Get all pass types (SalsaMe pricing)
+GET {{baseUrl}}/pass/types
+
+### Get all passes
+GET {{baseUrl}}/pass
+
+### Get passes for a specific user (replace with actual user ID)
+@userId = 550e8400-e29b-41d4-a716-446655440000
+GET {{baseUrl}}/pass/user/{{userId}}
+
+### Get current active pass for a user
+GET {{baseUrl}}/pass/user/{{userId}}/current
+
+### Get active passes
+GET {{baseUrl}}/pass/active
+
+### Get passes expiring in 7 days
+GET {{baseUrl}}/pass/expiring?days=7
+
+### Get passes expiring in 30 days
+GET {{baseUrl}}/pass/expiring?days=30
+
+### Create a new Monthly3Courses pass
+POST {{baseUrl}}/pass
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "startDate": "2025-06-16T00:00:00Z",
+  "endDate": "2025-07-14T23:59:59Z",
+  "type": "Monthly3Courses",
+  "classesPerWeek": 3,
+  "totalClasses": 12
+}
+
+### Create a FLEXI 4 Classes pass
+POST {{baseUrl}}/pass
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "startDate": "2025-06-16T00:00:00Z", 
+  "endDate": "2025-07-14T23:59:59Z",
+  "type": "Flexi4Classes",
+  "classesPerWeek": 1,
+  "totalClasses": 4
+}
+
+### Get pass by ID (replace with actual pass ID)
+@passId = 550e8400-e29b-41d4-a716-446655440001
+GET {{baseUrl}}/pass/{{passId}}
+
+### Get pass usage statistics
+GET {{baseUrl}}/pass/{{passId}}/stats
+
+### Update a pass (extend validity and add classes)
+PUT {{baseUrl}}/pass/{{passId}}
+Content-Type: application/json
+
+{
+  "endDate": "2025-08-14T23:59:59Z",
+  "isActive": true,
+  "additionalClasses": 2
+}
+
+### Deactivate a pass
+PUT {{baseUrl}}/pass/{{passId}}
+Content-Type: application/json
+
+{
+  "endDate": "2025-07-14T23:59:59Z",
+  "isActive": false
+}
+
+### Delete a pass
+DELETE {{baseUrl}}/pass/{{passId}}

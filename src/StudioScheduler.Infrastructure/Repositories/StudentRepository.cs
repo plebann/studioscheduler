@@ -17,6 +17,7 @@ public class StudentRepository : IStudentRepository
     public async Task<Student?> GetByIdAsync(Guid id)
     {
         return await _context.Students
+            .Include(s => s.Passes)
             .Include(s => s.Enrollments)
             .ThenInclude(e => e.Schedule)
             .ThenInclude(s => s.DanceClass)
@@ -28,6 +29,7 @@ public class StudentRepository : IStudentRepository
     public async Task<IEnumerable<Student>> GetAllAsync()
     {
         return await _context.Students
+            .Include(s => s.Passes)
             .Include(s => s.Enrollments)
             .ThenInclude(e => e.Schedule)
             .ThenInclude(s => s.DanceClass)
@@ -69,6 +71,7 @@ public class StudentRepository : IStudentRepository
     public async Task<Student?> GetByEmailAsync(string email)
     {
         return await _context.Students
+            .Include(s => s.Passes)
             .Include(s => s.Enrollments)
             .ThenInclude(e => e.Schedule)
             .ThenInclude(s => s.DanceClass)
@@ -81,6 +84,7 @@ public class StudentRepository : IStudentRepository
     {
         return await _context.Students
             .Where(s => s.Enrollments.Any(e => e.ScheduleId == scheduleId))
+            .Include(s => s.Passes)
             .Include(s => s.Enrollments)
             .ThenInclude(e => e.Schedule)
             .ThenInclude(s => s.DanceClass)
@@ -93,6 +97,7 @@ public class StudentRepository : IStudentRepository
     {
         return await _context.Students
             .Where(s => s.Enrollments.Any(e => e.Schedule.DanceClassId == classId))
+            .Include(s => s.Passes)
             .Include(s => s.Enrollments)
             .ThenInclude(e => e.Schedule)
             .ThenInclude(s => s.DanceClass)

@@ -65,9 +65,17 @@ public class AttendanceController : ControllerBase
                 // Get attendance history for this student and schedule
                 var attendanceHistory = await _attendanceRepository.GetByStudentAndScheduleAsync(enrollment.StudentId, scheduleGuid);
                 
+                // Cache the current pass to avoid multiple computed property evaluations
+                var currentPass = student.CurrentPass;
+                
                 // Check if pass is expired
-                var isPassExpired = student.CurrentPass != null && student.CurrentPass.EndDate < DateTime.UtcNow;
-                var hasActivePass = student.CurrentPass?.IsActive == true && !isPassExpired;
+                var isPassExpired = currentPass != null && currentPass.EndDate < DateTime.UtcNow;
+                var hasActivePass = currentPass?.IsActive == true && !isPassExpired;
+                
+                // Check if student is marked present for today
+                var today = DateTime.Today;
+                var isMarkedPresentToday = attendanceHistory.Any(a => 
+                    a.ClassDate.Date == today && a.WasPresent);
                 
                 // Map student to StudentAttendanceDto
                 var studentDto = new StudentAttendanceDto
@@ -75,29 +83,29 @@ public class AttendanceController : ControllerBase
                     StudentId = student.Id.ToString(),
                     FirstName = student.FirstName,
                     LastName = student.LastName,
-                    IsMarkedPresentToday = false, // Would check today's attendance
+                    IsMarkedPresentToday = isMarkedPresentToday,
                     CanAttendToday = hasActivePass,
                     AttendanceNote = isPassExpired ? "Pass expired" : 
-                                   student.CurrentPass == null ? "No active pass" : null,
-                    CurrentPass = student.CurrentPass != null ? new StudentPassDto
+                                   currentPass == null ? "No active pass" : null,
+                    CurrentPass = currentPass != null ? new StudentPassDto
                     {
-                        PassId = student.CurrentPass.Id.ToString(),
-                        PassType = student.CurrentPass.Type.ToString(),
-                        StartDate = student.CurrentPass.StartDate,
-                        EndDate = student.CurrentPass.EndDate,
-                        TotalClasses = student.CurrentPass.TotalClasses,
-                        RemainingClasses = student.CurrentPass.RemainingClasses,
-                        ClassesPerWeek = student.CurrentPass.ClassesPerWeek,
-                        Price = 200.00m, // Mock price since it's not in the model
-                        IsActive = student.CurrentPass.IsActive,
+                        PassId = currentPass.Id.ToString(),
+                        PassType = currentPass.Type.ToString(),
+                        StartDate = currentPass.StartDate,
+                        EndDate = currentPass.EndDate,
+                        TotalClasses = currentPass.TotalClasses,
+                        RemainingClasses = currentPass.CalculateRemainingClasses(attendanceHistory),
+                        ClassesPerWeek = currentPass.ClassesPerWeek,
+                        Price = 200.00m,
+                        IsActive = currentPass.IsActive,
                         IsExpired = isPassExpired,
                         ClassesUsedForThisClass = attendanceHistory.Count(a => a.WasPresent),
-                        MaxClassesForThisClassType = student.CurrentPass.TotalClasses
+                        MaxClassesForThisClassType = currentPass.TotalClasses
                     } : null,
                     AttendanceHistory = attendanceHistory.Select(a => new AttendanceRecordDto
                     {
                         ClassDate = a.ClassDate,
-                        WeekOffset = (int)Math.Floor((DateTime.Now - a.ClassDate).TotalDays / 7), // Calculate week offset
+                        WeekOffset = (int)Math.Floor((DateTime.Now - a.ClassDate).TotalDays / 7),
                         WasPresent = a.WasPresent,
                         PassUsed = a.PassUsed?.ToString() ?? null,
                         PassClassNumber = a.PassClassNumber,

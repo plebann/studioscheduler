@@ -16,10 +16,6 @@
 GET {{StudioScheduler.Server_HostAddress}}/api/classes
 Accept: application/json
 
-### Check if mock data is loaded (should return SalsaMe classes)
-GET {{StudioScheduler.Server_HostAddress}}/api/classes
-Accept: application/json
-
 ### Quick test to verify mock repositories are working
 # This should return classes with names like "SALSA LADIES STYLING", "BACHATA", etc.
 # If it returns empty array or error, mock repositories are not registered properly

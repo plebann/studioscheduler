@@ -21,6 +21,7 @@ public static class DependencyInjection
         services.AddScoped<IStudentRepository, StudentRepository>();
         services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
         services.AddScoped<IAttendanceRepository, AttendanceRepository>();
+        services.AddScoped<IPassRepository, PassRepository>();
 
         // Register services
         services.AddScoped<IDanceClassService, DanceClassService>();
@@ -28,6 +29,7 @@ public static class DependencyInjection
         services.AddScoped<IRoomService, RoomService>();
         services.AddScoped<IScheduleService, ScheduleService>();
         services.AddScoped<IClassAttendanceService, ClassAttendanceService>();
+        services.AddScoped<IPassService, PassService>();
 
         // Register data seeding service
         services.AddScoped<DataSeedingService>();

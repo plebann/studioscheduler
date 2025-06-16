@@ -11,8 +11,10 @@ namespace StudioScheduler.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Reservations");
+            // Check if table exists before dropping it
+            migrationBuilder.Sql(@"
+                DROP TABLE IF EXISTS ""Reservations"";
+            ");
         }
 
         /// <inheritdoc />

@@ -233,7 +233,7 @@ public class DataSeedingService
                 // Add student's pass if they have one
                 if (studentData.CurrentPass != null)
                 {
-                    var passType = PassType.Monthly; // Default
+                    var passType = PassType.Monthly2Courses; // Default to 2 courses/week pass
                     if (Enum.TryParse<PassType>(studentData.CurrentPass.Type, out var parsedPassType))
                     {
                         passType = parsedPassType;
@@ -253,7 +253,6 @@ public class DataSeedingService
                         StartDate = studentData.CurrentPass.StartDate,
                         EndDate = studentData.CurrentPass.EndDate,
                         TotalClasses = studentData.CurrentPass.TotalClasses,
-                        RemainingClasses = studentData.CurrentPass.RemainingClasses,
                         ClassesPerWeek = studentData.CurrentPass.ClassesPerWeek,
                         IsActive = studentData.CurrentPass.IsActive,
                         CreatedAt = studentData.CreatedAt

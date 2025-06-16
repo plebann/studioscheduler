@@ -18,7 +18,7 @@ Accept: application/json
 
 ### 2. Search Students (Minimum 3 characters)
 # Expected: Should return students matching the search term
-GET {{baseUrl}}/api/attendance/search?searchTerm=Ana
+GET {{baseUrl}}/api/attendance/search?searchTerm=Anna
 Accept: application/json
 
 ###
