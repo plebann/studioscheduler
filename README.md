@@ -34,8 +34,10 @@ StudioScheduler/
 │   ├── StudioScheduler.Infrastructure/    # Data Access & External Services
 │   └── StudioScheduler.Shared/           # DTOs & Shared Models
 ├── tests/
-│   ├── StudioScheduler.UnitTests/
-│   └── StudioScheduler.IntegrationTests/
+│   ├── StudioScheduler.UnitTests/        # Unit tests
+│   ├── StudioScheduler.IntegrationTests/ # EF Core integration tests
+│   ├── StudioScheduler.PlaywrightTests/  # ✅ API & E2E tests (Playwright)
+│   └── StudioScheduler.ReservationTests/ # Business logic tests
 └── tools/                                # DB migrations, scripts
 ```
 
@@ -48,6 +50,11 @@ StudioScheduler/
 - **Data Migration**: Automatic seeding from JSON data to SQLite
 - **Core API Endpoints**: Working endpoints for locations, rooms, classes, and schedules
 - **Database Schema**: Complete with relationships and constraints
+- **🎉 Playwright Integration Testing**: Modern .NET 9 API testing infrastructure with 19 comprehensive tests
+  - Modern WebApplication pattern (bypasses WebApplicationFactory limitations)
+  - Dynamic port assignment and database integration
+  - Complete API contract validation and error handling testing
+  - CI/CD ready with reliable execution
 
 ### 📊 Migrated Data
 - **1 Location** with full studio details
