@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using StudioScheduler.Core.Interfaces.Services;
 using StudioScheduler.Core.Interfaces.Repositories;
-using StudioScheduler.Infrastructure.MockRepositories.Implementations;
 using StudioScheduler.Infrastructure.Repositories;
 using StudioScheduler.Infrastructure.Services;
 
@@ -9,26 +8,8 @@ namespace StudioScheduler.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddMockRepositories(this IServiceCollection services)
-    {
-        // Register repositories
-        services.AddSingleton<ILocationRepository, MockLocationRepository>();
-        services.AddSingleton<IRoomRepository, MockRoomRepository>();
-        services.AddSingleton<IDanceClassRepository, MockDanceClassRepository>();
-        services.AddSingleton<IScheduleRepository, MockScheduleRepository>();
-        services.AddSingleton<IStudentRepository, MockStudentRepository>();
-        services.AddSingleton<IEnrollmentRepository, MockEnrollmentRepository>();
-        services.AddSingleton<IAttendanceRepository, MockAttendanceRepository>();
-
-        // Register services
-        services.AddScoped<IDanceClassService, DanceClassService>();
-        services.AddScoped<ILocationService, LocationService>();
-        services.AddScoped<IRoomService, RoomService>();
-        services.AddScoped<IScheduleService, ScheduleService>();
-        services.AddScoped<IClassAttendanceService, ClassAttendanceService>();
-
-        return services;
-    }
+    // Note: Mock repositories have been removed in favor of Entity Framework repositories with data seeding
+    // The JSON mock data is now loaded into the EF database via DataSeedingService
 
     public static IServiceCollection AddEfRepositories(this IServiceCollection services)
     {

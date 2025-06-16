@@ -64,8 +64,8 @@ Accept: application/json
 
 ###
 
-### 6. Delete Class (Use with caution - will modify mock data)
-# DELETE {{baseUrl}}/api/classes/c1a2b3c4-1234-5678-9abc-def012345601
+### 6. Delete Class (Use with caution - will modify data)
+DELETE {{baseUrl}}/api/classes/c1a2b3c4-1234-5678-9abc-def012345601
 
 ###
 

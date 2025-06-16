@@ -1,0 +1,111 @@
+@baseUrl = http://localhost:5224
+
+###############################################################################
+# Attendance Controller Tests
+# 
+# This file tests all endpoints for the Attendance controller to verify:
+# 1. Class attendance functionality is working
+# 2. Student search functionality works
+# 3. Attendance marking operations work correctly
+###############################################################################
+
+### 1. Get Class Schedule and Attendance Info
+# Expected: Should return class details with enrolled students and their attendance info
+GET {{baseUrl}}/api/attendance/class/c1a2b3c4-1234-5678-9abc-def012345614
+Accept: application/json
+
+###
+
+### 2. Search Students (Minimum 3 characters)
+# Expected: Should return students matching the search term
+GET {{baseUrl}}/api/attendance/search?searchTerm=Ana
+Accept: application/json
+
+###
+
+### 3. Search Students (Short term - should fail)
+# Expected: Should return 400 Bad Request due to short search term
+GET {{baseUrl}}/api/attendance/search?searchTerm=An
+Accept: application/json
+
+###
+
+### 4. Mark Student as Present
+# Expected: Should mark a student as present for a specific class
+POST {{baseUrl}}/api/attendance/mark
+Content-Type: application/json
+
+{
+  "scheduleId": "c1a2b3c4-1234-5678-9abc-def012345614",
+  "studentId": "S1A2B3C4-1234-5678-9ABC-DEF012345601",
+  "isPresent": true,
+  "notes": "Student attended full class"
+}
+
+###
+
+### 5. Mark Student as Absent
+# Expected: Should mark a student as absent for a specific class
+POST {{baseUrl}}/api/attendance/mark
+Content-Type: application/json
+
+{
+  "scheduleId": "c1a2b3c4-1234-5678-9abc-def012345614",
+  "studentId": "S1A2B3C4-1234-5678-9ABC-DEF012345602",
+  "isPresent": false,
+  "notes": "Student was sick"
+}
+
+###
+
+### 6. Mark Attendance with Invalid Schedule ID (Error Test)
+# Expected: Should return 400 Bad Request due to invalid GUID format
+POST {{baseUrl}}/api/attendance/mark
+Content-Type: application/json
+
+{
+  "scheduleId": "invalid-guid",
+  "studentId": "S1A2B3C4-1234-5678-9ABC-DEF012345601",
+  "isPresent": true,
+  "notes": "Test with invalid ID"
+}
+
+###
+
+### 7. Get Class Schedule with Invalid ID (Error Test)
+# Expected: Should return 400 Bad Request due to invalid GUID format
+GET {{baseUrl}}/api/attendance/class/invalid-schedule-id
+Accept: application/json
+
+###
+
+### 8. Get Class Schedule for Non-Existent Class (Error Test)
+# Expected: Should return 404 Not Found
+GET {{baseUrl}}/api/attendance/class/00000000-0000-0000-0000-000000000000
+Accept: application/json
+
+###
+
+###############################################################################
+# Expected Results:
+# 
+# GET /api/attendance/class/{scheduleId} should return:
+# - Schedule information (class name, time, instructor, level, style)
+# - List of enrolled students with their attendance history
+# - Pass information for each student (type, remaining classes, expiry)
+# - Attendance status and eligibility for today's class
+# 
+# GET /api/attendance/search?searchTerm={term} should return:
+# - List of students matching the search term (minimum 3 characters)
+# - Student basic information for attendance purposes
+# 
+# POST /api/attendance/mark should:
+# - Successfully mark attendance and return success response
+# - Update student's pass usage if applicable
+# - Return error for invalid data
+# 
+# Error cases should return appropriate HTTP status codes:
+# - 400 Bad Request for invalid input
+# - 404 Not Found for non-existent resources
+# - 500 Internal Server Error for server issues
+###############################################################################

@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudioScheduler.Reservation
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudioScheduler.IntegrationTests", "tests\StudioScheduler.IntegrationTests\StudioScheduler.IntegrationTests.csproj", "{7155708A-0B52-44EC-BE6B-6D25C8D47FA8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudioScheduler.PlaywrightTests", "tests\StudioScheduler.PlaywrightTests\StudioScheduler.PlaywrightTests.csproj", "{E887B011-3204-436B-972D-30C042C359E7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -129,6 +131,18 @@ Global
 		{7155708A-0B52-44EC-BE6B-6D25C8D47FA8}.Release|x64.Build.0 = Release|Any CPU
 		{7155708A-0B52-44EC-BE6B-6D25C8D47FA8}.Release|x86.ActiveCfg = Release|Any CPU
 		{7155708A-0B52-44EC-BE6B-6D25C8D47FA8}.Release|x86.Build.0 = Release|Any CPU
+		{E887B011-3204-436B-972D-30C042C359E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E887B011-3204-436B-972D-30C042C359E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E887B011-3204-436B-972D-30C042C359E7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E887B011-3204-436B-972D-30C042C359E7}.Debug|x64.Build.0 = Debug|Any CPU
+		{E887B011-3204-436B-972D-30C042C359E7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E887B011-3204-436B-972D-30C042C359E7}.Debug|x86.Build.0 = Debug|Any CPU
+		{E887B011-3204-436B-972D-30C042C359E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E887B011-3204-436B-972D-30C042C359E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E887B011-3204-436B-972D-30C042C359E7}.Release|x64.ActiveCfg = Release|Any CPU
+		{E887B011-3204-436B-972D-30C042C359E7}.Release|x64.Build.0 = Release|Any CPU
+		{E887B011-3204-436B-972D-30C042C359E7}.Release|x86.ActiveCfg = Release|Any CPU
+		{E887B011-3204-436B-972D-30C042C359E7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -142,5 +156,6 @@ Global
 		{F51A1355-7578-419A-9B28-4F39244C930E} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{34036B23-7E79-420C-8103-2A700EF51F16} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{7155708A-0B52-44EC-BE6B-6D25C8D47FA8} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{E887B011-3204-436B-972D-30C042C359E7} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 EndGlobal

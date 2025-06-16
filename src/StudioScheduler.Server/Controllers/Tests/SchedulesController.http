@@ -14,5 +14,48 @@ Accept: application/json
 
 ### 2. Get Schedule by ID
 # Expected: Should return a ScheduleDto for the specified ID
-GET {{baseUrl}}/api/schedules/C1A2B3C4-1234-5678-9ABC-DEF012345614
-Accept: application/json}
+GET {{baseUrl}}/api/schedules/c1a2b3c4-1234-5678-9abc-def012345614
+Accept: application/json
+
+### 3. Get All Schedules
+# Expected: Should return an array of ScheduleSummaryDto objects
+GET {{baseUrl}}/api/schedules
+Accept: application/json
+
+### 4. Create Schedule
+# Expected: Should create a new schedule and return a ScheduleDto
+POST {{baseUrl}}/api/schedules
+Content-Type: application/json
+
+{
+  "name": "Test Schedule",
+  "locationId": "e8f3d8c1-2a82-4f6e-b846-4ad35182e7f1",
+  "danceClassId": "c1a2b3c4-1234-5678-9abc-def012345601",
+  "startTime": "2025-06-16T18:00:00Z",
+  "duration": "00:55:00",
+  "isRecurring": true,
+  "recurrencePattern": "Weekly",
+  "effectiveFrom": "2025-06-16T00:00:00Z",
+  "effectiveTo": null
+}
+
+### 5. Update Schedule
+# Expected: Should update the schedule and return the updated ScheduleDto
+PUT {{baseUrl}}/api/schedules/c1a2b3c4-1234-5678-9abc-def012345614
+Content-Type: application/json
+
+{
+  "name": "Updated Test Schedule",
+  "startTime": "2025-06-16T19:00:00Z",
+  "duration": "00:55:00",
+  "isRecurring": true,
+  "recurrencePattern": "Weekly",
+  "effectiveFrom": "2025-06-16T00:00:00Z",
+  "effectiveTo": null,
+  "isActive": true,
+  "isCancelled": false
+}
+
+### 6. Delete Schedule
+# Expected: Should delete the schedule and return 204 No Content
+DELETE {{baseUrl}}/api/schedules/c1a2b3c4-1234-5678-9abc-def012345614

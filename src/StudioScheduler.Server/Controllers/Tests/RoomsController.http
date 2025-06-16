@@ -1,0 +1,95 @@
+@baseUrl = http://localhost:5224
+
+###############################################################################
+# Rooms Controller Tests
+# 
+# This file tests all endpoints for the Rooms controller to verify:
+# 1. Entity Framework repositories are working
+# 2. Room data is loaded correctly
+# 3. CRUD operations work correctly
+###############################################################################
+
+### 1. Get All Rooms
+# Expected: Should return rooms from the dance studio (Studio A, Studio B)
+GET {{baseUrl}}/api/rooms
+Accept: application/json
+
+###
+
+### 2. Get Specific Room by ID
+# This uses a room ID that should exist in the database
+GET {{baseUrl}}/api/rooms/R1A2B3C4-1234-5678-9ABC-DEF012345601
+Accept: application/json
+
+###
+
+### 3. Create New Room
+POST {{baseUrl}}/api/rooms
+Content-Type: application/json
+
+{
+  "name": "Test Studio C",
+  "locationId": "e8f3d8c1-2a82-4f6e-b846-4ad35182e7f1",
+  "capacity": 25,
+  "description": "A test studio room for API testing",
+  "equipment": [
+    "Mirrors",
+    "Sound System",
+    "Air Conditioning"
+  ]
+}
+
+###
+
+### 4. Update Existing Room
+# Updates a room with new information
+PUT {{baseUrl}}/api/rooms/R1A2B3C4-1234-5678-9ABC-DEF012345601
+Content-Type: application/json
+
+{
+  "name": "Updated Studio A",
+  "capacity": 30,
+  "description": "Updated description for Studio A",
+  "equipment": [
+    "Mirrors",
+    "Sound System", 
+    "Air Conditioning",
+    "Special Flooring"
+  ]
+}
+
+###
+
+### 5. Get Non-Existent Room (Error Test)
+GET {{baseUrl}}/api/rooms/00000000-0000-0000-0000-000000000000
+Accept: application/json
+
+###
+
+### 6. Delete Room (Use with caution - will modify data)
+# DELETE {{baseUrl}}/api/rooms/R1A2B3C4-1234-5678-9ABC-DEF012345601
+
+###
+
+###############################################################################
+# Expected Results:
+# 
+# GET /api/rooms should return:
+# - Multiple rooms including "Studio A", "Studio B"
+# - Each room should have capacity, equipment, location info
+# 
+# GET /api/rooms/{id} should return:
+# - Detailed room information including equipment list
+# - Associated location information
+# 
+# POST /api/rooms should:
+# - Create a new room and return 201 Created
+# - Return the created room with generated ID
+# 
+# PUT /api/rooms/{id} should:
+# - Update the existing room and return updated data
+# 
+# DELETE /api/rooms/{id} should:
+# - Return 204 No Content on successful deletion
+# - Return 404 if room doesn't exist
+###############################################################################

@@ -76,8 +76,8 @@ Accept: application/json
 
 ###
 
-### 8. Delete Location (Use with caution - will modify mock data)
-# DELETE {{baseUrl}}/api/locations/e8f3d8c1-2a82-4f6e-b846-4ad35182e7f1
+### 8. Delete Location (Use with caution - will modify data)
+DELETE {{baseUrl}}/api/locations/e8f3d8c1-2a82-4f6e-b846-4ad35182e7f1
 
 ###
 
