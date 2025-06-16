@@ -51,7 +51,7 @@ public class AttendanceApiTests : BaseApiTest
         var classAttendance = await DeserializeResponse<ClassAttendanceDto>(response);
         
         Assert.That(classAttendance, Is.Not.Null, "Class attendance should not be null");
-        Assert.That(classAttendance.ScheduleId, Is.Not.Null.And.Not.Empty, "Schedule ID should not be empty");
+        Assert.That(classAttendance!.ScheduleId, Is.Not.Null.And.Not.Empty, "Schedule ID should not be empty");
         Assert.That(classAttendance.ClassName, Is.Not.Null.And.Not.Empty, "Class name should not be empty");
         Assert.That(classAttendance.DayOfWeek, Is.Not.Null.And.Not.Empty, "Day of week should not be empty");
         Assert.That(classAttendance.Level, Is.Not.Null.And.Not.Empty, "Level should not be empty");
