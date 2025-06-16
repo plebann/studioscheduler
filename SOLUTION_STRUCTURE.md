@@ -199,10 +199,29 @@ Based on analysis of https://salsame.pl/en/price-list/, our system models a real
 ---
 
 ## Documentation Files
-- **`SOLUTION_STRUCTURE.md`** - This file (architecture overview)
+
+### Root Level Documentation
+- **`README.md`** - Project overview, current status, and implementation roadmap
+- **`CHANGELOG.md`** - Complete change log of recent database migration and architecture updates
+- **`SOLUTION_STRUCTURE.md`** - This file (comprehensive architecture overview)
+
+### Business & Analysis Documentation
 - **`SALSAME_BUSINESS_ANALYSIS.md`** - Detailed business model analysis and pass system comparison
 - **`SCHEDULE_SYSTEM_FIXES.md`** - Technical fixes for schedule display issues
+
+### Development Documentation
 - **`COPILOT_INSTRUCTIONS.md`** - Development guidelines and coding standards
+- **`docs/schedule_implementation_plan.md`** - Data model specifications and implementation phases
+
+### API Testing Documentation
+- **`src/StudioScheduler.Server/Controllers/Tests/README.md`** - API testing instructions and setup
+- **`src/StudioScheduler.Server/Controllers/Tests/SETUP_SUMMARY.md`** - Testing troubleshooting and architecture notes
+
+### HTTP Test Files
+- **`src/StudioScheduler.Server/Controllers/Tests/AllEndpoints.http`** - Comprehensive API test suite
+- **`src/StudioScheduler.Server/Controllers/Tests/ClassesController.http`** - Classes endpoint tests
+- **`src/StudioScheduler.Server/Controllers/Tests/LocationsController.http`** - Locations endpoint tests
+- **`src/StudioScheduler.Server/Controllers/Tests/SchedulesController.http`** - Schedule endpoint tests
 
 ---
 
