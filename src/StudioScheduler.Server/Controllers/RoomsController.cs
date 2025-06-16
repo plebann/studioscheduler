@@ -64,8 +64,8 @@ public class RoomsController : ControllerBase
             Name = createDto.Name,
             LocationId = createDto.LocationId,
             Capacity = createDto.Capacity,
-            Description = createDto.Description,
-            Equipment = createDto.Equipment?.ToList()
+            Description = createDto.Description ?? string.Empty,
+            Equipment = createDto.Equipment?.ToList() ?? new List<string>()
         };
 
         var created = await _roomService.CreateAsync(room);
@@ -101,8 +101,8 @@ public class RoomsController : ControllerBase
             Name = updateDto.Name,
             LocationId = existingRoom.LocationId,
             Capacity = updateDto.Capacity,
-            Description = updateDto.Description,
-            Equipment = updateDto.Equipment?.ToList(),
+            Description = updateDto.Description ?? string.Empty,
+            Equipment = updateDto.Equipment?.ToList() ?? new List<string>(),
             CreatedAt = existingRoom.CreatedAt,
             UpdatedAt = DateTime.UtcNow
         };

@@ -11,12 +11,15 @@ public class ApplicationDbContext : DbContext
     }
 
     public DbSet<User> Users { get; set; }
+    public DbSet<Student> Students { get; set; }
     public DbSet<Location> Locations { get; set; }
     public DbSet<Room> Rooms { get; set; }
     public DbSet<DanceClass> DanceClasses { get; set; }
     public DbSet<Pass> Passes { get; set; }
     public DbSet<Reservation> Reservations { get; set; }
     public DbSet<Schedule> Schedules { get; set; }
+    public DbSet<Enrollment> Enrollments { get; set; }
+    public DbSet<Attendance> Attendances { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -69,9 +72,41 @@ public class ApplicationDbContext : DbContext
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Pass>()
-            .HasOne<User>()
+            .HasOne(p => p.User)
             .WithMany()
             .HasForeignKey(p => p.UserId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Student>()
+            .HasMany(s => s.Enrollments)
+            .WithOne(e => e.Student)
+            .HasForeignKey(e => e.StudentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Student>()
+            .HasMany(s => s.AttendanceRecords)
+            .WithOne(a => a.Student)
+            .HasForeignKey(a => a.StudentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Enrollment relationships
+        modelBuilder.Entity<Enrollment>()
+            .HasOne(e => e.Schedule)
+            .WithMany()
+            .HasForeignKey(e => e.ScheduleId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Attendance relationships
+        modelBuilder.Entity<Attendance>()
+            .HasOne(a => a.Schedule)
+            .WithMany()
+            .HasForeignKey(a => a.ScheduleId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Attendance>()
+            .HasOne(a => a.Pass)
+            .WithMany()
+            .HasForeignKey(a => a.PassUsed)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

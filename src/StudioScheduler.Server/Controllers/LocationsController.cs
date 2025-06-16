@@ -65,7 +65,7 @@ public class LocationsController : ControllerBase
         {
             Name = createDto.Name,
             Address = createDto.Address,
-            Description = createDto.Description,
+            Description = createDto.Description ?? string.Empty,
             Capacity = createDto.Capacity,
             OpeningTime = createDto.OpeningTime,
             ClosingTime = createDto.ClosingTime,
@@ -105,7 +105,7 @@ public class LocationsController : ControllerBase
             Id = existingLocation.Id,
             Name = updateDto.Name,
             Address = updateDto.Address,
-            Description = updateDto.Description,
+            Description = updateDto.Description ?? string.Empty,
             Capacity = updateDto.Capacity,
             OpeningTime = updateDto.OpeningTime,
             ClosingTime = updateDto.ClosingTime,

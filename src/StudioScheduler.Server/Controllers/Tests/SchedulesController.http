@@ -11,6 +11,8 @@
 GET {{baseUrl}}/api/schedules/weekly
 Accept: application/json
 
-###
-# You can run this request using the REST Client extension in VS Code.
-# This endpoint returns the weekly schedule as used by the client Schedule page.
+
+### 2. Get Schedule by ID
+# Expected: Should return a ScheduleDto for the specified ID
+GET {{baseUrl}}/api/schedules/C1A2B3C4-1234-5678-9ABC-DEF012345614
+Accept: application/json}
