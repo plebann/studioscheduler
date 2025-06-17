@@ -1,0 +1,304 @@
+// =============================================================================
+// SCHEDULE PAGE STYLES - SCSS VERSION
+// =============================================================================
+
+@import '../wwwroot/scss/variables';
+@import '../wwwroot/scss/mixins';
+
+// Schedule container
+.schedule-container {
+  @include container;
+}
+
+.schedule-header {
+  @include text-center;
+  margin-bottom: map-get($spacing, '8');
+}
+
+.schedule-title {
+  font-size: map-get($font-sizes, '3xl');
+  font-weight: map-get($font-weights, 'semibold');
+  color: $primary-light;
+  margin: 0;
+  letter-spacing: 0;
+}
+
+.loading-container {
+  @include loading-container;
+}
+
+.schedule-actions {
+  @include flex-column-center;
+  gap: map-get($spacing, '2');
+}
+
+.schedule-wrapper {
+  margin-bottom: map-get($spacing, '10');
+  overflow-x: auto;
+}
+
+// Desktop Table View
+.desktop-view {
+  display: block;
+}
+
+.mobile-view {
+  display: none;
+}
+
+.schedule-table {
+  table {
+    @include table-base;
+  }
+
+  th,
+  td {
+    @include table-cell;
+  }
+
+  th {
+    @include table-header;
+
+    &:first-child {
+      background: #fff;
+    }
+  }
+
+  td {
+    height: $schedule-slot-min-height;
+
+    &:first-child {
+      background: $time-slot-bg;
+      font-weight: map-get($font-weights, 'normal');
+      color: #000;
+      padding: map-get($spacing, '2') map-get($spacing, '4');
+    }
+
+    div {
+      @include schedule-slot;
+      font-family: inherit;
+      border: none;
+      margin: 0;
+    }
+
+    div strong {
+      font-weight: map-get($font-weights, 'bold');
+      margin-bottom: map-get($spacing, '1');
+      display: block;
+      font-size: map-get($font-sizes, 'sm');
+    }
+  }
+}
+
+.time-slot-header {
+  @include time-slot;
+}
+
+.clickable {
+  @include clickable;
+}
+
+.schedule-slot {
+  @include schedule-slot;
+}
+
+// Mobile View
+.schedule-mobile {
+  .day-block {
+    margin-bottom: map-get($spacing, '5');
+    border: 1px solid #e2e8f0;
+    border-radius: map-get($border-radius, 'lg');
+    overflow: hidden;
+
+    h3 {
+      background-color: $table-header-bg;
+      margin: 0;
+      padding: map-get($spacing, '4');
+      font-size: map-get($font-sizes, 'xl');
+      font-weight: map-get($font-weights, 'semibold');
+      color: $primary-light;
+      border-bottom: 1px solid #e2e8f0;
+    }
+  }
+
+  .time-block {
+    color: #fff;
+    border-radius: map-get($border-radius, 'lg');
+    margin-bottom: map-get($spacing, '2');
+    padding: map-get($spacing, '3');
+    transition: $transition-base;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .time-range {
+    font-weight: map-get($font-weights, 'semibold');
+    font-size: map-get($font-sizes, 'sm');
+    margin-bottom: map-get($spacing, '1');
+  }
+
+  .dance-name {
+    font-size: map-get($font-sizes, 'base');
+    margin-bottom: map-get($spacing, '1');
+  }
+
+  .level {
+    font-size: map-get($font-sizes, 'sm');
+    opacity: 0.9;
+  }
+
+  .no-classes {
+    padding: map-get($spacing, '5');
+    @include text-center;
+    color: #64748b;
+    font-style: italic;
+  }
+}
+
+// Context Menu
+.context-menu {
+  position: fixed;
+  z-index: map-get($z-index, 'dropdown');
+}
+
+// Action Buttons
+.action-buttons {
+  @include flex-center;
+  gap: map-get($spacing, '5');
+  margin: map-get($spacing, '10') 0;
+  flex-wrap: wrap;
+
+  .btn {
+    padding: map-get($spacing, '4') map-get($spacing, '8');
+    border: 2px solid transparent;
+    border-radius: map-get($border-radius, 'lg');
+    font-weight: map-get($font-weights, 'semibold');
+    text-decoration: none;
+    cursor: pointer;
+    transition: $transition-slow;
+    font-size: map-get($font-sizes, 'lg');
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: map-get($shadows, 'button');
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: map-get($shadows, 'button-hover');
+    }
+  }
+
+  .btn-primary {
+    background: $gradient-primary;
+    color: white;
+    border-color: #667eea;
+
+    &:hover {
+      background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    }
+  }
+
+  .btn-secondary {
+    background: $gradient-secondary;
+    color: white;
+    border-color: #f093fb;
+
+    &:hover {
+      box-shadow: 0 6px 20px rgba(240, 147, 251, 0.4);
+      background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+    }
+  }
+}
+
+// Level Info
+.level-info {
+  @include text-center;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: map-get($spacing, '8');
+  background: $gradient-background;
+  border-radius: map-get($border-radius, 'xl');
+  box-shadow: map-get($shadows, 'xl');
+
+  h5 {
+    font-size: map-get($font-sizes, '2xl');
+    font-weight: map-get($font-weights, 'bold');
+    color: $primary-dark;
+    margin-bottom: map-get($spacing, '4');
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  p {
+    color: #34495e;
+    line-height: 1.8;
+    font-size: map-get($font-sizes, 'lg');
+    font-weight: map-get($font-weights, 'normal');
+  }
+}
+
+// Responsive Design
+@include respond-below(md) {
+  .desktop-view {
+    display: none;
+  }
+
+  .mobile-view {
+    display: block;
+  }
+
+  .schedule-container {
+    padding: map-get($spacing, '4');
+  }
+
+  .schedule-title {
+    font-size: map-get($font-sizes, '2xl');
+  }
+
+  .action-buttons {
+    @include flex-column-center;
+
+    .btn {
+      width: 100%;
+      max-width: 300px;
+    }
+  }
+}
+
+@include respond-to(lg) {
+  .schedule-table {
+    font-size: map-get($font-sizes, 'sm');
+
+    td div {
+      min-height: 50px;
+      font-size: map-get($font-sizes, 'xs');
+    }
+  }
+}
+
+// High contrast mode for accessibility
+@media (prefers-contrast: high) {
+  .schedule-table {
+    th, td {
+      border-color: #000;
+      border-width: 2px;
+    }
+  }
+}
+
+// Reduced motion for accessibility
+@media (prefers-reduced-motion: reduce) {
+  .clickable,
+  .action-buttons .btn,
+  .schedule-slot,
+  .time-block {
+    transition: none;
+    transform: none;
+
+    &:hover {
+      transform: none;
+    }
+  }
+}

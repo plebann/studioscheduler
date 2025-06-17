@@ -1,0 +1,324 @@
+// =============================================================================
+// MUDBLAZOR CUSTOMIZATIONS - SalsaMe Theme
+// =============================================================================
+
+// Override MudBlazor's default theme colors
+:root {
+  // Primary palette (SalsaMe Red)
+  --mud-palette-primary: #{$primary-red};
+  --mud-palette-primary-hover: #{darken($primary-red, 10%)};
+  --mud-palette-primary-text: #ffffff;
+  --mud-palette-primary-contrasttext: #ffffff;
+  --mud-palette-primary-lighten: #{lighten($primary-red, 10%)};
+  --mud-palette-primary-darken: #{darken($primary-red, 10%)};
+
+  // Secondary palette (SalsaMe Gold)
+  --mud-palette-secondary: #{$primary-gold};
+  --mud-palette-secondary-hover: #{darken($primary-gold, 10%)};
+  --mud-palette-secondary-text: #ffffff;
+  --mud-palette-secondary-contrasttext: #ffffff;
+  --mud-palette-secondary-lighten: #{lighten($primary-gold, 10%)};
+  --mud-palette-secondary-darken: #{darken($primary-gold, 10%)};
+
+  // Success color
+  --mud-palette-success: #{map-get($colors, 'success')};
+  --mud-palette-success-hover: #{darken(map-get($colors, 'success'), 10%)};
+
+  // Warning color
+  --mud-palette-warning: #{map-get($colors, 'warning')};
+  --mud-palette-warning-hover: #{darken(map-get($colors, 'warning'), 10%)};
+
+  // Error color
+  --mud-palette-error: #{map-get($colors, 'error')};
+  --mud-palette-error-hover: #{darken(map-get($colors, 'error'), 10%)};
+
+  // Info color
+  --mud-palette-info: #{map-get($colors, 'info')};
+  --mud-palette-info-hover: #{darken(map-get($colors, 'info'), 10%)};
+
+  // Surface colors
+  --mud-palette-surface: #ffffff;
+  --mud-palette-background: #fafafa;
+  --mud-palette-background-grey: #f5f5f5;
+
+  // Text colors
+  --mud-palette-text-primary: #{$primary-dark};
+  --mud-palette-text-secondary: #{$primary-light};
+
+  // Border radius
+  --mud-default-borderradius: #{map-get($border-radius, 'base')};
+
+  // Typography
+  --mud-typography-default-family: #{$font-family-base};
+  --mud-typography-h1-family: #{$font-family-heading};
+  --mud-typography-h2-family: #{$font-family-heading};
+  --mud-typography-h3-family: #{$font-family-heading};
+  --mud-typography-h4-family: #{$font-family-heading};
+  --mud-typography-h5-family: #{$font-family-heading};
+  --mud-typography-h6-family: #{$font-family-heading};
+}
+
+// MudButton customizations
+.mud-button-root {
+  border-radius: map-get($border-radius, 'base');
+  font-weight: map-get($font-weights, 'semibold');
+  transition: $transition-base;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: map-get($shadows, 'lg');
+  }
+
+  // SalsaMe branded button
+  &.mud-button-salsame {
+    background: $gradient-salsame;
+    color: white;
+    border: none;
+
+    &:hover {
+      background: linear-gradient(135deg, $primary-gold 0%, $primary-red 100%);
+    }
+  }
+}
+
+// MudCard customizations
+.mud-card {
+  border-radius: map-get($border-radius, 'lg');
+  box-shadow: map-get($shadows, 'base');
+  transition: $transition-base;
+
+  &:hover {
+    box-shadow: map-get($shadows, 'lg');
+  }
+
+  .mud-card-header {
+    padding: map-get($spacing, '6');
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  }
+
+  .mud-card-content {
+    padding: map-get($spacing, '6');
+  }
+}
+
+// MudPaper customizations
+.mud-paper {
+  border-radius: map-get($border-radius, 'base');
+  
+  &.mud-elevation-1 {
+    box-shadow: map-get($shadows, 'sm');
+  }
+  
+  &.mud-elevation-2 {
+    box-shadow: map-get($shadows, 'base');
+  }
+  
+  &.mud-elevation-4 {
+    box-shadow: map-get($shadows, 'lg');
+  }
+}
+
+// MudTextField customizations
+.mud-input-control {
+  .mud-input-root {
+    border-radius: map-get($border-radius, 'base');
+  }
+
+  &.mud-input-control-margin-dense {
+    margin-bottom: map-get($spacing, '4');
+  }
+}
+
+// MudSelect customizations
+.mud-select {
+  .mud-input-root {
+    border-radius: map-get($border-radius, 'base');
+  }
+}
+
+// MudDataGrid customizations
+.mud-table-container {
+  border-radius: map-get($border-radius, 'lg');
+  overflow: hidden;
+
+  .mud-table {
+    .mud-table-head {
+      .mud-table-cell {
+        background-color: $table-header-bg;
+        font-weight: map-get($font-weights, 'semibold');
+        color: $primary-light;
+        border-bottom: 2px solid $table-border-color;
+      }
+    }
+
+    .mud-table-body {
+      .mud-table-row {
+        &:hover {
+          background-color: rgba($primary-red, 0.05);
+        }
+      }
+    }
+  }
+}
+
+// MudMenu customizations
+.mud-menu {
+  .mud-paper {
+    border-radius: map-get($border-radius, 'lg');
+    box-shadow: map-get($shadows, 'xl');
+    border: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  .mud-menu-item {
+    border-radius: map-get($border-radius, 'sm');
+    margin: map-get($spacing, '1');
+    transition: $transition-fast;
+
+    &:hover {
+      background-color: rgba($primary-red, 0.08);
+      color: $primary-red;
+    }
+  }
+}
+
+// MudDialog customizations
+.mud-dialog {
+  .mud-dialog-container {
+    .mud-paper {
+      border-radius: map-get($border-radius, 'xl');
+      box-shadow: map-get($shadows, 'xl');
+    }
+  }
+
+  .mud-dialog-title {
+    font-family: $font-family-heading;
+    font-weight: map-get($font-weights, 'semibold');
+    color: $primary-dark;
+  }
+}
+
+// MudSnackbar customizations
+.mud-snackbar {
+  border-radius: map-get($border-radius, 'lg');
+
+  &.mud-snackbar-severity-success {
+    background-color: map-get($colors, 'success');
+  }
+
+  &.mud-snackbar-severity-error {
+    background-color: map-get($colors, 'error');
+  }
+
+  &.mud-snackbar-severity-warning {
+    background-color: map-get($colors, 'warning');
+  }
+
+  &.mud-snackbar-severity-info {
+    background-color: map-get($colors, 'info');
+  }
+}
+
+// MudChip customizations
+.mud-chip {
+  border-radius: map-get($border-radius, 'full');
+  font-weight: map-get($font-weights, 'medium');
+
+  &.mud-chip-color-primary {
+    background-color: rgba($primary-red, 0.12);
+    color: $primary-red;
+  }
+
+  &.mud-chip-color-secondary {
+    background-color: rgba($primary-gold, 0.12);
+    color: $primary-gold;
+  }
+}
+
+// MudProgress customizations
+.mud-progress-circular {
+  &.mud-progress-color-primary {
+    color: $primary-red;
+  }
+
+  &.mud-progress-color-secondary {
+    color: $primary-gold;
+  }
+}
+
+// MudList customizations
+.mud-list {
+  .mud-list-item {
+    border-radius: map-get($border-radius, 'sm');
+    margin: map-get($spacing, '1') 0;
+    transition: $transition-fast;
+
+    &:hover {
+      background-color: rgba($primary-red, 0.05);
+    }
+
+    &.mud-list-item-active {
+      background-color: rgba($primary-red, 0.12);
+      color: $primary-red;
+    }
+  }
+}
+
+// MudDivider customizations
+.mud-divider {
+  border-color: rgba($primary-light, 0.12);
+}
+
+// MudIconButton customizations
+.mud-icon-button {
+  border-radius: map-get($border-radius, 'full');
+  transition: $transition-fast;
+
+  &:hover {
+    background-color: rgba($primary-red, 0.08);
+    transform: scale(1.05);
+  }
+
+  &.mud-icon-button-color-primary {
+    color: $primary-red;
+  }
+
+  &.mud-icon-button-color-secondary {
+    color: $primary-gold;
+  }
+}
+
+// MudToggleIconButton customizations
+.mud-toggle-icon-button {
+  border-radius: map-get($border-radius, 'full');
+
+  &.mud-toggle-icon-button-toggled {
+    background-color: rgba($primary-red, 0.12);
+    color: $primary-red;
+  }
+}
+
+// MudAlert customizations
+.mud-alert {
+  border-radius: map-get($border-radius, 'lg');
+  border-left-width: 4px;
+
+  &.mud-alert-severity-success {
+    border-left-color: map-get($colors, 'success');
+    background-color: rgba(map-get($colors, 'success'), 0.08);
+  }
+
+  &.mud-alert-severity-error {
+    border-left-color: map-get($colors, 'error');
+    background-color: rgba(map-get($colors, 'error'), 0.08);
+  }
+
+  &.mud-alert-severity-warning {
+    border-left-color: map-get($colors, 'warning');
+    background-color: rgba(map-get($colors, 'warning'), 0.08);
+  }
+
+  &.mud-alert-severity-info {
+    border-left-color: map-get($colors, 'info');
+    background-color: rgba(map-get($colors, 'info'), 0.08);
+  }
+}

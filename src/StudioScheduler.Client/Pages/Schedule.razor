@@ -13,7 +13,7 @@
         <div class="schedule-header">
             <h2 class="schedule-title">SCHEDULE 2025</h2>
         </div>
-        <div style="text-align: center; padding: 40px;">
+        <div class="loading-container">
             <p>Loading schedule...</p>
         </div>
     </div>
@@ -27,12 +27,6 @@ else
                 <MudText Typo="Typo.body2" Class="mb-2">
                     Click on any class to manage attendance
                 </MudText>
-                <MudButton Variant="Variant.Filled" 
-                          Color="Color.Primary" 
-                          OnClick="OpenCreateScheduleModal"
-                          Class="mt-2">
-                    ➕ Add New Class
-                </MudButton>
             </div>
         </div>
 
@@ -56,7 +50,7 @@ else
                         @foreach (var timeSlot in GetAllTimeSlots())
                         {
                             <tr>
-                                <td style="background: #f8f8f8;">@timeSlot</td>
+                                <td class="time-slot-header">@timeSlot</td>
                                 @foreach (var day in new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" })
                                 {
                                     <td>
@@ -66,7 +60,7 @@ else
                                         @if (classForSlot != null)
                                         {
                                             <div class="schedule-slot clickable" 
-                                                 style="background: @classForSlot.BackgroundColor; color: #fff; padding: 5px; cursor: pointer;"
+                                                 style="background: @classForSlot.BackgroundColor;"
                                                  @onclick="() => OpenAttendanceModal(classForSlot.Id.ToString())"
                                                  @oncontextmenu="(e) => OpenContextMenu(e, classForSlot.Id.ToString())"
                                                  title="Click to view details, right-click for options">
@@ -94,7 +88,7 @@ else
                             @foreach (var slot in weeklySchedule.Schedule[day])
                             {
                                 <div class="time-block clickable" 
-                                     style="background: @slot.BackgroundColor; color: #fff; cursor: pointer;"
+                                     style="background: @slot.BackgroundColor;"
                                      @onclick="() => OpenAttendanceModal(slot.Id.ToString())"
                                      title="Click to view details">
                                     <div class="time-range">@slot.TimeSlot</div>
@@ -150,37 +144,6 @@ else
        Learn at your pace, improve technique, and enjoy the rhythm.</p>
 </div>
 
-<style>
-    .clickable:hover {
-        opacity: 0.8;
-        transform: scale(1.02);
-        transition: all 0.2s ease;
-    }
-    
-    .schedule-slot {
-        border-radius: 4px;
-        transition: all 0.2s ease;
-    }
-    
-    .time-block {
-        border-radius: 8px;
-        margin-bottom: 8px;
-        padding: 12px;
-        transition: all 0.2s ease;
-    }
-
-    .schedule-actions {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .context-menu {
-        position: fixed;
-        z-index: 1000;
-    }
-</style>
 
 @code {
     private WeeklyScheduleDto? weeklySchedule;
@@ -290,30 +253,6 @@ else
         };
 
         var dialog = await DialogService.ShowAsync<ScheduleDetailsModal>("Edit Class", parameters, options);
-        var result = await dialog.Result;
-        
-        if (result != null && !result.Canceled)
-        {
-            await LoadSchedule(); // Refresh data
-        }
-    }
-
-    private async Task OpenCreateScheduleModal()
-    {
-        var parameters = new DialogParameters
-        {
-            ["Mode"] = "create"
-        };
-
-        var options = new DialogOptions() 
-        { 
-            MaxWidth = MaxWidth.Large, 
-            FullWidth = true,
-            CloseButton = true,
-            Position = DialogPosition.Center
-        };
-
-        var dialog = await DialogService.ShowAsync<ScheduleDetailsModal>("Create New Class", parameters, options);
         var result = await dialog.Result;
         
         if (result != null && !result.Canceled)

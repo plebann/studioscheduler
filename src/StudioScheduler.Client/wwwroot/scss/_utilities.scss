@@ -1,0 +1,165 @@
+// =============================================================================
+// UTILITY CLASSES
+// =============================================================================
+
+// Spacing utilities
+@include spacing-utilities(margin, 'm');
+@include spacing-utilities(margin-top, 'mt');
+@include spacing-utilities(margin-bottom, 'mb');
+@include spacing-utilities(margin-left, 'ml');
+@include spacing-utilities(margin-right, 'mr');
+@include spacing-utilities(padding, 'p');
+@include spacing-utilities(padding-top, 'pt');
+@include spacing-utilities(padding-bottom, 'pb');
+@include spacing-utilities(padding-left, 'pl');
+@include spacing-utilities(padding-right, 'pr');
+
+// Text utilities
+.text-center { @include text-center; }
+.text-truncate { @include text-truncate; }
+
+.text-xs { font-size: map-get($font-sizes, 'xs'); }
+.text-sm { font-size: map-get($font-sizes, 'sm'); }
+.text-base { font-size: map-get($font-sizes, 'base'); }
+.text-lg { font-size: map-get($font-sizes, 'lg'); }
+.text-xl { font-size: map-get($font-sizes, 'xl'); }
+.text-2xl { font-size: map-get($font-sizes, '2xl'); }
+.text-3xl { font-size: map-get($font-sizes, '3xl'); }
+.text-4xl { font-size: map-get($font-sizes, '4xl'); }
+
+.font-normal { font-weight: map-get($font-weights, 'normal'); }
+.font-medium { font-weight: map-get($font-weights, 'medium'); }
+.font-semibold { font-weight: map-get($font-weights, 'semibold'); }
+.font-bold { font-weight: map-get($font-weights, 'bold'); }
+
+// Color utilities
+@each $name, $color in $colors {
+  .text-#{$name} { color: $color; }
+  .bg-#{$name} { background-color: $color; }
+  .border-#{$name} { border-color: $color; }
+}
+
+// Flexbox utilities
+.flex { display: flex; }
+.flex-column { @include flex-column; }
+.flex-center { @include flex-center; }
+.flex-between { @include flex-between; }
+.flex-column-center { @include flex-column-center; }
+
+.items-start { align-items: flex-start; }
+.items-center { align-items: center; }
+.items-end { align-items: flex-end; }
+.items-stretch { align-items: stretch; }
+
+.justify-start { justify-content: flex-start; }
+.justify-center { justify-content: center; }
+.justify-end { justify-content: flex-end; }
+.justify-between { justify-content: space-between; }
+.justify-around { justify-content: space-around; }
+
+.flex-wrap { flex-wrap: wrap; }
+.flex-nowrap { flex-wrap: nowrap; }
+
+.flex-1 { flex: 1; }
+.flex-auto { flex: auto; }
+.flex-none { flex: none; }
+
+// Border radius utilities
+@each $name, $radius in $border-radius {
+  .rounded-#{$name} { border-radius: $radius; }
+}
+
+// Shadow utilities
+@each $name, $shadow in $shadows {
+  .shadow-#{$name} { box-shadow: $shadow; }
+}
+
+// Interactive utilities
+.clickable { @include clickable; }
+.pointer { cursor: pointer; }
+
+// Display utilities
+.block { display: block; }
+.inline { display: inline; }
+.inline-block { display: inline-block; }
+.hidden { display: none; }
+
+// Position utilities
+.relative { position: relative; }
+.absolute { position: absolute; }
+.fixed { position: fixed; }
+.sticky { position: sticky; }
+
+// Width utilities
+.w-full { width: 100%; }
+.w-auto { width: auto; }
+.w-fit { width: fit-content; }
+
+// Height utilities
+.h-full { height: 100%; }
+.h-auto { height: auto; }
+.h-screen { height: 100vh; }
+
+// Overflow utilities
+.overflow-hidden { overflow: hidden; }
+.overflow-auto { overflow: auto; }
+.overflow-x-auto { overflow-x: auto; }
+.overflow-y-auto { overflow-y: auto; }
+
+// Z-index utilities
+@each $name, $z in $z-index {
+  .z-#{$name} { z-index: $z; }
+}
+
+// Transition utilities
+.transition { transition: $transition-base; }
+.transition-slow { transition: $transition-slow; }
+.transition-fast { transition: $transition-fast; }
+
+// Transform utilities
+.transform { transform: translateZ(0); } // Enable hardware acceleration
+.scale-105 { transform: scale(1.05); }
+.scale-110 { transform: scale(1.1); }
+.translate-y-1 { transform: translateY(0.25rem); }
+.translate-y-2 { transform: translateY(0.5rem); }
+
+// Opacity utilities
+.opacity-0 { opacity: 0; }
+.opacity-25 { opacity: 0.25; }
+.opacity-50 { opacity: 0.5; }
+.opacity-75 { opacity: 0.75; }
+.opacity-90 { opacity: 0.9; }
+.opacity-100 { opacity: 1; }
+
+// Responsive utilities
+@include respond-below(md) {
+  .md\:hidden { display: none; }
+  .md\:block { display: block; }
+  .md\:flex { display: flex; }
+}
+
+@include respond-to(md) {
+  .md\:hidden { display: none; }
+  .md\:block { display: block; }
+  .md\:flex { display: flex; }
+}
+
+// Accessibility utilities
+.sr-only { @include sr-only; }
+
+// Focus utilities
+.focus\:outline:focus { @include focus-outline; }
+
+// Button utilities (using mixins)
+.btn-primary { @include button-primary; }
+.btn-secondary { @include button-secondary; }
+.btn-salsame { @include button-salsame; }
+
+// Card utilities
+.card { @include card; }
+.card-elevated { @include card-elevated; }
+
+// Gap utilities (for flexbox and grid)
+@each $name, $value in $spacing {
+  .gap-#{$name} { gap: $value; }
+}

@@ -1,0 +1,119 @@
+// =============================================================================
+// DESIGN TOKENS - SalsaMe Studio Scheduler
+// =============================================================================
+
+// Brand Colors (SalsaMe Theme)
+$primary-red: #E40046;
+$primary-gold: #B08A47;
+$primary-dark: #2c3e50;
+$primary-light: #334155;
+
+// Extended Color Palette
+$colors: (
+  'primary': $primary-red,
+  'secondary': $primary-gold,
+  'dark': $primary-dark,
+  'light': $primary-light,
+  'success': #26b050,
+  'warning': #ffa726,
+  'error': #f44336,
+  'info': #2196f3
+);
+
+// Gradients
+$gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+$gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+$gradient-salsame: linear-gradient(135deg, $primary-red 0%, $primary-gold 100%);
+$gradient-background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+
+// Typography
+$font-family-base: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+$font-family-heading: 'Poppins', sans-serif;
+
+$font-sizes: (
+  'xs': 0.75rem,    // 12px
+  'sm': 0.875rem,   // 14px
+  'base': 1rem,     // 16px
+  'lg': 1.125rem,   // 18px
+  'xl': 1.25rem,    // 20px
+  '2xl': 1.5rem,    // 24px
+  '3xl': 2rem,      // 32px
+  '4xl': 2.5rem     // 40px
+);
+
+$font-weights: (
+  'normal': 400,
+  'medium': 500,
+  'semibold': 600,
+  'bold': 700
+);
+
+// Spacing Scale (8px base)
+$spacing: (
+  '0': 0,
+  '1': 0.25rem,  // 4px
+  '2': 0.5rem,   // 8px
+  '3': 0.75rem,  // 12px
+  '4': 1rem,     // 16px
+  '5': 1.25rem,  // 20px
+  '6': 1.5rem,   // 24px
+  '8': 2rem,     // 32px
+  '10': 2.5rem,  // 40px
+  '12': 3rem,    // 48px
+  '16': 4rem,    // 64px
+  '20': 5rem     // 80px
+);
+
+// Border Radius
+$border-radius: (
+  'none': 0,
+  'sm': 0.25rem,   // 4px
+  'base': 0.5rem,  // 8px
+  'lg': 0.75rem,   // 12px
+  'xl': 1rem,      // 16px
+  'full': 9999px
+);
+
+// Shadows
+$shadows: (
+  'sm': 0 1px 2px rgba(0, 0, 0, 0.05),
+  'base': 0 1px 3px rgba(0, 0, 0, 0.1),
+  'lg': 0 4px 6px rgba(0, 0, 0, 0.1),
+  'xl': 0 8px 25px rgba(0, 0, 0, 0.1),
+  'button': 0 4px 15px rgba(0, 0, 0, 0.1),
+  'button-hover': 0 6px 20px rgba(102, 126, 234, 0.4)
+);
+
+// Z-Index Scale
+$z-index: (
+  'dropdown': 1000,
+  'modal': 1050,
+  'popover': 1060,
+  'tooltip': 1070
+);
+
+// Breakpoints
+$breakpoints: (
+  'sm': 640px,
+  'md': 768px,
+  'lg': 1024px,
+  'xl': 1280px,
+  '2xl': 1536px
+);
+
+// Layout
+$max-width-container: 1200px;
+$sidebar-width: 250px;
+$sidebar-collapsed-width: 60px;
+$header-height: 3.5rem;
+
+// Animation
+$transition-base: all 0.2s ease;
+$transition-slow: all 0.3s ease;
+$transition-fast: all 0.15s ease;
+
+// Table/Schedule specific
+$table-border-color: #ddd;
+$table-header-bg: #f8fafc;
+$time-slot-bg: #f8f8f8;
+$schedule-slot-min-height: 60px;

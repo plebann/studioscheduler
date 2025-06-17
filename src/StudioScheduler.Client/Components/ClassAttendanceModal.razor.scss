@@ -1,0 +1,275 @@
+// =============================================================================
+// CLASS ATTENDANCE MODAL STYLES - SCSS VERSION
+// =============================================================================
+
+@import '../wwwroot/scss/variables';
+@import '../wwwroot/scss/mixins';
+
+.attendance-button {
+  min-width: auto;
+  padding: map-get($spacing, '2');
+  border-radius: map-get($border-radius, 'full');
+  transition: $transition-base;
+  
+  &:hover {
+    background-color: rgba($primary-red, 0.08);
+    transform: scale(1.05);
+  }
+}
+
+// Additional component-specific styles
+.attendance-modal {
+  .class-info-header {
+    @include card;
+    margin-bottom: map-get($spacing, '6');
+    
+    .class-details {
+      @include flex-between;
+      flex-wrap: wrap;
+      gap: map-get($spacing, '4');
+      
+      .class-title {
+        flex-grow: 1;
+        font-family: $font-family-heading;
+        font-weight: map-get($font-weights, 'semibold');
+        color: $primary-dark;
+      }
+      
+      .class-meta {
+        @include flex-center;
+        gap: map-get($spacing, '4');
+        
+        .meta-item {
+          font-size: map-get($font-sizes, 'sm');
+          color: $primary-light;
+        }
+      }
+      
+      .student-count {
+        background-color: rgba($primary-red, 0.12);
+        color: $primary-red;
+        padding: map-get($spacing, '1') map-get($spacing, '3');
+        border-radius: map-get($border-radius, 'full');
+        font-weight: map-get($font-weights, 'medium');
+        font-size: map-get($font-sizes, 'sm');
+      }
+    }
+  }
+  
+  .search-container {
+    margin-bottom: map-get($spacing, '6');
+    
+    .search-input {
+      width: 100%;
+      padding: map-get($spacing, '3');
+      border: 1px solid rgba($primary-light, 0.2);
+      border-radius: map-get($border-radius, 'base');
+      font-size: map-get($font-sizes, 'base');
+      transition: $transition-base;
+      
+      &:focus {
+        outline: none;
+        border-color: $primary-red;
+        box-shadow: 0 0 0 2px rgba($primary-red, 0.1);
+      }
+      
+      &::placeholder {
+        color: rgba($primary-light, 0.6);
+      }
+    }
+  }
+  
+  .student-list {
+    @include card;
+    max-height: 400px;
+    overflow-y: auto;
+    
+    .student-item {
+      padding: map-get($spacing, '4');
+      border-bottom: 1px solid rgba($primary-light, 0.1);
+      transition: $transition-base;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      &:hover {
+        background-color: rgba($primary-red, 0.03);
+      }
+      
+      .student-info {
+        @include flex-between;
+        align-items: center;
+        
+        .student-name {
+          font-weight: map-get($font-weights, 'medium');
+          color: $primary-dark;
+        }
+        
+        .attendance-toggle {
+          @include flex-center;
+          gap: map-get($spacing, '2');
+          
+          .toggle-button {
+            padding: map-get($spacing, '1') map-get($spacing, '3');
+            border: 1px solid rgba($primary-light, 0.2);
+            border-radius: map-get($border-radius, 'base');
+            background: white;
+            cursor: pointer;
+            transition: $transition-base;
+            font-size: map-get($font-sizes, 'sm');
+            
+            &:hover {
+              background-color: rgba($primary-red, 0.05);
+            }
+            
+            &.present {
+              background-color: map-get($colors, 'success');
+              color: white;
+              border-color: map-get($colors, 'success');
+            }
+            
+            &.absent {
+              background-color: map-get($colors, 'error');
+              color: white;
+              border-color: map-get($colors, 'error');
+            }
+          }
+        }
+      }
+    }
+    
+    .no-students {
+      padding: map-get($spacing, '8');
+      @include text-center;
+      color: rgba($primary-light, 0.6);
+      font-style: italic;
+      
+      .empty-icon {
+        font-size: map-get($font-sizes, '4xl');
+        margin-bottom: map-get($spacing, '4');
+        opacity: 0.3;
+      }
+    }
+  }
+  
+  .loading-state {
+    @include flex-column-center;
+    padding: map-get($spacing, '8');
+    
+    .loading-spinner {
+      margin-bottom: map-get($spacing, '4');
+    }
+    
+    .loading-text {
+      color: rgba($primary-light, 0.7);
+      font-size: map-get($font-sizes, 'sm');
+    }
+  }
+  
+  .error-state {
+    @include card;
+    background-color: rgba(map-get($colors, 'error'), 0.05);
+    border-left: 4px solid map-get($colors, 'error');
+    
+    .error-title {
+      color: map-get($colors, 'error');
+      font-weight: map-get($font-weights, 'semibold');
+      margin-bottom: map-get($spacing, '2');
+    }
+    
+    .error-message {
+      color: rgba(map-get($colors, 'error'), 0.8);
+      font-size: map-get($font-sizes, 'sm');
+    }
+  }
+}
+
+// Dialog actions styling
+.attendance-modal-actions {
+  @include flex-between;
+  padding: map-get($spacing, '6');
+  border-top: 1px solid rgba($primary-light, 0.1);
+  
+  .action-button {
+    padding: map-get($spacing, '3') map-get($spacing, '6');
+    border-radius: map-get($border-radius, 'base');
+    font-weight: map-get($font-weights, 'medium');
+    transition: $transition-base;
+    cursor: pointer;
+    
+    &.primary {
+      background: $gradient-salsame;
+      color: white;
+      border: none;
+      
+      &:hover {
+        background: linear-gradient(135deg, $primary-gold 0%, $primary-red 100%);
+        transform: translateY(-1px);
+        box-shadow: map-get($shadows, 'lg');
+      }
+    }
+    
+    &.secondary {
+      background: white;
+      color: $primary-light;
+      border: 1px solid rgba($primary-light, 0.2);
+      
+      &:hover {
+        background-color: rgba($primary-light, 0.05);
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@include respond-below(md) {
+  .attendance-modal {
+    .class-info-header {
+      .class-details {
+        @include flex-column;
+        align-items: flex-start;
+        
+        .class-meta {
+          @include flex-column;
+          align-items: flex-start;
+          gap: map-get($spacing, '2');
+        }
+      }
+    }
+    
+    .student-list {
+      max-height: 300px;
+      
+      .student-item {
+        .student-info {
+          @include flex-column;
+          align-items: flex-start;
+          gap: map-get($spacing, '2');
+        }
+      }
+    }
+  }
+  
+  .attendance-modal-actions {
+    @include flex-column;
+    gap: map-get($spacing, '3');
+    
+    .action-button {
+      width: 100%;
+    }
+  }
+}
+
+// Accessibility improvements
+@media (prefers-reduced-motion: reduce) {
+  .attendance-button,
+  .toggle-button,
+  .action-button {
+    transition: none;
+    
+    &:hover {
+      transform: none;
+    }
+  }
+}
