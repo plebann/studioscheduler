@@ -11,6 +11,6 @@ public interface IRoomService
     Task<bool> DeleteAsync(Guid id);
     Task<bool> ExistsAsync(Guid id);
     Task<bool> IsRoomAvailableAsync(Guid roomId, DateTime startTime, TimeSpan duration);
-    Task<IEnumerable<DanceClass>> GetRoomClassesAsync(Guid roomId);
+    Task<IEnumerable<Schedule>> GetRoomSchedulesAsync(Guid roomId);
     Task<Room?> GetRoomByLocationAndNameAsync(Guid locationId, string name);
 }

@@ -31,7 +31,11 @@ public class SchedulesController : ControllerBase
             StartTime = s.StartTime,
             Duration = s.Duration,
             IsActive = s.IsActive,
-            IsCancelled = s.IsCancelled
+            IsCancelled = s.IsCancelled,
+            Level = s.Level,
+            InstructorName = s.Instructor != null ? $"{s.Instructor.FirstName} {s.Instructor.LastName}" : null,
+            RoomName = s.Room?.Name,
+            Capacity = s.Capacity
         });
         
         return Ok(summaries);
@@ -64,7 +68,13 @@ public class SchedulesController : ControllerBase
             EffectiveTo = schedule.EffectiveTo,
             IsActive = schedule.IsActive,
             CreatedAt = schedule.CreatedAt,
-            UpdatedAt = schedule.UpdatedAt
+            UpdatedAt = schedule.UpdatedAt,
+            Level = schedule.Level,
+            InstructorId = schedule.InstructorId,
+            InstructorName = schedule.Instructor != null ? $"{schedule.Instructor.FirstName} {schedule.Instructor.LastName}" : null,
+            RoomId = schedule.RoomId,
+            RoomName = schedule.Room?.Name,
+            Capacity = schedule.Capacity
         };
 
         return Ok(scheduleDto);
@@ -86,7 +96,11 @@ public class SchedulesController : ControllerBase
             EffectiveFrom = createDto.EffectiveFrom,
             EffectiveTo = createDto.EffectiveTo,
             IsActive = true,
-            IsCancelled = false
+            IsCancelled = false,
+            Level = createDto.Level,
+            InstructorId = createDto.InstructorId,
+            RoomId = createDto.RoomId,
+            Capacity = createDto.Capacity
         };
 
         var created = await _scheduleService.CreateAsync(schedule);
@@ -109,7 +123,13 @@ public class SchedulesController : ControllerBase
             EffectiveTo = created.EffectiveTo,
             IsActive = created.IsActive,
             CreatedAt = created.CreatedAt,
-            UpdatedAt = created.UpdatedAt
+            UpdatedAt = created.UpdatedAt,
+            Level = created.Level,
+            InstructorId = created.InstructorId,
+            InstructorName = created.Instructor != null ? $"{created.Instructor.FirstName} {created.Instructor.LastName}" : null,
+            RoomId = created.RoomId,
+            RoomName = created.Room?.Name,
+            Capacity = created.Capacity
         };
 
         return CreatedAtAction(nameof(GetSchedule), new { id = scheduleDto.Id }, scheduleDto);
@@ -140,7 +160,11 @@ public class SchedulesController : ControllerBase
             IsActive = updateDto.IsActive,
             IsCancelled = updateDto.IsCancelled,
             CreatedAt = existingSchedule.CreatedAt,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
+            Level = updateDto.Level,
+            InstructorId = updateDto.InstructorId,
+            RoomId = updateDto.RoomId,
+            Capacity = updateDto.Capacity
         };
 
         var updated = await _scheduleService.UpdateAsync(updatedSchedule);
@@ -163,7 +187,13 @@ public class SchedulesController : ControllerBase
             EffectiveTo = updated.EffectiveTo,
             IsActive = updated.IsActive,
             CreatedAt = updated.CreatedAt,
-            UpdatedAt = updated.UpdatedAt
+            UpdatedAt = updated.UpdatedAt,
+            Level = updated.Level,
+            InstructorId = updated.InstructorId,
+            InstructorName = updated.Instructor != null ? $"{updated.Instructor.FirstName} {updated.Instructor.LastName}" : null,
+            RoomId = updated.RoomId,
+            RoomName = updated.Room?.Name,
+            Capacity = updated.Capacity
         };
 
         return Ok(scheduleDto);
@@ -225,7 +255,7 @@ public class SchedulesController : ControllerBase
 
             // Use dance class information for accurate data
             var danceName = danceClass?.Name ?? schedule.Name;
-            var level = danceClass?.Level ?? "P1";
+            var level = schedule.Level;
             var style = danceClass?.Style ?? "UNKNOWN";
 
             // Determine background color based on dance style

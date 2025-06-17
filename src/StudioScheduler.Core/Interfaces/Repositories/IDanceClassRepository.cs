@@ -11,11 +11,9 @@ public interface IDanceClassRepository
     Task<bool> DeleteAsync(Guid id);
     Task<bool> ExistsAsync(Guid id);
     Task<IEnumerable<DanceClass>> GetByStyleAsync(string style);
-    Task<IEnumerable<DanceClass>> GetByLevelAsync(string level);
-    Task<IEnumerable<DanceClass>> GetByInstructorAsync(Guid instructorId);
-    Task<IEnumerable<DanceClass>> GetByRoomAsync(Guid roomId);
     Task<IEnumerable<Schedule>> GetSchedulesAsync(Guid classId);
     Task<int> GetCurrentEnrollmentAsync(Guid classId);
     Task<bool> IsInstructorAvailableAsync(Guid instructorId, DateTime startTime, TimeSpan duration);
     Task SaveChangesAsync();
+    Task<DanceClass?> GetByNameAsync(string name);
 }

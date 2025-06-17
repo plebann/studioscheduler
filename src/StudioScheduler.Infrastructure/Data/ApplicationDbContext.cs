@@ -38,25 +38,25 @@ public class ApplicationDbContext : DbContext
             .OnDelete(DeleteBehavior.Restrict);
 
         // Room relationships
-        modelBuilder.Entity<DanceClass>()
-            .HasOne(c => c.Room)
-            .WithMany(r => r.Classes)
-            .HasForeignKey(c => c.RoomId)
+        modelBuilder.Entity<Schedule>()
+            .HasOne(s => s.Room)
+            .WithMany(r => r.Schedules)
+            .HasForeignKey(s => s.RoomId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Instructor relationships
+        modelBuilder.Entity<Schedule>()
+            .HasOne(s => s.Instructor)
+            .WithMany()
+            .HasForeignKey(s => s.InstructorId)
             .OnDelete(DeleteBehavior.Restrict);
 
         // DanceClass relationships
-        modelBuilder.Entity<DanceClass>()
-            .HasOne(c => c.Instructor)
-            .WithMany()
-            .HasForeignKey(c => c.InstructorId)
-            .OnDelete(DeleteBehavior.Restrict);
-
         modelBuilder.Entity<Schedule>()
             .HasOne(s => s.DanceClass)
             .WithMany(c => c.Schedules)
             .HasForeignKey(s => s.DanceClassId)
             .OnDelete(DeleteBehavior.Restrict);
-
 
         modelBuilder.Entity<Pass>()
             .HasOne(p => p.User)
@@ -79,7 +79,7 @@ public class ApplicationDbContext : DbContext
         // Enrollment relationships
         modelBuilder.Entity<Enrollment>()
             .HasOne(e => e.Schedule)
-            .WithMany()
+            .WithMany(s => s.Enrollments)
             .HasForeignKey(e => e.ScheduleId)
             .OnDelete(DeleteBehavior.Restrict);
 

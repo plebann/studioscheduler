@@ -122,8 +122,8 @@ public class AttendanceController : ControllerBase
                 ClassName = schedule.DanceClass?.Name ?? schedule.Name,
                 DayOfWeek = schedule.StartTime.DayOfWeek.ToString(),
                 StartTime = schedule.StartTime,
-                Instructor = schedule.DanceClass?.Instructor?.FirstName + " " + schedule.DanceClass?.Instructor?.LastName ?? "TBD",
-                Level = schedule.DanceClass?.Level ?? "Unknown",
+                Instructor = schedule.Instructor != null ? $"{schedule.Instructor.FirstName} {schedule.Instructor.LastName}" : "TBD",
+                Level = schedule.Level,
                 Style = schedule.DanceClass?.Style ?? "Unknown",
                 EnrolledStudents = enrolledStudents
             };

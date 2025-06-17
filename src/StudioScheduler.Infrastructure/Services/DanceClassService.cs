@@ -30,16 +30,6 @@ public class DanceClassService : IDanceClassService
         return await _repository.GetByStyleAsync(style);
     }
 
-    public async Task<IEnumerable<DanceClass>> GetByLevelAsync(string level)
-    {
-        return await _repository.GetByLevelAsync(level);
-    }
-
-    public async Task<IEnumerable<DanceClass>> GetByInstructorAsync(Guid instructorId)
-    {
-        return await _repository.GetByInstructorAsync(instructorId);
-    }
-
     public async Task<DanceClass> CreateAsync(DanceClass danceClass)
     {
         var created = await _repository.AddAsync(danceClass);
@@ -72,11 +62,6 @@ public class DanceClassService : IDanceClassService
     public async Task<IEnumerable<Schedule>> GetClassSchedulesAsync(Guid classId)
     {
         return await _scheduleRepository.GetByDanceClassAsync(classId);
-    }
-
-    public async Task<IEnumerable<DanceClass>> GetClassesByRoomAsync(Guid roomId)
-    {
-        return await _repository.GetByRoomAsync(roomId);
     }
 
     public async Task<bool> IsInstructorAvailableAsync(Guid instructorId, DateTime startTime, TimeSpan duration)

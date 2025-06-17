@@ -20,11 +20,11 @@ public class EnrollmentRepository : IEnrollmentRepository
             .Include(e => e.Student)
             .Include(e => e.Schedule)
             .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Room)
+            .Include(e => e.Schedule)
+            .ThenInclude(s => s.Room)
             .ThenInclude(r => r.Location)
             .Include(e => e.Schedule)
-            .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Instructor)
+            .ThenInclude(s => s.Instructor)
             .FirstOrDefaultAsync(e => e.Id == id);
     }
 
@@ -34,11 +34,11 @@ public class EnrollmentRepository : IEnrollmentRepository
             .Include(e => e.Student)
             .Include(e => e.Schedule)
             .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Room)
+            .Include(e => e.Schedule)
+            .ThenInclude(s => s.Room)
             .ThenInclude(r => r.Location)
             .Include(e => e.Schedule)
-            .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Instructor)
+            .ThenInclude(s => s.Instructor)
             .ToListAsync();
     }
 
@@ -79,11 +79,11 @@ public class EnrollmentRepository : IEnrollmentRepository
             .Include(e => e.Student)
             .Include(e => e.Schedule)
             .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Room)
+            .Include(e => e.Schedule)
+            .ThenInclude(s => s.Room)
             .ThenInclude(r => r.Location)
             .Include(e => e.Schedule)
-            .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Instructor)
+            .ThenInclude(s => s.Instructor)
             .ToListAsync();
     }
 
@@ -94,11 +94,11 @@ public class EnrollmentRepository : IEnrollmentRepository
             .Include(e => e.Student)
             .Include(e => e.Schedule)
             .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Room)
+            .Include(e => e.Schedule)
+            .ThenInclude(s => s.Room)
             .ThenInclude(r => r.Location)
             .Include(e => e.Schedule)
-            .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Instructor)
+            .ThenInclude(s => s.Instructor)
             .ToListAsync();
     }
 
@@ -109,11 +109,11 @@ public class EnrollmentRepository : IEnrollmentRepository
             .Include(e => e.Student)
             .Include(e => e.Schedule)
             .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Room)
+            .Include(e => e.Schedule)
+            .ThenInclude(s => s.Room)
             .ThenInclude(r => r.Location)
             .Include(e => e.Schedule)
-            .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Instructor)
+            .ThenInclude(s => s.Instructor)
             .ToListAsync();
     }
 

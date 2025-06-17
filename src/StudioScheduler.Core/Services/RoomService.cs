@@ -81,9 +81,9 @@ public class RoomService : IRoomService
         return await _roomRepository.IsAvailableAsync(roomId, startTime, duration);
     }
 
-    public async Task<IEnumerable<DanceClass>> GetRoomClassesAsync(Guid roomId)
+    public async Task<IEnumerable<Schedule>> GetRoomSchedulesAsync(Guid roomId)
     {
-        return await _roomRepository.GetClassesAsync(roomId);
+        return await _roomRepository.GetSchedulesAsync(roomId);
     }
 
     public async Task<Room?> GetRoomByLocationAndNameAsync(Guid locationId, string name)

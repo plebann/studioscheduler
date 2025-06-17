@@ -18,7 +18,6 @@ public class RoomRepository : IRoomRepository
     {
         return await _context.Rooms
             .Include(r => r.Location)
-            .Include(r => r.Classes)
             .FirstOrDefaultAsync(r => r.Id == id);
     }
 
@@ -26,7 +25,6 @@ public class RoomRepository : IRoomRepository
     {
         return await _context.Rooms
             .Include(r => r.Location)
-            .Include(r => r.Classes)
             .ToListAsync();
     }
 
@@ -65,7 +63,6 @@ public class RoomRepository : IRoomRepository
         return await _context.Rooms
             .Where(r => r.LocationId == locationId)
             .Include(r => r.Location)
-            .Include(r => r.Classes)
             .ToListAsync();
     }
 
@@ -75,12 +72,13 @@ public class RoomRepository : IRoomRepository
             .FirstOrDefaultAsync(r => r.Name == name && r.LocationId == locationId);
     }
 
-    public async Task<IEnumerable<DanceClass>> GetClassesAsync(Guid roomId)
+    public async Task<IEnumerable<Schedule>> GetSchedulesAsync(Guid roomId)
     {
-        return await _context.DanceClasses
-            .Where(c => c.RoomId == roomId)
-            .Include(c => c.Room)
-            .Include(c => c.Instructor)
+        return await _context.Schedules
+            .Where(s => s.RoomId == roomId)
+            .Include(s => s.Room)
+            .Include(s => s.Instructor)
+            .Include(s => s.DanceClass)
             .ToListAsync();
     }
 
@@ -90,7 +88,7 @@ public class RoomRepository : IRoomRepository
         
         // Check if there are any overlapping schedules for this room
         var overlappingSchedules = await _context.Schedules
-            .Where(s => s.DanceClass != null && s.DanceClass.RoomId == roomId)
+            .Where(s => s.RoomId == roomId)
             .Where(s => s.StartTime < endTime && s.StartTime.Add(s.Duration) > startTime)
             .AnyAsync();
 

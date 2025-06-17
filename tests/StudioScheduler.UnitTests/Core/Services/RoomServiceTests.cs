@@ -356,35 +356,36 @@ public class RoomServiceTests
     }
 
     [Fact]
-    public async Task GetRoomClassesAsync_ShouldReturnClasses()
+    public async Task GetRoomSchedulesAsync_ShouldReturnSchedules()
     {
         // Arrange
         var roomId = Guid.NewGuid();
-        var classes = new List<DanceClass>
+        var schedules = new List<Schedule>
         {
             new()
             {
-                Name = "Salsa Beginners",
-                Description = "Basic salsa class",
-                Level = "P1",
-                Style = "Salsa",
-                Capacity = 20,
-                InstructorId = Guid.NewGuid(),
-                RoomId = roomId
+                Name = "Monday Evening Salsa",
+                LocationId = Guid.NewGuid(),
+                EffectiveFrom = DateTime.UtcNow,
+                DanceClassId = Guid.NewGuid(),
+                StartTime = DateTime.UtcNow.AddDays(1),
+                Duration = TimeSpan.FromHours(1),
+                Level = "Beginner",
+                Capacity = 20
             }
         };
 
         _mockRoomRepository
-            .Setup(x => x.GetClassesAsync(roomId))
-            .ReturnsAsync(classes);
+            .Setup(x => x.GetSchedulesAsync(roomId))
+            .ReturnsAsync(schedules);
 
         // Act
-        var result = await _roomService.GetRoomClassesAsync(roomId);
+        var result = await _roomService.GetRoomSchedulesAsync(roomId);
 
         // Assert
         result.Should().HaveCount(1);
-        result.Should().BeEquivalentTo(classes);
-        _mockRoomRepository.Verify(x => x.GetClassesAsync(roomId), Times.Once);
+        result.Should().BeEquivalentTo(schedules);
+        _mockRoomRepository.Verify(x => x.GetSchedulesAsync(roomId), Times.Once);
     }
 
     [Fact]

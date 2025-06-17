@@ -19,6 +19,14 @@ public record ScheduleDto
     public bool IsActive { get; init; }
     public DateTime CreatedAt { get; init; }
     public DateTime? UpdatedAt { get; init; }
+    
+    // ✅ NEW: Properties moved from DanceClass
+    public required string Level { get; init; }
+    public Guid? InstructorId { get; init; }
+    public string? InstructorName { get; init; }
+    public Guid? RoomId { get; init; }
+    public string? RoomName { get; init; }
+    public required int Capacity { get; init; }
 }
 
 public record CreateScheduleDto
@@ -33,6 +41,12 @@ public record CreateScheduleDto
     public DateTime? RecurrenceEndDate { get; init; }
     public required DateTime EffectiveFrom { get; init; }
     public DateTime? EffectiveTo { get; init; }
+    
+    // ✅ NEW: Properties moved from DanceClass
+    public required string Level { get; init; }
+    public Guid? InstructorId { get; init; }
+    public Guid? RoomId { get; init; }
+    public required int Capacity { get; init; }
 }
 
 public record UpdateScheduleDto
@@ -47,6 +61,12 @@ public record UpdateScheduleDto
     public DateTime? EffectiveTo { get; init; }
     public bool IsActive { get; init; }
     public bool IsCancelled { get; init; }
+    
+    // ✅ NEW: Properties moved from DanceClass
+    public required string Level { get; init; }
+    public Guid? InstructorId { get; init; }
+    public Guid? RoomId { get; init; }
+    public required int Capacity { get; init; }
 }
 
 public record ScheduleSummaryDto
@@ -59,6 +79,12 @@ public record ScheduleSummaryDto
     public required TimeSpan Duration { get; init; }
     public bool IsActive { get; init; }
     public bool IsCancelled { get; init; }
+    
+    // ✅ NEW: Properties moved from DanceClass
+    public required string Level { get; init; }
+    public string? InstructorName { get; init; }
+    public string? RoomName { get; init; }
+    public required int Capacity { get; init; }
 }
 
 public record WeeklyScheduleDto

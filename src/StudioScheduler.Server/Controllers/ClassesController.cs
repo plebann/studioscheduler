@@ -24,8 +24,6 @@ public class ClassesController : ControllerBase
         {
             Id = c.Id,
             Name = c.Name,
-            InstructorName = c.Instructor != null ? $"{c.Instructor.FirstName} {c.Instructor.LastName}" : null,
-            Capacity = c.Capacity,
             IsActive = c.IsActive
         });
         
@@ -46,9 +44,6 @@ public class ClassesController : ControllerBase
             Id = danceClass.Id,
             Name = danceClass.Name,
             Description = danceClass.Description,
-            Capacity = danceClass.Capacity,
-            InstructorId = danceClass.InstructorId,
-            InstructorName = danceClass.Instructor != null ? $"{danceClass.Instructor.FirstName} {danceClass.Instructor.LastName}" : null,
             IsActive = danceClass.IsActive,
             CreatedAt = danceClass.CreatedAt,
             UpdatedAt = danceClass.UpdatedAt
@@ -64,11 +59,7 @@ public class ClassesController : ControllerBase
         {
             Name = createDto.Name,
             Description = createDto.Description,
-            Level = createDto.Level,
             Style = createDto.Style,
-            Capacity = createDto.Capacity,
-            InstructorId = createDto.InstructorId,
-            RoomId = createDto.RoomId,
             IsActive = true
         };
 
@@ -79,9 +70,6 @@ public class ClassesController : ControllerBase
             Id = created.Id,
             Name = created.Name,
             Description = created.Description,
-            Capacity = created.Capacity,
-            InstructorId = created.InstructorId,
-            InstructorName = created.Instructor != null ? $"{created.Instructor.FirstName} {created.Instructor.LastName}" : null,
             IsActive = created.IsActive,
             CreatedAt = created.CreatedAt,
             UpdatedAt = created.UpdatedAt
@@ -104,11 +92,7 @@ public class ClassesController : ControllerBase
             Id = existingClass.Id,
             Name = updateDto.Name,
             Description = updateDto.Description,
-            Level = updateDto.Level,
             Style = updateDto.Style,
-            Capacity = updateDto.Capacity,
-            InstructorId = updateDto.InstructorId,
-            RoomId = updateDto.RoomId,
             IsActive = updateDto.IsActive,
             CreatedAt = existingClass.CreatedAt,
             UpdatedAt = DateTime.UtcNow
@@ -121,9 +105,6 @@ public class ClassesController : ControllerBase
             Id = updated.Id,
             Name = updated.Name,
             Description = updated.Description,
-            Capacity = updated.Capacity,
-            InstructorId = updated.InstructorId,
-            InstructorName = updated.Instructor != null ? $"{updated.Instructor.FirstName} {updated.Instructor.LastName}" : null,
             IsActive = updated.IsActive,
             CreatedAt = updated.CreatedAt,
             UpdatedAt = updated.UpdatedAt

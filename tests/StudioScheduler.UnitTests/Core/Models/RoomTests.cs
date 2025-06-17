@@ -30,7 +30,6 @@ public class RoomTests
         room.IsActive.Should().BeTrue();
         room.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
         room.UpdatedAt.Should().BeNull();
-        room.Classes.Should().BeEmpty();
     }
 
     [Fact]
@@ -80,37 +79,6 @@ public class RoomTests
 
         // Assert
         room.Capacity.Should().Be(capacity);
-    }
-
-    [Fact]
-    public void Room_ShouldAllowModificationOfClassesCollection()
-    {
-        // Arrange
-        var room = new Room
-        {
-            Name = "Test Room",
-            Description = "Test Description",
-            Capacity = 20,
-            LocationId = Guid.NewGuid()
-        };
-
-        var danceClass = new DanceClass
-        {
-            Name = "Salsa Beginners",
-            Description = "Basic salsa class",
-            Level = "P1",
-            Style = "Salsa",
-            Capacity = 15,
-            InstructorId = Guid.NewGuid(),
-            RoomId = room.Id
-        };
-
-        // Act
-        room.Classes.Add(danceClass);
-
-        // Assert
-        room.Classes.Should().HaveCount(1);
-        room.Classes.Should().Contain(danceClass);
     }
 
     [Fact]

@@ -12,7 +12,7 @@ public interface IRoomRepository
     Task<bool> ExistsAsync(Guid id);
     Task<IEnumerable<Room>> GetByLocationIdAsync(Guid locationId);
     Task<Room?> GetByLocationAndNameAsync(Guid locationId, string name);
-    Task<IEnumerable<DanceClass>> GetClassesAsync(Guid roomId);
+    Task<IEnumerable<Schedule>> GetSchedulesAsync(Guid roomId);
     Task<bool> IsAvailableAsync(Guid roomId, DateTime startTime, TimeSpan duration);
     Task SaveChangesAsync();
 }

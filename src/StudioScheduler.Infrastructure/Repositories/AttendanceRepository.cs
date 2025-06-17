@@ -20,11 +20,11 @@ public class AttendanceRepository : IAttendanceRepository
             .Include(a => a.Student)
             .Include(a => a.Schedule)
             .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Room)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.Room)
             .ThenInclude(r => r.Location)
             .Include(a => a.Schedule)
-            .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Instructor)
+            .ThenInclude(s => s.Instructor)
             .Include(a => a.Pass)
             .FirstOrDefaultAsync(a => a.Id == id);
     }
@@ -35,11 +35,11 @@ public class AttendanceRepository : IAttendanceRepository
             .Include(a => a.Student)
             .Include(a => a.Schedule)
             .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Room)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.Room)
             .ThenInclude(r => r.Location)
             .Include(a => a.Schedule)
-            .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Instructor)
+            .ThenInclude(s => s.Instructor)
             .Include(a => a.Pass)
             .OrderByDescending(a => a.ClassDate)
             .ToListAsync();
@@ -82,11 +82,11 @@ public class AttendanceRepository : IAttendanceRepository
             .Include(a => a.Student)
             .Include(a => a.Schedule)
             .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Room)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.Room)
             .ThenInclude(r => r.Location)
             .Include(a => a.Schedule)
-            .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Instructor)
+            .ThenInclude(s => s.Instructor)
             .Include(a => a.Pass)
             .OrderByDescending(a => a.ClassDate)
             .ToListAsync();
@@ -99,11 +99,11 @@ public class AttendanceRepository : IAttendanceRepository
             .Include(a => a.Student)
             .Include(a => a.Schedule)
             .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Room)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.Room)
             .ThenInclude(r => r.Location)
             .Include(a => a.Schedule)
-            .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Instructor)
+            .ThenInclude(s => s.Instructor)
             .Include(a => a.Pass)
             .OrderByDescending(a => a.ClassDate)
             .ToListAsync();
@@ -116,11 +116,11 @@ public class AttendanceRepository : IAttendanceRepository
             .Include(a => a.Student)
             .Include(a => a.Schedule)
             .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Room)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.Room)
             .ThenInclude(r => r.Location)
             .Include(a => a.Schedule)
-            .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Instructor)
+            .ThenInclude(s => s.Instructor)
             .Include(a => a.Pass)
             .OrderByDescending(a => a.ClassDate)
             .ToListAsync();
@@ -133,11 +133,11 @@ public class AttendanceRepository : IAttendanceRepository
             .Include(a => a.Student)
             .Include(a => a.Schedule)
             .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Room)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.Room)
             .ThenInclude(r => r.Location)
             .Include(a => a.Schedule)
-            .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Instructor)
+            .ThenInclude(s => s.Instructor)
             .Include(a => a.Pass)
             .OrderByDescending(a => a.ClassDate)
             .ToListAsync();
@@ -176,11 +176,11 @@ public class AttendanceRepository : IAttendanceRepository
             .Include(a => a.Student)
             .Include(a => a.Schedule)
             .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Room)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.Room)
             .ThenInclude(r => r.Location)
             .Include(a => a.Schedule)
-            .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Instructor)
+            .ThenInclude(s => s.Instructor)
             .Include(a => a.Pass)
             .OrderByDescending(a => a.ClassDate)
             .ToListAsync();
@@ -198,6 +198,108 @@ public class AttendanceRepository : IAttendanceRepository
                                    a.ClassDate.Date == classDate.Date);
     }
 
+    public async Task<IEnumerable<Attendance>> GetByInstructorAsync(Guid instructorId)
+    {
+        return await _context.Attendances
+            .Where(a => a.Schedule.InstructorId == instructorId)
+            .Include(a => a.Student)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.DanceClass)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.Room)
+            .ThenInclude(r => r.Location)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.Instructor)
+            .Include(a => a.Pass)
+            .OrderByDescending(a => a.ClassDate)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Attendance>> GetByRoomAsync(Guid roomId)
+    {
+        return await _context.Attendances
+            .Where(a => a.Schedule.RoomId == roomId)
+            .Include(a => a.Student)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.DanceClass)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.Room)
+            .ThenInclude(r => r.Location)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.Instructor)
+            .Include(a => a.Pass)
+            .OrderByDescending(a => a.ClassDate)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Attendance>> GetByLocationAsync(Guid locationId)
+    {
+        return await _context.Attendances
+            .Where(a => a.Schedule.LocationId == locationId)
+            .Include(a => a.Student)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.DanceClass)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.Room)
+            .ThenInclude(r => r.Location)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.Instructor)
+            .Include(a => a.Pass)
+            .OrderByDescending(a => a.ClassDate)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Attendance>> GetByPassAsync(Guid passId)
+    {
+        return await _context.Attendances
+            .Where(a => a.PassUsed == passId)
+            .Include(a => a.Student)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.DanceClass)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.Room)
+            .ThenInclude(r => r.Location)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.Instructor)
+            .Include(a => a.Pass)
+            .OrderByDescending(a => a.ClassDate)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Attendance>> GetByStudentAndDateRangeAsync(Guid studentId, DateTime startDate, DateTime endDate)
+    {
+        return await _context.Attendances
+            .Where(a => a.StudentId == studentId && a.ClassDate >= startDate && a.ClassDate <= endDate)
+            .Include(a => a.Student)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.DanceClass)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.Room)
+            .ThenInclude(r => r.Location)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.Instructor)
+            .Include(a => a.Pass)
+            .OrderByDescending(a => a.ClassDate)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Attendance>> GetByScheduleAndDateRangeAsync(Guid scheduleId, DateTime startDate, DateTime endDate)
+    {
+        return await _context.Attendances
+            .Where(a => a.ScheduleId == scheduleId && a.ClassDate >= startDate && a.ClassDate <= endDate)
+            .Include(a => a.Student)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.DanceClass)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.Room)
+            .ThenInclude(r => r.Location)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.Instructor)
+            .Include(a => a.Pass)
+            .OrderByDescending(a => a.ClassDate)
+            .ToListAsync();
+    }
+
     public async Task<IEnumerable<Attendance>> GetByPassIdAsync(Guid passId)
     {
         return await _context.Attendances
@@ -205,11 +307,11 @@ public class AttendanceRepository : IAttendanceRepository
             .Include(a => a.Student)
             .Include(a => a.Schedule)
             .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Room)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.Room)
             .ThenInclude(r => r.Location)
             .Include(a => a.Schedule)
-            .ThenInclude(s => s.DanceClass)
-            .ThenInclude(c => c.Instructor)
+            .ThenInclude(s => s.Instructor)
             .Include(a => a.Pass)
             .OrderByDescending(a => a.ClassDate)
             .ToListAsync();

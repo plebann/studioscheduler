@@ -19,9 +19,8 @@ public class ScheduleRepository : IScheduleRepository
         return await _context.Schedules
             .Include(s => s.Location)
             .Include(s => s.DanceClass)
-            .ThenInclude(c => c.Room)
-            .Include(s => s.DanceClass)
-            .ThenInclude(c => c.Instructor)
+            .Include(s => s.Instructor)
+            .Include(s => s.Room)
             .FirstOrDefaultAsync(s => s.Id == id);
     }
 
@@ -30,9 +29,8 @@ public class ScheduleRepository : IScheduleRepository
         return await _context.Schedules
             .Include(s => s.Location)
             .Include(s => s.DanceClass)
-            .ThenInclude(c => c.Room)
-            .Include(s => s.DanceClass)
-            .ThenInclude(c => c.Instructor)
+            .Include(s => s.Instructor)
+            .Include(s => s.Room)
             .ToListAsync();
     }
 
@@ -72,9 +70,8 @@ public class ScheduleRepository : IScheduleRepository
             .Where(s => s.LocationId == locationId)
             .Include(s => s.Location)
             .Include(s => s.DanceClass)
-            .ThenInclude(c => c.Room)
-            .Include(s => s.DanceClass)
-            .ThenInclude(c => c.Instructor)
+            .Include(s => s.Instructor)
+            .Include(s => s.Room)
             .ToListAsync();
     }
 
@@ -84,9 +81,8 @@ public class ScheduleRepository : IScheduleRepository
             .Where(s => s.DanceClassId == danceClassId)
             .Include(s => s.Location)
             .Include(s => s.DanceClass)
-            .ThenInclude(c => c.Room)
-            .Include(s => s.DanceClass)
-            .ThenInclude(c => c.Instructor)
+            .Include(s => s.Instructor)
+            .Include(s => s.Room)
             .ToListAsync();
     }
 
@@ -96,12 +92,10 @@ public class ScheduleRepository : IScheduleRepository
             .Where(s => s.StartTime >= startDate && s.StartTime <= endDate)
             .Include(s => s.Location)
             .Include(s => s.DanceClass)
-            .ThenInclude(c => c.Room)
-            .Include(s => s.DanceClass)
-            .ThenInclude(c => c.Instructor)
+            .Include(s => s.Instructor)
+            .Include(s => s.Room)
             .ToListAsync();
     }
-
 
     public async Task<IEnumerable<Schedule>> GetActiveSchedulesAsync()
     {
@@ -109,21 +103,19 @@ public class ScheduleRepository : IScheduleRepository
             .Where(s => s.IsActive)
             .Include(s => s.Location)
             .Include(s => s.DanceClass)
-            .ThenInclude(c => c.Room)
-            .Include(s => s.DanceClass)
-            .ThenInclude(c => c.Instructor)
+            .Include(s => s.Instructor)
+            .Include(s => s.Room)
             .ToListAsync();
     }
 
     public async Task<IEnumerable<Schedule>> GetByInstructorAsync(Guid instructorId)
     {
         return await _context.Schedules
-            .Where(s => s.DanceClass != null && s.DanceClass.InstructorId == instructorId)
+            .Where(s => s.InstructorId == instructorId)
             .Include(s => s.Location)
             .Include(s => s.DanceClass)
-            .ThenInclude(c => c.Room)
-            .Include(s => s.DanceClass)
-            .ThenInclude(c => c.Instructor)
+            .Include(s => s.Instructor)
+            .Include(s => s.Room)
             .ToListAsync();
     }
 
@@ -132,7 +124,7 @@ public class ScheduleRepository : IScheduleRepository
         var endTime = startTime.Add(duration);
         
         var hasConflict = await _context.Schedules
-            .Where(s => s.DanceClass != null && s.DanceClass.RoomId == roomId)
+            .Where(s => s.RoomId == roomId)
             .Where(s => s.StartTime < endTime && s.StartTime.Add(s.Duration) > startTime)
             .AnyAsync();
 
@@ -142,17 +134,16 @@ public class ScheduleRepository : IScheduleRepository
     public async Task<int> GetAvailableSpotsAsync(Guid scheduleId)
     {
         var schedule = await _context.Schedules
-            .Include(s => s.DanceClass)
-            .ThenInclude(c => c.Room)
+            .Include(s => s.Room)
             .FirstOrDefaultAsync(s => s.Id == scheduleId);
 
-        if (schedule?.DanceClass?.Room == null)
+        if (schedule?.Room == null)
             return 0;
 
         var enrollmentCount = await _context.Enrollments
             .CountAsync(e => e.ScheduleId == scheduleId);
 
-        return Math.Max(0, schedule.DanceClass.Room.Capacity - enrollmentCount);
+        return Math.Max(0, schedule.Capacity - enrollmentCount);
     }
 
     public async Task<bool> HasScheduleConflictAsync(Guid roomId, DateTime startTime, TimeSpan duration, Guid? excludeScheduleId = null)
@@ -160,7 +151,7 @@ public class ScheduleRepository : IScheduleRepository
         var endTime = startTime.Add(duration);
         
         var query = _context.Schedules
-            .Where(s => s.DanceClass != null && s.DanceClass.RoomId == roomId)
+            .Where(s => s.RoomId == roomId)
             .Where(s => s.StartTime < endTime && s.StartTime.Add(s.Duration) > startTime);
 
         if (excludeScheduleId.HasValue)
@@ -177,7 +168,7 @@ public class ScheduleRepository : IScheduleRepository
         if (schedule == null)
             return false;
 
-        schedule.IsActive = false;
+        schedule.IsCancelled = true;
         await _context.SaveChangesAsync();
         return true;
     }

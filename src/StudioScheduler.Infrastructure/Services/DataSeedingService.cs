@@ -185,7 +185,11 @@ public class DataSeedingService
                     RecurrenceEndDate = scheduleData.RecurrenceEndDate,
                     IsCancelled = scheduleData.IsCancelled,
                     CreatedAt = scheduleData.CreatedAt,
-                    UpdatedAt = scheduleData.UpdatedAt
+                    UpdatedAt = scheduleData.UpdatedAt,
+                    Level = scheduleData.Level ?? "Beginner",
+                    Capacity = scheduleData.Capacity ?? 20,
+                    InstructorId = !string.IsNullOrEmpty(scheduleData.InstructorId) ? Guid.Parse(scheduleData.InstructorId) : null,
+                    RoomId = !string.IsNullOrEmpty(scheduleData.RoomId) ? Guid.Parse(scheduleData.RoomId) : null
                 };
                 _context.Schedules.Add(schedule);
             }
@@ -361,6 +365,10 @@ public class DataSeedingService
         public bool IsCancelled { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        public string? Level { get; set; }
+        public int? Capacity { get; set; }
+        public string? InstructorId { get; set; }
+        public string? RoomId { get; set; }
     }
 
     private class StudentsData

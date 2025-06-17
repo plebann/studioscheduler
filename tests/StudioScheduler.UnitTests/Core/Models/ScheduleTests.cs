@@ -22,7 +22,9 @@ public class ScheduleTests
             EffectiveFrom = DateTime.UtcNow,
             DanceClassId = danceClassId,
             StartTime = DateTime.UtcNow.AddDays(1),
-            Duration = TimeSpan.FromMinutes(60)
+            Duration = TimeSpan.FromMinutes(60),
+            Level = "Beginner",
+            Capacity = 20
         };
 
         // Assert
@@ -41,6 +43,8 @@ public class ScheduleTests
         schedule.IsCancelled.Should().BeFalse();
         schedule.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
         schedule.UpdatedAt.Should().BeNull();
+        schedule.Level.Should().Be("Beginner");
+        schedule.Capacity.Should().Be(20);
     }
 
     [Fact]
@@ -54,7 +58,9 @@ public class ScheduleTests
             EffectiveFrom = DateTime.UtcNow,
             DanceClassId = Guid.NewGuid(),
             StartTime = DateTime.UtcNow.AddDays(1),
-            Duration = TimeSpan.FromMinutes(60)
+            Duration = TimeSpan.FromMinutes(60),
+            Level = "Beginner",
+            Capacity = 20
         };
 
         // Assert
@@ -89,7 +95,9 @@ public class ScheduleTests
             Duration = TimeSpan.FromMinutes(60),
             RecurrencePattern = "FREQ=WEEKLY;BYDAY=MO,WE,FR",
             RecurrenceEndDate = endDate,
-            IsRecurring = true
+            IsRecurring = true,
+            Level = "Intermediate",
+            Capacity = 25
         };
 
         // Assert
@@ -112,7 +120,9 @@ public class ScheduleTests
             EffectiveFrom = DateTime.UtcNow,
             DanceClassId = Guid.NewGuid(),
             StartTime = DateTime.UtcNow.AddDays(1),
-            Duration = TimeSpan.FromMinutes(invalidDurationMinutes)
+            Duration = TimeSpan.FromMinutes(invalidDurationMinutes),
+            Level = "Beginner",
+            Capacity = 20
         };
 
         // Act
@@ -136,7 +146,9 @@ public class ScheduleTests
             EffectiveFrom = DateTime.UtcNow,
             DanceClassId = Guid.NewGuid(),
             StartTime = DateTime.UtcNow.AddMinutes(-1),
-            Duration = TimeSpan.FromMinutes(60)
+            Duration = TimeSpan.FromMinutes(60),
+            Level = "Beginner",
+            Capacity = 20
         };
 
         // Act
@@ -164,7 +176,9 @@ public class ScheduleTests
             Duration = TimeSpan.FromMinutes(60),
             RecurrencePattern = "FREQ=WEEKLY;BYDAY=MO",
             RecurrenceEndDate = startTime.AddDays(-1),
-            IsRecurring = true
+            IsRecurring = true,
+            Level = "Beginner",
+            Capacity = 20
         };
 
         // Act
@@ -190,7 +204,9 @@ public class ScheduleTests
             StartTime = DateTime.UtcNow.AddDays(1),
             Duration = TimeSpan.FromMinutes(60),
             IsRecurring = true,
-            RecurrenceEndDate = DateTime.UtcNow.AddMonths(1)
+            RecurrenceEndDate = DateTime.UtcNow.AddMonths(1),
+            Level = "Beginner",
+            Capacity = 20
         };
 
         // Act
@@ -201,5 +217,4 @@ public class ScheduleTests
         result.Errors.Should().Contain(error => 
             error.ErrorMessage.Contains("Recurrence pattern is required for recurring schedules"));
     }
-
 }

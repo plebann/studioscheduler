@@ -17,9 +17,6 @@ public class DanceClassRepository : IDanceClassRepository
     public async Task<DanceClass?> GetByIdAsync(Guid id)
     {
         return await _context.DanceClasses
-            .Include(c => c.Room)
-            .ThenInclude(r => r.Location)
-            .Include(c => c.Instructor)
             .Include(c => c.Schedules)
             .FirstOrDefaultAsync(c => c.Id == id);
     }
@@ -27,9 +24,6 @@ public class DanceClassRepository : IDanceClassRepository
     public async Task<IEnumerable<DanceClass>> GetAllAsync()
     {
         return await _context.DanceClasses
-            .Include(c => c.Room)
-            .ThenInclude(r => r.Location)
-            .Include(c => c.Instructor)
             .Include(c => c.Schedules)
             .ToListAsync();
     }
@@ -68,53 +62,6 @@ public class DanceClassRepository : IDanceClassRepository
     {
         return await _context.DanceClasses
             .Where(c => c.Style == style)
-            .Include(c => c.Room)
-            .ThenInclude(r => r.Location)
-            .Include(c => c.Instructor)
-            .Include(c => c.Schedules)
-            .ToListAsync();
-    }
-
-    public async Task<IEnumerable<DanceClass>> GetByLevelAsync(string level)
-    {
-        return await _context.DanceClasses
-            .Where(c => c.Level == level)
-            .Include(c => c.Room)
-            .ThenInclude(r => r.Location)
-            .Include(c => c.Instructor)
-            .Include(c => c.Schedules)
-            .ToListAsync();
-    }
-
-    public async Task<IEnumerable<DanceClass>> GetByInstructorAsync(Guid instructorId)
-    {
-        return await _context.DanceClasses
-            .Where(c => c.InstructorId == instructorId)
-            .Include(c => c.Room)
-            .ThenInclude(r => r.Location)
-            .Include(c => c.Instructor)
-            .Include(c => c.Schedules)
-            .ToListAsync();
-    }
-
-    public async Task<IEnumerable<DanceClass>> GetByRoomAsync(Guid roomId)
-    {
-        return await _context.DanceClasses
-            .Where(c => c.RoomId == roomId)
-            .Include(c => c.Room)
-            .ThenInclude(r => r.Location)
-            .Include(c => c.Instructor)
-            .Include(c => c.Schedules)
-            .ToListAsync();
-    }
-
-    public async Task<IEnumerable<DanceClass>> GetByLocationAsync(Guid locationId)
-    {
-        return await _context.DanceClasses
-            .Where(c => c.Room.LocationId == locationId)
-            .Include(c => c.Room)
-            .ThenInclude(r => r.Location)
-            .Include(c => c.Instructor)
             .Include(c => c.Schedules)
             .ToListAsync();
     }
@@ -147,7 +94,7 @@ public class DanceClassRepository : IDanceClassRepository
         
         // Check if there are any overlapping schedules for this instructor
         var overlappingSchedules = await _context.Schedules
-            .Where(s => s.DanceClass != null && s.DanceClass.InstructorId == instructorId)
+            .Where(s => s.InstructorId == instructorId)
             .Where(s => s.StartTime < endTime && s.StartTime.Add(s.Duration) > startTime)
             .AnyAsync();
 

@@ -15,28 +15,29 @@ public class DanceClassValidator : AbstractValidator<DanceClass>
             .NotEmpty()
             .WithMessage("Description is required");
 
-        RuleFor(x => x.Level)
-            .NotEmpty()
-            .WithMessage("Level is required");
-
         RuleFor(x => x.Style)
             .NotEmpty()
             .WithMessage("Style is required");
 
-        RuleFor(x => x.Capacity)
-            .GreaterThan(0)
-            .WithMessage("Capacity must be positive");
+        // ❌ REMOVED: These properties moved to Schedule
+        // RuleFor(x => x.Level)
+        //     .NotEmpty()
+        //     .WithMessage("Level is required");
 
-        RuleFor(x => x.InstructorId)
-            .NotNull()
-            .WithMessage("Instructor is required")
-            .NotEqual(System.Guid.Empty)
-            .WithMessage("Instructor is required");
+        // RuleFor(x => x.Capacity)
+        //     .GreaterThan(0)
+        //     .WithMessage("Capacity must be positive");
 
-        RuleFor(x => x.RoomId)
-            .NotNull()
-            .WithMessage("Room is required")
-            .NotEqual(System.Guid.Empty)
-            .WithMessage("Room is required");
+        // RuleFor(x => x.InstructorId)
+        //     .NotNull()
+        //     .WithMessage("Instructor is required")
+        //     .NotEqual(System.Guid.Empty)
+        //     .WithMessage("Instructor is required");
+
+        // RuleFor(x => x.RoomId)
+        //     .NotNull()
+        //     .WithMessage("Room is required")
+        //     .NotEqual(System.Guid.Empty)
+        //     .WithMessage("Room is required");
     }
 }
