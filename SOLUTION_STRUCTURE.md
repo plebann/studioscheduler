@@ -74,13 +74,35 @@ StudioScheduler/
 ## Data Model (from `schedule_implementation_plan.md`)
 - **Location**: id, name, address, description, isActive, capacity, opening/closing times
 - **Room**: id, locationId, name, capacity, description, equipment
-- **DanceClass**: id, name, level, instructor, start/end time, dayOfWeek, startDate, style, description, roomId
-- **Schedule**: id, locationId, effectiveFrom/To, isActive, classes
+- **DanceClass**: id, name, description, style, isActive - Dance style definitions (Bachata, Salsa, etc.)
+- **Schedule**: id, name, locationId, danceClassId, level, instructorId, roomId, startTime, duration, isRecurring, isActive - Actual class groups
 - **Relationships:**
   - Location 1--* Room
   - Location 1--* Schedule
-  - Schedule 1--* DanceClass
-  - Room 1--* DanceClass
+  - Schedule *--1 DanceClass (each class group belongs to a dance style)
+  - Room 1--* Schedule (each class group is held in a room)
+
+### Architecture Overview
+The system models real-world dance studio operations:
+
+#### DanceClass (Dance Style)
+- **Static definitions** of dance styles: "Bachata", "Salsa Cubana", "Salsa on1"
+- **Style categorization**: BACHATA, SALSA, ZOUK, KIZOMBA, etc.
+- **Reusable templates** for creating class groups
+
+#### Schedule (Class Group)
+- **Dynamic class groups** with specific characteristics
+- **Level progression**: P1 → P2 → P3 → S1 → S2 → S3
+- **Instructor assignment**: Can change over time
+- **Time and location**: Specific weekly schedule
+- **Group evolution**: Groups can merge, split, or change characteristics
+
+#### Real-World Business Scenarios
+1. **New Semester Planning**: Create multiple Schedules for popular dance styles
+2. **Group Progression**: Update Schedule.Level as students advance
+3. **Instructor Substitution**: Change Schedule.InstructorId temporarily
+4. **Group Consolidation**: Merge small groups during reorganization
+5. **Schedule Changes**: Update time/location for existing groups
 
 ---
 

@@ -59,14 +59,17 @@ StudioScheduler/
 ### 📊 Migrated Data
 - **1 Location** with full studio details
 - **2 Rooms** with equipment and capacity information
-- **29 Dance Classes** (Salsa, Bachata, Zouk, Kizomba)
-- **32 Class Schedules** with recurring patterns
+- **29 Dance Styles** (Salsa, Bachata, Zouk, Kizomba) - DanceClass entities
+- **32 Class Groups** with recurring patterns - Schedule entities with levels and instructors
 - **10 Students** with contact information
 - **9 Student Passes** (Monthly/Annual with remaining classes)
-- **23 Student Enrollments** across various classes
+- **23 Student Enrollments** across various class groups
 
 ### 🏗️ Current Architecture
 The application uses Entity Framework Core with SQLite for data persistence, implementing a clean repository pattern with:
+- **DanceClass**: Dance style definitions (Bachata, Salsa, etc.)
+- **Schedule**: Actual class groups with levels, instructors, and time slots
+- **Real-world business model**: Supports group progression, instructor changes, and group merging
 - Async operations throughout
 - Complex relationship queries
 - Business logic methods for availability checks
@@ -77,20 +80,20 @@ The application uses Entity Framework Core with SQLite for data persistence, imp
 ### Phase 1: Core Infrastructure ✅ COMPLETED
 1. ✅ Solution structure with proper layered architecture
 2. ✅ Entity Framework Core setup with SQLite
-3. ✅ Complete data models (User, Student, DanceClass, Schedule, Pass, Enrollment, etc.)
+3. ✅ Complete data models (User, Student, DanceClass as styles, Schedule as groups, Pass, Enrollment, etc.)
 4. ✅ Repository pattern implementation
 5. ✅ Data migration from JSON to database
 6. ✅ Basic API endpoints working
 
 ### Phase 1.5: Current Development Focus 🔄
 - API endpoints for student management
-- Enrollment management endpoints
+- Enrollment management endpoints for class groups
 - Pass management system
 - Authentication implementation
 
 ### Phase 2: Basic Backend Implementation
-- API endpoints for CRUD operations
-- Business logic implementation
+- API endpoints for CRUD operations on dance styles and class groups
+- Business logic implementation for group management
 - Service layer setup
 - Basic error handling
 - Logging setup
@@ -102,13 +105,19 @@ The application uses Entity Framework Core with SQLite for data persistence, imp
 - Core components structure
 
 ### Phase 4: Feature Implementation
-- Class management module
+- Dance style management module
+- Class group management with level progression
 - User management module
 - Pass system
-- Reservation system
 - Real-time updates with SignalR
 
-### Phase 5: Azure Infrastructure
+### Phase 5: Advanced Business Features
+- Group merging and splitting capabilities
+- Instructor substitution management
+- Semester planning tools
+- Student progression analytics
+
+### Phase 6: Azure Infrastructure
 - App Service setup
 - Database deployment
 - Application Insights integration

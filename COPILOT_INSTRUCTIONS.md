@@ -69,11 +69,30 @@ The application uses Entity Framework Core with SQLite for development and Postg
 - **Users/Students** (id, firstName, lastName, email, passwordHash, phone, dateOfBirth, gender, role, isActive)
 - **Locations** (id, name, address, description, isActive)
 - **Rooms** (id, name, description, locationId, capacity, equipment, isActive)
-- **DanceClasses** (id, name, description, style, level, capacity, roomId, instructorId, isActive)
-- **Schedules** (id, name, locationId, danceClassId, startTime, duration, isRecurring, recurrencePattern)
+- **DanceClasses** (id, name, description, style, isActive) - Dance style definitions (Bachata, Salsa, etc.)
+- **Schedules** (id, name, locationId, danceClassId, level, instructorId, roomId, startTime, duration, isRecurring, isActive) - Actual class groups
 - **Passes** (id, userId, type, startDate, endDate, totalClasses, remainingClasses, classesPerWeek, isActive)
 - **Enrollments** (id, studentId, scheduleId, enrolledDate, isActive)
 - **Attendances** (id, studentId, scheduleId, passUsed, attendedAt, isPresent)
+
+### Architecture Overview
+The system follows a real-world dance studio business model:
+
+#### DanceClass (Dance Style Definition)
+- **Purpose**: Defines dance styles/types (e.g., "Bachata", "Salsa Cubana", "Salsa on1")
+- **Properties**: Name, Description, Style (BACHATA, SALSA, etc.)
+- **Static**: These represent dance genres, not specific classes
+
+#### Schedule (Class Group)
+- **Purpose**: Represents actual class groups with specific characteristics
+- **Properties**: Level (P1, P2, P3, S1, S2, S3), Instructor, Room, StartTime, Duration
+- **Dynamic**: Groups evolve over time - levels change, instructors change, groups merge/split
+
+#### Real-World Scenarios
+1. **Adding New Bachata P1 Classes**: Create multiple Schedules for the same DanceClass
+2. **Class Progression**: Update Schedule.Level from "P1" to "P2" as students progress
+3. **Group Merging**: Combine small groups during semester reorganization
+4. **Instructor Changes**: Update Schedule.InstructorId when instructors change
 
 ### Data Access
 - Entity Framework repositories replace previous mock JSON-based repositories
