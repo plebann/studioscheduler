@@ -21,7 +21,9 @@ public class ScheduleValidator : AbstractValidator<Schedule>
 
         RuleFor(x => x.StartTime)
             .NotEmpty()
-            .WithMessage("Start time is required");
+            .WithMessage("Start time is required")
+            .GreaterThan(DateTime.UtcNow)
+            .WithMessage("Start time must be in the future");
 
         RuleFor(x => x.Duration)
             .GreaterThan(TimeSpan.Zero)

@@ -11,6 +11,11 @@ using StudioScheduler.Core.Validators;
 using StudioScheduler.Infrastructure;
 using StudioScheduler.Infrastructure.Data;
 using StudioScheduler.Infrastructure.Services;
+using System.Text.Json;
+using Microsoft.Playwright;
+using NUnit.Framework;
+using System.Net;
+using StudioScheduler.Shared.Dtos;
 
 namespace StudioScheduler.PlaywrightTests;
 
@@ -108,56 +113,146 @@ public static class TestAppFactory
 
     public static async Task<ApplicationDbContext> SetupTestDatabaseAsync(WebApplication app, string testDatabasePath)
     {
-        // Copy existing database to test database path
-        var mainDatabasePath = Path.Combine(
-            Directory.GetCurrentDirectory(), 
-            "..", "..", "..", "..", 
-            "src", "StudioScheduler.Server", "studioscheduler.db");
+        using var scope = app.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         
-        if (File.Exists(mainDatabasePath))
-        {
-            // Copy the main database to test location
-            File.Copy(mainDatabasePath, testDatabasePath, true);
-            Console.WriteLine($"DEBUG: Copied database from {mainDatabasePath} to {testDatabasePath}");
-        }
-        else
-        {
-            Console.WriteLine($"DEBUG: Main database not found at {mainDatabasePath}");
-            // If main database doesn't exist, create empty database and try seeding
-            using var scope = app.Services.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            await context.Database.EnsureCreatedAsync();
-            
-            try
-            {
-                var seedingService = scope.ServiceProvider.GetRequiredService<DataSeedingService>();
-                await seedingService.SeedDataAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"DEBUG: Seeding failed: {ex.Message}");
-            }
-        }
-
-        // Return context for verification
-        using var verifyScope = app.Services.CreateScope();
-        var verifyContext = verifyScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        var scheduleCount = await verifyContext.Schedules.CountAsync();
-        Console.WriteLine($"DEBUG: Database setup complete. Schedule count: {scheduleCount}");
+        // Ensure database is created
+        await context.Database.EnsureCreatedAsync();
         
-        // Debug: Show first few schedule IDs to help with tests
-        var scheduleIds = await verifyContext.Schedules
+        // Create test data programmatically
+        await SeedTestDataAsync(context);
+        
+        // Debug: Show created schedule IDs
+        var scheduleIds = await context.Schedules
             .Take(5)
             .Select(s => s.Id.ToString())
             .ToListAsync();
-        Console.WriteLine($"DEBUG: First 5 schedule IDs: {string.Join(", ", scheduleIds)}");
+        Console.WriteLine($"DEBUG: Created {await context.Schedules.CountAsync()} schedules with IDs: {string.Join(", ", scheduleIds)}");
         
-        // Check if the test ID exists (with different case)
-        var testId = "c1a2b3c4-1234-5678-9abc-def012345614";
-        var existsLower = await verifyContext.Schedules.AnyAsync(s => s.Id.ToString().ToLower() == testId);
-        var existsUpper = await verifyContext.Schedules.AnyAsync(s => s.Id.ToString().ToUpper() == testId.ToUpper());
-        Console.WriteLine($"DEBUG: Test ID exists (lower): {existsLower}, exists (upper): {existsUpper}");
+        return context;
+    }
+
+    private static async Task SeedTestDataAsync(ApplicationDbContext context)
+    {
+        // Create test location
+        var testLocation = new Location
+        {
+            Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+            Name = "Test Studio",
+            Address = "123 Test Street, Test City, 12345",
+            Description = "Test dance studio for integration tests",
+            Capacity = 100,
+            OpeningTime = TimeSpan.FromHours(10), // 10 AM
+            ClosingTime = TimeSpan.FromHours(23), // 11 PM
+            IsActive = true
+        };
+        context.Locations.Add(testLocation);
+
+        // Create test dance classes
+        var salsaClass = new DanceClass
+        {
+            Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
+            Name = "Salsa Beginners",
+            Description = "Beginner level salsa class",
+            Style = "SALSA",
+            IsActive = true
+        };
         
-        return verifyContext;
+        var bachataClass = new DanceClass
+        {
+            Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
+            Name = "Bachata Intermediate",
+            Description = "Intermediate level bachata class",
+            Style = "BACHATA",
+            IsActive = true
+        };
+        
+        context.DanceClasses.AddRange(salsaClass, bachataClass);
+
+        // Create test schedules for specific weekdays
+        var now = DateTime.UtcNow;
+        var mondaySchedule = new Schedule
+        {
+            Id = Guid.Parse("44444444-4444-4444-4444-444444444444"),
+            Name = "Monday Salsa",
+            LocationId = testLocation.Id,
+            DanceClassId = salsaClass.Id,
+            StartTime = GetNextWeekday(DayOfWeek.Monday).AddHours(19), // Next Monday 7 PM
+            Duration = TimeSpan.FromHours(1),
+            EffectiveFrom = DateTime.UtcNow.AddDays(-30),
+            IsActive = true,
+            IsCancelled = false,
+            Level = "Level P1",
+            Capacity = 20
+        };
+
+        var tuesdaySchedule = new Schedule
+        {
+            Id = Guid.Parse("55555555-5555-5555-5555-555555555555"),
+            Name = "Tuesday Bachata",
+            LocationId = testLocation.Id,
+            DanceClassId = bachataClass.Id,
+            StartTime = GetNextWeekday(DayOfWeek.Tuesday).AddHours(20), // Next Tuesday 8 PM
+            Duration = TimeSpan.FromHours(1),
+            EffectiveFrom = DateTime.UtcNow.AddDays(-30),
+            IsActive = true,
+            IsCancelled = false,
+            Level = "Level S2", 
+            Capacity = 15
+        };
+
+        var wednesdaySchedule = new Schedule
+        {
+            Id = Guid.Parse("88888888-8888-8888-8888-888888888888"),
+            Name = "Wednesday Kizomba",
+            LocationId = testLocation.Id,
+            DanceClassId = salsaClass.Id, // Reuse salsa class but different schedule
+            StartTime = GetNextWeekday(DayOfWeek.Wednesday).AddHours(18), // Next Wednesday 6 PM
+            Duration = TimeSpan.FromMinutes(90),
+            EffectiveFrom = DateTime.UtcNow.AddDays(-30),
+            IsActive = true,
+            IsCancelled = false,
+            Level = "Level P1",
+            Capacity = 18
+        };
+
+        context.Schedules.AddRange(mondaySchedule, tuesdaySchedule, wednesdaySchedule);
+
+        // Create test students
+        var testStudent = new Student
+        {
+            Id = Guid.Parse("66666666-6666-6666-6666-666666666666"),
+            FirstName = "Test",
+            LastName = "Student",
+            Email = "test.student@example.com",
+            PasswordHash = "test_hash",
+            Phone = "+1234567890",
+            IsActive = true,
+            Role = UserRole.Student
+        };
+        
+        context.Students.Add(testStudent);
+
+        // Create test enrollments
+        var enrollment = new Enrollment
+        {
+            Id = Guid.Parse("77777777-7777-7777-7777-777777777777"),
+            StudentId = testStudent.Id,
+            ScheduleId = mondaySchedule.Id,
+            EnrolledDate = DateTime.UtcNow.AddDays(-7),
+            IsActive = true
+        };
+        
+        context.Enrollments.Add(enrollment);
+
+        await context.SaveChangesAsync();
+    }
+
+    private static DateTime GetNextWeekday(DayOfWeek targetDay)
+    {
+        var today = DateTime.UtcNow.Date;
+        var daysUntilTarget = ((int)targetDay - (int)today.DayOfWeek + 7) % 7;
+        if (daysUntilTarget == 0) daysUntilTarget = 7; // If today is the target day, get next week's
+        return today.AddDays(daysUntilTarget);
     }
 }
