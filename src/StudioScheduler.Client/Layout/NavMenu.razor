@@ -1,6 +1,14 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using Microsoft.AspNetCore.Components
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="schedule">Studio Scheduler</a>
+        <a class="navbar-brand" href="schedule">
+            <img src="/salsame-logo.png" alt="SalsaMe" class="navbar-logo" />
+            @if (!IsCollapsed)
+            {
+                <span class="brand-text">SalsaMe Studio</span>
+            }
+        </a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -11,7 +19,20 @@
     <nav class="nav flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="schedule" Match="NavLinkMatch.All">
-                <span class="bi bi-calendar-event-nav-menu" aria-hidden="true"></span> Schedule
+                <span class="bi bi-calendar-event-nav-menu" aria-hidden="true"></span>
+                @if (!IsCollapsed)
+                {
+                    <span class="nav-text">Schedule</span>
+                }
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="students">
+                <span class="bi bi-people-nav-menu" aria-hidden="true"></span>
+                @if (!IsCollapsed)
+                {
+                    <span class="nav-text">Students</span>
+                }
             </NavLink>
         </div>
     </nav>
@@ -19,6 +40,8 @@
 
 @code {
     private bool collapseNavMenu = true;
+
+    [Parameter] public bool IsCollapsed { get; set; }
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 

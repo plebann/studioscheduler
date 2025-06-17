@@ -6,13 +6,19 @@
 <MudSnackbarProvider />
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
+    <div class="sidebar @(sidebarCollapsed ? "collapsed" : "")">
+        <div class="sidebar-toggle" @onclick="ToggleSidebar">
+            <span class="@(sidebarCollapsed ? "bi-chevron-right" : "bi-chevron-left")"></span>
+        </div>
+        <NavMenu IsCollapsed="sidebarCollapsed" />
     </div>
 
-    <main>
+    <main class="@(sidebarCollapsed ? "sidebar-collapsed" : "")">
         <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+            <div class="logo-container">
+                <img src="/salsame-logo.png" alt="SalsaMe Studio Scheduler" class="app-logo" />
+                <span class="app-title">Studio Scheduler</span>
+            </div>
         </div>
 
         <article class="content px-4">
@@ -20,3 +26,12 @@
         </article>
     </main>
 </div>
+
+@code {
+    private bool sidebarCollapsed = false;
+
+    private void ToggleSidebar()
+    {
+        sidebarCollapsed = !sidebarCollapsed;
+    }
+}
