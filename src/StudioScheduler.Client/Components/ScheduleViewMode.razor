@@ -1,0 +1,102 @@
+@using StudioScheduler.Shared.Dtos
+
+<MudContainer>
+    @if (Schedule != null)
+    {
+        <MudPaper Class="pa-4" Elevation="2">
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h5" Class="mb-4">@Schedule.Name</MudText>
+                </MudItem>
+                
+                <MudItem xs="12" sm="6">
+                    <MudText Typo="Typo.subtitle1" Class="font-weight-bold">Class Information</MudText>
+                    <MudList T="string" Dense="true">
+                        <MudListItem T="string">
+                            <MudText Typo="Typo.body2">
+                                <strong>Dance Style:</strong> @Schedule.DanceClassName
+                            </MudText>
+                        </MudListItem>
+                        <MudListItem T="string">
+                            <MudText Typo="Typo.body2">
+                                <strong>Level:</strong> @Schedule.Level
+                            </MudText>
+                        </MudListItem>
+                        <MudListItem T="string">
+                            <MudText Typo="Typo.body2">
+                                <strong>Instructor:</strong> @(Schedule.InstructorName ?? "TBD")
+                            </MudText>
+                        </MudListItem>
+                        <MudListItem T="string">
+                            <MudText Typo="Typo.body2">
+                                <strong>Capacity:</strong> @Schedule.Capacity students
+                            </MudText>
+                        </MudListItem>
+                    </MudList>
+                </MudItem>
+                
+                <MudItem xs="12" sm="6">
+                    <MudText Typo="Typo.subtitle1" Class="font-weight-bold">Schedule Details</MudText>
+                    <MudList T="string" Dense="true">
+                        <MudListItem T="string">
+                            <MudText Typo="Typo.body2">
+                                <strong>Location:</strong> @Schedule.LocationName
+                            </MudText>
+                        </MudListItem>
+                        <MudListItem T="string">
+                            <MudText Typo="Typo.body2">
+                                <strong>Room:</strong> @(Schedule.RoomName ?? "TBD")
+                            </MudText>
+                        </MudListItem>
+                        <MudListItem T="string">
+                            <MudText Typo="Typo.body2">
+                                <strong>Time:</strong> @Schedule.StartTime.ToString("HH:mm") - @Schedule.StartTime.Add(Schedule.Duration).ToString("HH:mm")
+                            </MudText>
+                        </MudListItem>
+                        <MudListItem T="string">
+                            <MudText Typo="Typo.body2">
+                                <strong>Day:</strong> @Schedule.StartTime.ToString("dddd")
+                            </MudText>
+                        </MudListItem>
+                        <MudListItem T="string">
+                            <MudText Typo="Typo.body2">
+                                <strong>Effective From:</strong> @Schedule.EffectiveFrom.ToString("MMM dd, yyyy")
+                            </MudText>
+                        </MudListItem>
+                        @if (Schedule.EffectiveTo.HasValue)
+                        {
+                            <MudListItem T="string">
+                                <MudText Typo="Typo.body2">
+                                    <strong>Effective To:</strong> @Schedule.EffectiveTo.Value.ToString("MMM dd, yyyy")
+                                </MudText>
+                            </MudListItem>
+                        }
+                    </MudList>
+                </MudItem>
+                
+                <MudItem xs="12">
+                    <MudText Typo="Typo.subtitle1" Class="font-weight-bold">Status</MudText>
+                    <MudChip T="string" Color="@(Schedule.IsActive ? Color.Success : Color.Error)" Size="Size.Small">
+                        @(Schedule.IsActive ? "Active" : "Inactive")
+                    </MudChip>
+                    @if (Schedule.IsCancelled)
+                    {
+                        <MudChip T="string" Color="Color.Warning" Size="Size.Small" Class="ml-2">
+                            Cancelled
+                        </MudChip>
+                    }
+                    @if (Schedule.IsRecurring)
+                    {
+                        <MudChip T="string" Color="Color.Info" Size="Size.Small" Class="ml-2">
+                            Recurring
+                        </MudChip>
+                    }
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+    }
+</MudContainer>
+
+@code {
+    [Parameter] public ScheduleDto? Schedule { get; set; }
+} 

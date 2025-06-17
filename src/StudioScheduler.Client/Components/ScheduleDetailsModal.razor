@@ -1,0 +1,199 @@
+@using StudioScheduler.Shared.Dtos
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudContainer MaxWidth="MaxWidth.Large">
+            @if (IsLoading)
+            {
+                <div class="d-flex justify-center pa-4">
+                    <MudProgressCircular Indeterminate="true" />
+                </div>
+            }
+            else
+            {
+                @if (Mode == "view")
+                {
+                    <ScheduleViewMode Schedule="Schedule" />
+                }
+                else
+                {
+                    <ScheduleEditMode Schedule="EditSchedule" 
+                                     Mode="Mode"
+                                     OnSave="OnSave"
+                                     OnCancel="OnCancel" />
+                }
+            }
+        </MudContainer>
+    </DialogContent>
+    <DialogActions>
+        @if (Mode == "view")
+        {
+            <MudButton OnClick="OnEdit">Edit</MudButton>
+            <MudButton OnClick="OnClose">Close</MudButton>
+        }
+        else
+        {
+            <MudButton OnClick="OnCancel" Variant="Variant.Text">Cancel</MudButton>
+            <MudButton OnClick="async () => { if (EditSchedule != null) await OnSave(EditSchedule); }" 
+                       Variant="Variant.Filled" 
+                       Color="Color.Primary"
+                       Disabled="@(EditSchedule == null)">
+                @(Mode == "create" ? "Create" : "Save")
+            </MudButton>
+        }
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public string? ScheduleId { get; set; }
+    [Parameter] public string Mode { get; set; } = "view"; // "view", "edit", "create"
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+
+    private ScheduleDto? Schedule;
+    private ScheduleEditDto? EditSchedule;
+    private bool IsLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Mode == "create")
+        {
+            EditSchedule = new ScheduleEditDto
+            {
+                Id = Guid.Empty,
+                Name = "",
+                LocationId = Guid.Empty,
+                DanceClassId = Guid.Empty,
+                StartTime = DateTime.Now,
+                Duration = TimeSpan.FromHours(1),
+                IsRecurring = false,
+                EffectiveFrom = DateTime.Now,
+                IsActive = true,
+                IsCancelled = false,
+                Level = "P1",
+                Capacity = 20
+            };
+            IsLoading = false;
+        }
+        else if (!string.IsNullOrEmpty(ScheduleId))
+        {
+            await LoadSchedule();
+        }
+        else
+        {
+            IsLoading = false;
+        }
+    }
+
+    private async Task LoadSchedule()
+    {
+        try
+        {
+            IsLoading = true;
+            var response = await Http.GetAsync($"api/schedules/{ScheduleId}");
+            if (response.IsSuccessStatusCode)
+            {
+                Schedule = await response.Content.ReadFromJsonAsync<ScheduleDto>();
+                if (Schedule != null)
+                {
+                    EditSchedule = ScheduleEditDto.FromScheduleDto(Schedule);
+                }
+            }
+            else
+            {
+                Snackbar.Add($"Failed to load schedule: {response.StatusCode}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading schedule: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private async Task OnSave(ScheduleEditDto updatedSchedule)
+    {
+        try
+        {
+            HttpResponseMessage response;
+            
+            if (Mode == "create")
+            {
+                var createDto = new CreateScheduleDto
+                {
+                    Name = updatedSchedule.Name,
+                    LocationId = updatedSchedule.LocationId,
+                    DanceClassId = updatedSchedule.DanceClassId,
+                    StartTime = updatedSchedule.StartTime,
+                    Duration = updatedSchedule.Duration,
+                    IsRecurring = updatedSchedule.IsRecurring,
+                    RecurrencePattern = updatedSchedule.RecurrencePattern,
+                    RecurrenceEndDate = updatedSchedule.RecurrenceEndDate,
+                    EffectiveFrom = updatedSchedule.EffectiveFrom,
+                    EffectiveTo = updatedSchedule.EffectiveTo,
+                    Level = updatedSchedule.Level,
+                    InstructorId = updatedSchedule.InstructorId,
+                    RoomId = updatedSchedule.RoomId,
+                    Capacity = updatedSchedule.Capacity
+                };
+                
+                response = await Http.PostAsJsonAsync("api/schedules", createDto);
+            }
+            else
+            {
+                var updateDto = new UpdateScheduleDto
+                {
+                    Name = updatedSchedule.Name,
+                    StartTime = updatedSchedule.StartTime,
+                    Duration = updatedSchedule.Duration,
+                    IsRecurring = updatedSchedule.IsRecurring,
+                    RecurrencePattern = updatedSchedule.RecurrencePattern,
+                    RecurrenceEndDate = updatedSchedule.RecurrenceEndDate,
+                    EffectiveFrom = updatedSchedule.EffectiveFrom,
+                    EffectiveTo = updatedSchedule.EffectiveTo,
+                    IsActive = updatedSchedule.IsActive,
+                    IsCancelled = updatedSchedule.IsCancelled,
+                    Level = updatedSchedule.Level,
+                    InstructorId = updatedSchedule.InstructorId,
+                    RoomId = updatedSchedule.RoomId,
+                    Capacity = updatedSchedule.Capacity
+                };
+                
+                response = await Http.PutAsJsonAsync($"api/schedules/{updatedSchedule.Id}", updateDto);
+            }
+
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add($"Schedule {(Mode == "create" ? "created" : "updated")} successfully", Severity.Success);
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                Snackbar.Add($"Failed to {(Mode == "create" ? "create" : "update")} schedule: {response.StatusCode}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error {(Mode == "create" ? "creating" : "updating")} schedule: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private void OnEdit()
+    {
+        Mode = "edit";
+    }
+
+    private void OnCancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void OnClose()
+    {
+        MudDialog.Close();
+    }
+}

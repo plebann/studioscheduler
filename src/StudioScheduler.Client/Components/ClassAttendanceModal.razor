@@ -1,6 +1,7 @@
 @using StudioScheduler.Shared.Dtos
 @inject HttpClient Http
 @inject ISnackbar Snackbar
+@inject IDialogService DialogService
 
 <MudDialog>
     <DialogContent>
@@ -23,15 +24,20 @@
                         <MudChip T="string" Color="Color.Info" Size="Size.Small">
                             @ClassAttendance.EnrolledStudents.Count students
                         </MudChip>
+                        <MudButton OnClick="OpenScheduleDetailsModal"
+                                  Variant="Variant.Filled"
+                                  Color="Color.Primary"
+                                  Size="Size.Small"
+                                  Style="min-width: auto; padding: 8px;">
+                            ⚙️
+                        </MudButton>
                     </div>
                 </MudPaper>
 
                 <!-- Student Search -->
                 <MudTextField @bind-Value="searchTerm" 
-                             Placeholder="Search students by name..." 
+                             Placeholder="🔍 Search students by name..." 
                              @oninput="OnSearchInput"
-                             Adornment="Adornment.Start" 
-                             AdornmentIcon="Icons.Material.Filled.Search"
                              Class="mb-4"
                              FullWidth="true" />
 
@@ -155,6 +161,32 @@
     private void OnSearchInput(ChangeEventArgs e)
     {
         searchTerm = e.Value?.ToString() ?? string.Empty;
+    }
+
+    private async Task OpenScheduleDetailsModal()
+    {
+        var parameters = new DialogParameters
+        {
+            ["ScheduleId"] = ScheduleId,
+            ["Mode"] = "view"
+        };
+
+        var options = new DialogOptions() 
+        { 
+            MaxWidth = MaxWidth.Large, 
+            FullWidth = true,
+            CloseButton = true,
+            Position = DialogPosition.Center
+        };
+
+        var dialog = await DialogService.ShowAsync<ScheduleDetailsModal>("Class Details", parameters, options);
+        var result = await dialog.Result;
+        
+        if (result != null && !result.Canceled)
+        {
+            // Reload attendance data in case schedule was updated
+            await LoadClassAttendance();
+        }
     }
 
     private void Close() => MudDialog.Close(DialogResult.Ok(true));

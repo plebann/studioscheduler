@@ -3,6 +3,7 @@
 @using System.Net.Http.Json
 @inject HttpClient Http
 @inject IDialogService DialogService
+@inject ISnackbar Snackbar
 
 <PageTitle>Schedule 2025</PageTitle>
 
@@ -22,9 +23,17 @@ else
     <div class="schedule-container">
         <div class="schedule-header">
             <h2 class="schedule-title">SCHEDULE 2025</h2>
-            <MudText Typo="Typo.body2" Class="mb-2">
-                Click on any class to manage attendance
-            </MudText>
+            <div class="schedule-actions">
+                <MudText Typo="Typo.body2" Class="mb-2">
+                    Click on any class to manage attendance
+                </MudText>
+                <MudButton Variant="Variant.Filled" 
+                          Color="Color.Primary" 
+                          OnClick="OpenCreateScheduleModal"
+                          Class="mt-2">
+                    ➕ Add New Class
+                </MudButton>
+            </div>
         </div>
 
         <div class="schedule-wrapper">
@@ -59,7 +68,8 @@ else
                                             <div class="schedule-slot clickable" 
                                                  style="background: @classForSlot.BackgroundColor; color: #fff; padding: 5px; cursor: pointer;"
                                                  @onclick="() => OpenAttendanceModal(classForSlot.Id.ToString())"
-                                                 title="Click to manage attendance">
+                                                 @oncontextmenu="(e) => OpenContextMenu(e, classForSlot.Id.ToString())"
+                                                 title="Click to view details, right-click for options">
                                                 <strong>@classForSlot.Style</strong><br>
                                                 @classForSlot.Level<br>
                                                 From @classForSlot.EffectiveFrom
@@ -79,14 +89,14 @@ else
                 {
                     <div class="day-block">
                         <h3>@day</h3>
-                        @if (weeklySchedule.Schedule[day].Any())
+                        @if (weeklySchedule.Schedule.ContainsKey(day) && weeklySchedule.Schedule[day].Any())
                         {
                             @foreach (var slot in weeklySchedule.Schedule[day])
                             {
                                 <div class="time-block clickable" 
                                      style="background: @slot.BackgroundColor; color: #fff; cursor: pointer;"
                                      @onclick="() => OpenAttendanceModal(slot.Id.ToString())"
-                                     title="Click to manage attendance">
+                                     title="Click to view details">
                                     <div class="time-range">@slot.TimeSlot</div>
                                     <div class="dance-name"><strong>@slot.Style</strong></div>
                                     <div class="level">@slot.Level</div>
@@ -103,6 +113,31 @@ else
         </div>
     </div>
 }
+
+<!-- Context Menu for Desktop -->
+<MudMenu @bind-IsOpen="contextMenuOpen" 
+         AnchorOrigin="Origin.BottomLeft" 
+         TransformOrigin="Origin.TopLeft"
+         Class="context-menu"
+         Style="@($"left: {contextMenuX}px; top: {contextMenuY}px;")">
+    <MudMenuItem OnClick="() => OpenAttendanceModal(selectedScheduleId)">
+        <MudIcon Icon="Icons.Material.Filled.People" Class="mr-2" />
+        Manage Attendance
+    </MudMenuItem>
+    <MudMenuItem OnClick="() => OpenEditScheduleModal(selectedScheduleId)">
+        <MudIcon Icon="Icons.Material.Filled.Edit" Class="mr-2" />
+        Edit Class
+    </MudMenuItem>
+    <MudMenuItem OnClick="() => OpenScheduleDetailsModal(selectedScheduleId)">
+        <MudIcon Icon="Icons.Material.Filled.Info" Class="mr-2" />
+        View Details
+    </MudMenuItem>
+    <MudDivider />
+    <MudMenuItem OnClick="() => CancelSchedule(selectedScheduleId)" color="Color.Warning">
+        <MudIcon Icon="Icons.Material.Filled.Cancel" Class="mr-2" />
+        Cancel Class
+    </MudMenuItem>
+</MudMenu>
 
 <div class="action-buttons">
     <button class="btn btn-primary">Sign Up</button>
@@ -133,12 +168,35 @@ else
         padding: 12px;
         transition: all 0.2s ease;
     }
+
+    .schedule-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .context-menu {
+        position: fixed;
+        z-index: 1000;
+    }
 </style>
 
 @code {
     private WeeklyScheduleDto? weeklySchedule;
+    
+    // Context menu state
+    private bool contextMenuOpen = false;
+    private string selectedScheduleId = string.Empty;
+    private double contextMenuX = 0;
+    private double contextMenuY = 0;
 
     protected override async Task OnInitializedAsync()
+    {
+        await LoadSchedule();
+    }
+
+    private async Task LoadSchedule()
     {
         try
         {
@@ -148,6 +206,7 @@ else
         catch (Exception ex)
         {
             Console.WriteLine($"Error loading schedule: {ex.Message}");
+            Snackbar.Add("Failed to load schedule", Severity.Error);
             // Create empty schedule as fallback
             weeklySchedule = new WeeklyScheduleDto 
             { 
@@ -162,6 +221,31 @@ else
                     ["Sunday"] = new List<ScheduleSlotDto>()
                 }
             };
+        }
+    }
+
+    private async Task OpenScheduleDetailsModal(string scheduleId)
+    {
+        var parameters = new DialogParameters
+        {
+            ["ScheduleId"] = scheduleId,
+            ["Mode"] = "view"
+        };
+
+        var options = new DialogOptions() 
+        { 
+            MaxWidth = MaxWidth.Large, 
+            FullWidth = true,
+            CloseButton = true,
+            Position = DialogPosition.Center
+        };
+
+        var dialog = await DialogService.ShowAsync<ScheduleDetailsModal>("Class Details", parameters, options);
+        var result = await dialog.Result;
+        
+        if (result != null && !result.Canceled)
+        {
+            await LoadSchedule(); // Refresh data
         }
     }
 
@@ -183,10 +267,103 @@ else
         var dialog = await DialogService.ShowAsync<ClassAttendanceModal>("Class Attendance", parameters, options);
         var result = await dialog.Result;
         
-        // Optionally refresh schedule data after attendance changes
         if (result != null && !result.Canceled)
         {
             // Could refresh data here if needed
+        }
+    }
+
+    private async Task OpenEditScheduleModal(string scheduleId)
+    {
+        var parameters = new DialogParameters
+        {
+            ["ScheduleId"] = scheduleId,
+            ["Mode"] = "edit"
+        };
+
+        var options = new DialogOptions() 
+        { 
+            MaxWidth = MaxWidth.Large, 
+            FullWidth = true,
+            CloseButton = true,
+            Position = DialogPosition.Center
+        };
+
+        var dialog = await DialogService.ShowAsync<ScheduleDetailsModal>("Edit Class", parameters, options);
+        var result = await dialog.Result;
+        
+        if (result != null && !result.Canceled)
+        {
+            await LoadSchedule(); // Refresh data
+        }
+    }
+
+    private async Task OpenCreateScheduleModal()
+    {
+        var parameters = new DialogParameters
+        {
+            ["Mode"] = "create"
+        };
+
+        var options = new DialogOptions() 
+        { 
+            MaxWidth = MaxWidth.Large, 
+            FullWidth = true,
+            CloseButton = true,
+            Position = DialogPosition.Center
+        };
+
+        var dialog = await DialogService.ShowAsync<ScheduleDetailsModal>("Create New Class", parameters, options);
+        var result = await dialog.Result;
+        
+        if (result != null && !result.Canceled)
+        {
+            await LoadSchedule(); // Refresh data
+        }
+    }
+
+    private void OpenContextMenu(MouseEventArgs e, string scheduleId)
+    {
+        selectedScheduleId = scheduleId;
+        contextMenuX = e.ClientX;
+        contextMenuY = e.ClientY;
+        contextMenuOpen = true;
+    }
+
+    private async Task CancelSchedule(string scheduleId)
+    {
+        contextMenuOpen = false;
+        
+        var parameters = new DialogParameters
+        {
+            ["ContentText"] = "Are you sure you want to cancel this class? This action cannot be undone.",
+            ["ButtonText"] = "Cancel Class",
+            ["Color"] = Color.Warning
+        };
+
+        var options = new DialogOptions() { MaxWidth = MaxWidth.ExtraSmall };
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>("Confirm Cancellation", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            try
+            {
+                var response = await Http.DeleteAsync($"api/schedules/{scheduleId}");
+                if (response.IsSuccessStatusCode)
+                {
+                    Snackbar.Add("Class cancelled successfully", Severity.Success);
+                    await LoadSchedule();
+                }
+                else
+                {
+                    Snackbar.Add("Failed to cancel class", Severity.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Error cancelling class: {ex.Message}", Severity.Error);
+            }
         }
     }
 

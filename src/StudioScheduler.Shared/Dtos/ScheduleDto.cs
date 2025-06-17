@@ -29,6 +29,94 @@ public record ScheduleDto
     public required int Capacity { get; init; }
 }
 
+public record ScheduleEditDto
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public Guid LocationId { get; set; }
+    public string? LocationName { get; set; }
+    public Guid DanceClassId { get; set; }
+    public string? DanceClassName { get; set; }
+    public DateTime StartTime { get; set; }
+    public TimeSpan Duration { get; set; }
+    public bool IsRecurring { get; set; }
+    public string? RecurrencePattern { get; set; }
+    public DateTime? RecurrenceEndDate { get; set; }
+    public bool IsCancelled { get; set; }
+    public DateTime EffectiveFrom { get; set; }
+    public DateTime? EffectiveTo { get; set; }
+    public bool IsActive { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
+    
+    public string Level { get; set; } = string.Empty;
+    public Guid? InstructorId { get; set; }
+    public string? InstructorName { get; set; }
+    public Guid? RoomId { get; set; }
+    public string? RoomName { get; set; }
+    public int Capacity { get; set; }
+
+    public static ScheduleEditDto FromScheduleDto(ScheduleDto dto)
+    {
+        return new ScheduleEditDto
+        {
+            Id = dto.Id,
+            Name = dto.Name,
+            LocationId = dto.LocationId,
+            LocationName = dto.LocationName,
+            DanceClassId = dto.DanceClassId,
+            DanceClassName = dto.DanceClassName,
+            StartTime = dto.StartTime,
+            Duration = dto.Duration,
+            IsRecurring = dto.IsRecurring,
+            RecurrencePattern = dto.RecurrencePattern,
+            RecurrenceEndDate = dto.RecurrenceEndDate,
+            IsCancelled = dto.IsCancelled,
+            EffectiveFrom = dto.EffectiveFrom,
+            EffectiveTo = dto.EffectiveTo,
+            IsActive = dto.IsActive,
+            CreatedAt = dto.CreatedAt,
+            UpdatedAt = dto.UpdatedAt,
+            Level = dto.Level,
+            InstructorId = dto.InstructorId,
+            InstructorName = dto.InstructorName,
+            RoomId = dto.RoomId,
+            RoomName = dto.RoomName,
+            Capacity = dto.Capacity
+        };
+    }
+
+    public ScheduleDto ToScheduleDto()
+    {
+        return new ScheduleDto
+        {
+            Id = Id,
+            Name = Name,
+            LocationId = LocationId,
+            LocationName = LocationName,
+            DanceClassId = DanceClassId,
+            DanceClassName = DanceClassName,
+            StartTime = StartTime,
+            Duration = Duration,
+            IsRecurring = IsRecurring,
+            RecurrencePattern = RecurrencePattern,
+            RecurrenceEndDate = RecurrenceEndDate,
+            IsCancelled = IsCancelled,
+            EffectiveFrom = EffectiveFrom,
+            EffectiveTo = EffectiveTo,
+            IsActive = IsActive,
+            CreatedAt = CreatedAt,
+            UpdatedAt = UpdatedAt,
+            Level = Level,
+            InstructorId = InstructorId,
+            InstructorName = InstructorName,
+            RoomId = RoomId,
+            RoomName = RoomName,
+            Capacity = Capacity
+        };
+    }
+}
+
 public record CreateScheduleDto
 {
     public required string Name { get; init; }
