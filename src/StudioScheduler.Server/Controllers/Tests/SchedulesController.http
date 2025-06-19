@@ -32,9 +32,8 @@ Content-Type: application/json
   "locationId": "e8f3d8c1-2a82-4f6e-b846-4ad35182e7f1",
   "danceClassId": "c1a2b3c4-1234-5678-9abc-def012345601",
   "startTime": "2025-06-16T18:00:00Z",
-  "duration": "00:55:00",
+  "duration": "55",
   "isRecurring": true,
-  "recurrencePattern": "Weekly",
   "effectiveFrom": "2025-06-16T00:00:00Z",
   "effectiveTo": null
 }
@@ -47,9 +46,8 @@ Content-Type: application/json
 {
   "name": "Updated Test Schedule",
   "startTime": "2025-06-16T19:00:00Z",
-  "duration": "00:55:00",
+  "duration": "55",
   "isRecurring": true,
-  "recurrencePattern": "Weekly",
   "effectiveFrom": "2025-06-16T00:00:00Z",
   "effectiveTo": null,
   "isActive": true,

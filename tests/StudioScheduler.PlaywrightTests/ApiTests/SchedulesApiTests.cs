@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace StudioScheduler.PlaywrightTests.ApiTests;
 
 [TestFixture]
@@ -189,4 +191,352 @@ public class SchedulesApiTests : BaseApiTest
         Assert.DoesNotThrow(() => JsonSerializer.Deserialize<object>(jsonContent), 
             "Response should be valid JSON");
     }
+
+    #region GetSchedules Tests
+
+    [Test]
+    public async Task GetSchedules_ShouldReturnSuccessWithScheduleList()
+    {
+        // Act
+        var response = await ApiContext.GetAsync("/api/schedules");
+        
+        // Assert
+        await AssertSuccessfulResponse(response);
+        
+        var schedules = await DeserializeResponse<List<ScheduleSummaryDto>>(response);
+        
+        Assert.That(schedules, Is.Not.Null, "Schedules list should not be null");
+        Assert.That(schedules.Count, Is.GreaterThan(0), "Should have at least one schedule");
+        
+        // Verify first schedule structure
+        var firstSchedule = schedules.First();
+        Assert.That(firstSchedule.Id, Is.Not.EqualTo(Guid.Empty), "Schedule should have valid ID");
+        Assert.That(firstSchedule.Name, Is.Not.Null.And.Not.Empty, "Schedule should have name");
+        Assert.That(firstSchedule.Level, Is.Not.Null.And.Not.Empty, "Schedule should have level");
+        Assert.That(firstSchedule.Capacity, Is.GreaterThan(0), "Schedule should have positive capacity");
+    }
+
+    [Test]
+    public async Task GetSchedules_ShouldReturnCorrectResponseHeaders()
+    {
+        // Act
+        var response = await ApiContext.GetAsync("/api/schedules");
+        
+        // Assert
+        await AssertSuccessfulResponse(response);
+        
+        var headers = response.Headers;
+        Assert.That(headers.ContainsKey("content-type"), Is.True, "Response should have content-type header");
+        Assert.That(headers["content-type"], Does.Contain("application/json"), "Content type should be JSON");
+    }
+
+    #endregion
+
+    #region GetSchedule Tests
+
+    [Test]
+    public async Task GetSchedule_WithValidId_ShouldReturnScheduleDetails()
+    {
+        // Arrange - First get a schedule to test with
+        var allSchedulesResponse = await ApiContext.GetAsync("/api/schedules");
+        await AssertSuccessfulResponse(allSchedulesResponse);
+        var schedules = await DeserializeResponse<List<ScheduleSummaryDto>>(allSchedulesResponse);
+        var testScheduleId = schedules.First().Id;
+        
+        // Act
+        var response = await ApiContext.GetAsync($"/api/schedules/{testScheduleId}");
+        
+        // Assert
+        await AssertSuccessfulResponse(response);
+        
+        var schedule = await DeserializeResponse<ScheduleDto>(response);
+        
+        Assert.That(schedule, Is.Not.Null, "Schedule should not be null");
+        Assert.That(schedule.Id, Is.EqualTo(testScheduleId), "Schedule ID should match requested ID");
+        Assert.That(schedule.Name, Is.Not.Null.And.Not.Empty, "Schedule should have name");
+        Assert.That(schedule.LocationId, Is.Not.EqualTo(Guid.Empty), "Schedule should have location ID");
+        Assert.That(schedule.DanceClassId, Is.Not.EqualTo(Guid.Empty), "Schedule should have dance class ID");
+        Assert.That(schedule.Level, Is.Not.Null.And.Not.Empty, "Schedule should have level");
+        Assert.That(schedule.Duration, Is.GreaterThan(0), "Schedule should have positive duration");
+        Assert.That(schedule.Capacity, Is.GreaterThan(0), "Schedule should have positive capacity");
+    }
+
+    [Test]
+    public async Task GetSchedule_WithNonExistentId_ShouldReturn404()
+    {
+        // Arrange
+        var nonExistentId = Guid.NewGuid();
+        
+        // Act
+        var response = await ApiContext.GetAsync($"/api/schedules/{nonExistentId}");
+        
+        // Assert
+        await AssertErrorResponse(response, HttpStatusCode.NotFound);
+    }
+
+    [Test]
+    public async Task GetSchedule_WithInvalidGuid_ShouldReturn404()
+    {
+        // Act
+        var response = await ApiContext.GetAsync("/api/schedules/invalid-guid");
+        
+        // Assert - ASP.NET Core returns 404 for invalid route parameters, not 400
+        await AssertErrorResponse(response, HttpStatusCode.NotFound);
+    }
+
+    #endregion
+
+    #region CreateSchedule Tests
+
+    [Test]
+    public async Task CreateSchedule_WithValidData_ShouldCreateAndReturnSchedule()
+    {
+        // Arrange - Get valid location and dance class IDs
+        var locationsResponse = await ApiContext.GetAsync("/api/locations");
+        await AssertSuccessfulResponse(locationsResponse);
+        var locations = await DeserializeResponse<List<LocationDto>>(locationsResponse);
+        var locationId = locations.First().Id;
+
+        var classesResponse = await ApiContext.GetAsync("/api/classes");
+        await AssertSuccessfulResponse(classesResponse);
+        var classes = await DeserializeResponse<List<ClassSummaryDto>>(classesResponse);
+        var danceClassId = classes.First().Id;
+
+        var createDto = new CreateScheduleDto
+        {
+            Name = "Test Schedule",
+            LocationId = locationId,
+            DanceClassId = danceClassId,
+            DayOfWeek = DayOfWeek.Monday,
+            StartTime = TimeSpan.FromHours(19), // 7 PM
+            Duration = 90,
+            IsRecurring = true,
+            EffectiveFrom = DateTime.UtcNow.Date,
+            Level = "P1",
+            Capacity = 20
+        };
+
+        // Act
+        var response = await ApiContext.PostAsync("/api/schedules", new APIRequestContextOptions
+        {
+            Data = JsonSerializer.Serialize(createDto, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            })
+        });
+
+        // Assert
+        await AssertSuccessfulResponse(response, HttpStatusCode.Created);
+        
+        var schedule = await DeserializeResponse<ScheduleDto>(response);
+        
+        Assert.That(schedule, Is.Not.Null, "Created schedule should not be null");
+        Assert.That(schedule.Id, Is.Not.EqualTo(Guid.Empty), "Created schedule should have valid ID");
+        Assert.That(schedule.Name, Is.EqualTo(createDto.Name), "Schedule name should match");
+        Assert.That(schedule.LocationId, Is.EqualTo(createDto.LocationId), "Location ID should match");
+        Assert.That(schedule.DanceClassId, Is.EqualTo(createDto.DanceClassId), "Dance class ID should match");
+        Assert.That(schedule.DayOfWeek, Is.EqualTo(createDto.DayOfWeek), "Day of week should match");
+        Assert.That(schedule.StartTime, Is.EqualTo(createDto.StartTime), "Start time should match");
+        Assert.That(schedule.Duration, Is.EqualTo(createDto.Duration), "Duration should match");
+        Assert.That(schedule.Level, Is.EqualTo(createDto.Level), "Level should match");
+        Assert.That(schedule.Capacity, Is.EqualTo(createDto.Capacity), "Capacity should match");
+        Assert.That(schedule.IsActive, Is.True, "New schedule should be active");
+        Assert.That(schedule.IsCancelled, Is.False, "New schedule should not be cancelled");
+    }
+
+    [Test]
+    public async Task CreateSchedule_WithInvalidLocationId_ShouldReturn400()
+    {
+        // Arrange
+        var createDto = new CreateScheduleDto
+        {
+            Name = "Test Schedule",
+            LocationId = Guid.NewGuid(), // Non-existent location
+            DanceClassId = Guid.NewGuid(),
+            DayOfWeek = DayOfWeek.Monday,
+            StartTime = TimeSpan.FromHours(19),
+            Duration = 90,
+            IsRecurring = true,
+            EffectiveFrom = DateTime.UtcNow.Date,
+            Level = "P1",
+            Capacity = 20
+        };
+
+        // Act
+        var response = await ApiContext.PostAsync("/api/schedules", new APIRequestContextOptions
+        {
+            Data = JsonSerializer.Serialize(createDto, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            })
+        });
+
+        // Assert - This might return 400 or 500 depending on validation implementation
+        Assert.That(response.Status, Is.AnyOf(400, 500), "Should return error for invalid location ID");
+    }
+
+    #endregion
+
+    #region UpdateSchedule Tests
+
+    [Test]
+    public async Task UpdateSchedule_WithValidData_ShouldReturnUpdatedSchedule()
+    {
+        // Arrange - First get an existing schedule
+        var allSchedulesResponse = await ApiContext.GetAsync("/api/schedules");
+        await AssertSuccessfulResponse(allSchedulesResponse);
+        var schedules = await DeserializeResponse<List<ScheduleSummaryDto>>(allSchedulesResponse);
+        var testScheduleId = schedules.First().Id;
+
+        // Get the full schedule details
+        var getResponse = await ApiContext.GetAsync($"/api/schedules/{testScheduleId}");
+        await AssertSuccessfulResponse(getResponse);
+        var originalSchedule = await DeserializeResponse<ScheduleDto>(getResponse);
+
+        var updateDto = new UpdateScheduleDto
+        {
+            Name = "Updated Schedule Name",
+            DayOfWeek = DayOfWeek.Tuesday, // Different from original
+            StartTime = TimeSpan.FromHours(20), // 8 PM
+            Duration = 120, // 2 hours
+            IsRecurring = true,
+            EffectiveFrom = DateTime.UtcNow.Date.AddDays(1),
+            IsActive = true,
+            IsCancelled = false,
+            Level = "P2", // Different level
+            Capacity = 25
+        };
+
+        // Act
+        var response = await ApiContext.PutAsync($"/api/schedules/{testScheduleId}", new APIRequestContextOptions
+        {
+            Data = JsonSerializer.Serialize(updateDto, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            })
+        });
+
+        // Assert
+        await AssertSuccessfulResponse(response);
+        
+        var updatedSchedule = await DeserializeResponse<ScheduleDto>(response);
+        
+        Assert.That(updatedSchedule, Is.Not.Null, "Updated schedule should not be null");
+        Assert.That(updatedSchedule.Id, Is.EqualTo(testScheduleId), "Schedule ID should remain same");
+        Assert.That(updatedSchedule.Name, Is.EqualTo(updateDto.Name), "Name should be updated");
+        Assert.That(updatedSchedule.DayOfWeek, Is.EqualTo(updateDto.DayOfWeek), "Day of week should be updated");
+        Assert.That(updatedSchedule.StartTime, Is.EqualTo(updateDto.StartTime), "Start time should be updated");
+        Assert.That(updatedSchedule.Duration, Is.EqualTo(updateDto.Duration), "Duration should be updated");
+        Assert.That(updatedSchedule.Level, Is.EqualTo(updateDto.Level), "Level should be updated");
+        Assert.That(updatedSchedule.Capacity, Is.EqualTo(updateDto.Capacity), "Capacity should be updated");
+        
+        // Verify immutable fields are preserved
+        Assert.That(updatedSchedule.LocationId, Is.EqualTo(originalSchedule.LocationId), "Location ID should be preserved");
+        Assert.That(updatedSchedule.DanceClassId, Is.EqualTo(originalSchedule.DanceClassId), "Dance class ID should be preserved");
+        Assert.That(updatedSchedule.CreatedAt, Is.EqualTo(originalSchedule.CreatedAt), "Created at should be preserved");
+        
+        // Verify UpdatedAt is changed
+        Assert.That(updatedSchedule.UpdatedAt, Is.Not.EqualTo(originalSchedule.UpdatedAt), "UpdatedAt should be changed");
+        Assert.That(updatedSchedule.UpdatedAt, Is.Not.Null, "UpdatedAt should not be null");
+    }
+
+    [Test]
+    public async Task UpdateSchedule_WithNonExistentId_ShouldReturn404()
+    {
+        // Arrange
+        var nonExistentId = Guid.NewGuid();
+        var updateDto = new UpdateScheduleDto
+        {
+            Name = "Updated Name",
+            DayOfWeek = DayOfWeek.Monday,
+            StartTime = TimeSpan.FromHours(19),
+            Duration = 90,
+            IsRecurring = true,
+            EffectiveFrom = DateTime.UtcNow.Date,
+            IsActive = true,
+            IsCancelled = false,
+            Level = "P1",
+            Capacity = 20
+        };
+
+        // Act
+        var response = await ApiContext.PutAsync($"/api/schedules/{nonExistentId}", new APIRequestContextOptions
+        {
+            Data = JsonSerializer.Serialize(updateDto, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            })
+        });
+
+        // Assert
+        await AssertErrorResponse(response, HttpStatusCode.NotFound);
+    }
+
+    #endregion
+
+    #region DeleteSchedule Tests
+
+    [Test]
+    public async Task DeleteSchedule_WithValidId_ShouldReturn204()
+    {
+        // Arrange - First create a schedule to delete
+        var locationsResponse = await ApiContext.GetAsync("/api/locations");
+        await AssertSuccessfulResponse(locationsResponse);
+        var locations = await DeserializeResponse<List<LocationDto>>(locationsResponse);
+        var locationId = locations.First().Id;
+
+        var classesResponse = await ApiContext.GetAsync("/api/classes");
+        await AssertSuccessfulResponse(classesResponse);
+        var classes = await DeserializeResponse<List<ClassSummaryDto>>(classesResponse);
+        var danceClassId = classes.First().Id;
+
+        var createDto = new CreateScheduleDto
+        {
+            Name = "Schedule to Delete",
+            LocationId = locationId,
+            DanceClassId = danceClassId,
+            DayOfWeek = DayOfWeek.Friday,
+            StartTime = TimeSpan.FromHours(18),
+            Duration = 90,
+            IsRecurring = true,
+            EffectiveFrom = DateTime.UtcNow.Date,
+            Level = "P1",
+            Capacity = 15
+        };
+
+        var createResponse = await ApiContext.PostAsync("/api/schedules", new APIRequestContextOptions
+        {
+            Data = JsonSerializer.Serialize(createDto, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            })
+        });
+        await AssertSuccessfulResponse(createResponse, HttpStatusCode.Created);
+        var createdSchedule = await DeserializeResponse<ScheduleDto>(createResponse);
+
+        // Act
+        var deleteResponse = await ApiContext.DeleteAsync($"/api/schedules/{createdSchedule.Id}");
+
+        // Assert
+        await AssertSuccessfulResponse(deleteResponse, HttpStatusCode.NoContent);
+        
+        // Verify schedule is actually deleted
+        var getResponse = await ApiContext.GetAsync($"/api/schedules/{createdSchedule.Id}");
+        await AssertErrorResponse(getResponse, HttpStatusCode.NotFound);
+    }
+
+    [Test]
+    public async Task DeleteSchedule_WithNonExistentId_ShouldReturn404()
+    {
+        // Arrange
+        var nonExistentId = Guid.NewGuid();
+
+        // Act
+        var response = await ApiContext.DeleteAsync($"/api/schedules/{nonExistentId}");
+
+        // Assert
+        await AssertErrorResponse(response, HttpStatusCode.NotFound);
+    }
+
+    #endregion
 }

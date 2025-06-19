@@ -43,9 +43,35 @@ public class ScheduleRepository : IScheduleRepository
 
     public async Task<Schedule> UpdateAsync(Schedule schedule)
     {
-        _context.Entry(schedule).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
-        return schedule;
+        // Check if entity is already being tracked
+        var existingEntry = _context.Entry(schedule);
+        if (existingEntry.State == EntityState.Detached)
+        {
+            // Get the existing entity from the database
+            var existingSchedule = await _context.Schedules
+                .Include(s => s.Location)
+                .Include(s => s.DanceClass)
+                .Include(s => s.Instructor)
+                .Include(s => s.Room)
+                .FirstOrDefaultAsync(s => s.Id == schedule.Id);
+
+            if (existingSchedule == null)
+            {
+                throw new InvalidOperationException($"Schedule with ID {schedule.Id} not found.");
+            }
+
+            // Update the existing tracked entity with new values
+            _context.Entry(existingSchedule).CurrentValues.SetValues(schedule);
+            await _context.SaveChangesAsync();
+            return existingSchedule;
+        }
+        else
+        {
+            // Entity is already tracked, just mark as modified
+            existingEntry.State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return schedule;
+        }
     }
 
     public async Task<bool> DeleteAsync(Guid id)

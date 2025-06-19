@@ -25,5 +25,5 @@ public class DanceClass
     
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
-    public ICollection<Schedule> Schedules { get; init; } = new List<Schedule>();
+    public ICollection<Schedule> Schedules { get; init; } = [];
 }

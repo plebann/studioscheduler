@@ -218,35 +218,23 @@ public class SchedulesController : ControllerBase
         var danceClassDict = danceClasses.ToDictionary(dc => dc.Id, dc => dc);
 
         var weeklySchedule = new Dictionary<string, List<ScheduleSlotDto>>();
-        var daysOfWeek = new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
-
+        var daysOfWeek = Enum.GetNames<DayOfWeek>().ToList();
         // Initialize each day with empty lists
         foreach (var day in daysOfWeek)
         {
-            weeklySchedule[day] = new List<ScheduleSlotDto>();
+            weeklySchedule[day] = [];
         }
 
         // Group schedules by day of week
         foreach (var schedule in activeSchedules)
         {
-            var dayName = schedule.DayOfWeek switch
-            {
-                DayOfWeek.Monday => "Monday",
-                DayOfWeek.Tuesday => "Tuesday", 
-                DayOfWeek.Wednesday => "Wednesday",
-                DayOfWeek.Thursday => "Thursday",
-                DayOfWeek.Friday => "Friday",
-                DayOfWeek.Saturday => "Saturday",
-                DayOfWeek.Sunday => "Sunday",
-                _ => "Monday"
-            };
+            var dayName = schedule.DayOfWeek.ToString();
 
             var endTime = schedule.StartTime.Add(TimeSpan.FromMinutes(schedule.Duration));
             var timeSlot = $"{schedule.StartTime:hh\\:mm} - {endTime:hh\\:mm}";
 
             // Get the dance class information
-            DanceClass? danceClass = null;
-            danceClassDict.TryGetValue(schedule.DanceClassId, out danceClass);
+            danceClassDict.TryGetValue(schedule.DanceClassId, out DanceClass? danceClass);
 
             // Use dance class information for accurate data
             var danceName = danceClass?.Name ?? schedule.Name;
