@@ -70,11 +70,6 @@
                             Recurrence: Weekly (every week on the same day)
                         </MudText>
                     </MudItem>
-                    
-                    <MudItem xs="12" sm="6">
-                        <MudDatePicker Date="@Schedule.RecurrenceEndDate" DateChanged="@(date => OnRecurrenceEndDateChanged(date))" 
-                                      Label="Recurrence End Date" />
-                    </MudItem>
                 }
                 
                 <MudItem xs="12" sm="6">
@@ -147,14 +142,6 @@
     private async Task HandleCancel()
     {
         await OnCancel.InvokeAsync();
-    }
-
-    private void OnRecurrenceEndDateChanged(DateTime? date)
-    {
-        if (Schedule != null)
-        {
-            Schedule.RecurrenceEndDate = date;
-        }
     }
 
     private void OnEffectiveFromDateChanged(DateTime date)

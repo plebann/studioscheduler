@@ -12,7 +12,6 @@ public record ScheduleDto
     public required TimeSpan StartTime { get; init; }
     public required int Duration { get; init; }
     public bool IsRecurring { get; init; }
-    public DateTime? RecurrenceEndDate { get; init; }
     public bool IsCancelled { get; init; }
     public required DateTime EffectiveFrom { get; init; }
     public DateTime? EffectiveTo { get; init; }
@@ -20,7 +19,6 @@ public record ScheduleDto
     public DateTime CreatedAt { get; init; }
     public DateTime? UpdatedAt { get; init; }
     
-    // ✅ NEW: Properties moved from DanceClass
     public required string Level { get; init; }
     public Guid? InstructorId { get; init; }
     public string? InstructorName { get; init; }
@@ -41,7 +39,6 @@ public record ScheduleEditDto
     public TimeSpan StartTime { get; set; }
     public int Duration { get; set; }
     public bool IsRecurring { get; set; }
-    public DateTime? RecurrenceEndDate { get; set; }
     public bool IsCancelled { get; set; }
     public DateTime EffectiveFrom { get; set; }
     public DateTime? EffectiveTo { get; set; }
@@ -70,7 +67,6 @@ public record ScheduleEditDto
             StartTime = dto.StartTime,
             Duration = dto.Duration,
             IsRecurring = dto.IsRecurring,
-            RecurrenceEndDate = dto.RecurrenceEndDate,
             IsCancelled = dto.IsCancelled,
             EffectiveFrom = dto.EffectiveFrom,
             EffectiveTo = dto.EffectiveTo,
@@ -100,7 +96,6 @@ public record ScheduleEditDto
             StartTime = StartTime,
             Duration = Duration,
             IsRecurring = IsRecurring,
-            RecurrenceEndDate = RecurrenceEndDate,
             IsCancelled = IsCancelled,
             EffectiveFrom = EffectiveFrom,
             EffectiveTo = EffectiveTo,
@@ -126,11 +121,9 @@ public record CreateScheduleDto
     public required TimeSpan StartTime { get; init; }
     public required int Duration { get; init; }
     public bool IsRecurring { get; init; }
-    public DateTime? RecurrenceEndDate { get; init; }
     public required DateTime EffectiveFrom { get; init; }
     public DateTime? EffectiveTo { get; init; }
     
-    // ✅ NEW: Properties moved from DanceClass
     public required string Level { get; init; }
     public Guid? InstructorId { get; init; }
     public Guid? RoomId { get; init; }
@@ -144,13 +137,11 @@ public record UpdateScheduleDto
     public required TimeSpan StartTime { get; init; }
     public required int Duration { get; init; }
     public bool IsRecurring { get; init; }
-    public DateTime? RecurrenceEndDate { get; init; }
     public required DateTime EffectiveFrom { get; init; }
     public DateTime? EffectiveTo { get; init; }
     public bool IsActive { get; init; }
     public bool IsCancelled { get; init; }
     
-    // ✅ NEW: Properties moved from DanceClass
     public required string Level { get; init; }
     public Guid? InstructorId { get; init; }
     public Guid? RoomId { get; init; }
@@ -169,7 +160,6 @@ public record ScheduleSummaryDto
     public bool IsActive { get; init; }
     public bool IsCancelled { get; init; }
     
-    // ✅ NEW: Properties moved from DanceClass
     public required string Level { get; init; }
     public string? InstructorName { get; init; }
     public string? RoomName { get; init; }

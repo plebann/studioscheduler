@@ -40,7 +40,6 @@ public class ScheduleTests
         schedule.StartTime.Should().Be(new TimeSpan(19, 0, 0));
         schedule.Duration.Should().Be(60);
         schedule.IsRecurring.Should().BeFalse();
-        schedule.RecurrenceEndDate.Should().BeNull();
         schedule.IsCancelled.Should().BeFalse();
         schedule.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
         schedule.UpdatedAt.Should().BeNull();
@@ -96,7 +95,6 @@ public class ScheduleTests
             DayOfWeek = DayOfWeek.Wednesday,
             StartTime = new TimeSpan(18, 30, 0), // 6:30 PM
             Duration = 60,
-            RecurrenceEndDate = endDate,
             IsRecurring = true,
             Level = "Intermediate",
             Capacity = 25
@@ -104,7 +102,6 @@ public class ScheduleTests
 
         // Assert
         schedule.IsRecurring.Should().BeTrue();
-        schedule.RecurrenceEndDate.Should().Be(endDate);
     }
 
     [Theory]
@@ -177,7 +174,6 @@ public class ScheduleTests
             DayOfWeek = DayOfWeek.Saturday,
             StartTime = new TimeSpan(10, 0, 0), // 10 AM
             Duration = 60,
-            RecurrenceEndDate = DateTime.UtcNow.AddDays(-1), // Past date for validation test
             IsRecurring = true,
             Level = "Beginner",
             Capacity = 20,

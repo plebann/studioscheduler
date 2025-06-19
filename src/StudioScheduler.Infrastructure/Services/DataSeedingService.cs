@@ -182,7 +182,6 @@ public class DataSeedingService
                     StartTime = scheduleData.StartTime.TimeOfDay,
                     Duration = scheduleData.Duration,
                     IsRecurring = scheduleData.IsRecurring,
-                    RecurrenceEndDate = scheduleData.RecurrenceEndDate,
                     IsCancelled = scheduleData.IsCancelled,
                     CreatedAt = scheduleData.CreatedAt,
                     UpdatedAt = scheduleData.UpdatedAt,
@@ -361,7 +360,6 @@ public class DataSeedingService
         public int Duration { get; set; }
         public bool IsRecurring { get; set; }
         public string? RecurrencePattern { get; set; }
-        public DateTime? RecurrenceEndDate { get; set; }
         public bool IsCancelled { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

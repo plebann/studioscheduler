@@ -18,7 +18,6 @@ public class Schedule
     public required TimeSpan StartTime { get; set; }
     public required int Duration { get; set; }
     public bool IsRecurring { get; set; }
-    public DateTime? RecurrenceEndDate { get; set; }
     public bool IsCancelled { get; set; }
     
     public required string Level { get; set; }
