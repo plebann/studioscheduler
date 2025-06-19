@@ -1,5 +1,8 @@
 @page "/students"
 @using MudBlazor
+@using StudioScheduler.Client.Services
+@using StudioScheduler.Shared.Dtos
+@inject IStudentService StudentService
 
 <PageTitle>Students - Studio Scheduler</PageTitle>
 
@@ -29,67 +32,96 @@
                                  AdornmentIcon="@Icons.Material.Filled.Search" />
                 </MudItem>
                 <MudItem xs="12" md="4">
-                    <MudSelect @bind-Value="selectedLevel" 
-                              Label="Filter by Level" 
+                    <MudSelect @bind-Value="statusFilter" 
+                              Label="Filter by Status" 
                               Variant="Variant.Outlined">
-                        <MudSelectItem Value="@("")">All Levels</MudSelectItem>
-                        <MudSelectItem Value="@("P1")">Beginner (P1)</MudSelectItem>
-                        <MudSelectItem Value="@("P2")">Beginner (P2)</MudSelectItem>
-                        <MudSelectItem Value="@("P3")">Beginner (P3)</MudSelectItem>
-                        <MudSelectItem Value="@("S1")">Intermediate (S1)</MudSelectItem>
-                        <MudSelectItem Value="@("S2")">Intermediate (S2)</MudSelectItem>
-                        <MudSelectItem Value="@("S3")">Advanced (S3)</MudSelectItem>
+                        <MudSelectItem Value="@("")">All Students</MudSelectItem>
+                        <MudSelectItem Value="@("active")">Active Only</MudSelectItem>
+                        <MudSelectItem Value="@("inactive")">Inactive Only</MudSelectItem>
                     </MudSelect>
                 </MudItem>
             </MudGrid>
             
             <MudDivider Class="my-4" />
             
-            <MudDataGrid Items="@students" 
-                        Filterable="true" 
-                        SortMode="@SortMode.Multiple" 
-                        Groupable="false">
-                <Columns>
-                    <PropertyColumn Property="x => x.Name" Title="Name" />
-                    <PropertyColumn Property="x => x.Email" Title="Email" />
-                    <PropertyColumn Property="x => x.Phone" Title="Phone" />
-                    <PropertyColumn Property="x => x.Level" Title="Current Level" />
-                    <PropertyColumn Property="x => x.JoinDate" Title="Join Date" Format="dd/MM/yyyy" />
-                    <TemplateColumn Title="Actions">
-                        <CellTemplate>
-                            <MudIconButton Icon="@Icons.Material.Filled.Edit" 
-                                          Size="Size.Small" 
-                                          Color="Color.Primary" />
-                            <MudIconButton Icon="@Icons.Material.Filled.Delete" 
-                                          Size="Size.Small" 
-                                          Color="Color.Error" />
-                        </CellTemplate>
-                    </TemplateColumn>
-                </Columns>
-            </MudDataGrid>
+            @if (isLoading)
+            {
+                <MudProgressCircular Indeterminate="true" />
+                <MudText>Loading students...</MudText>
+            }
+            else
+            {
+                <MudDataGrid Items="@filteredStudents" 
+                            Filterable="true" 
+                            SortMode="@SortMode.Multiple" 
+                            Groupable="false">
+                    <Columns>
+                        <PropertyColumn Property="x => x.Name" Title="Name" />
+                        <PropertyColumn Property="x => x.Email" Title="Email" />
+                        <PropertyColumn Property="x => x.Phone" Title="Phone" />
+                        <PropertyColumn Property="x => x.JoinDate" Title="Join Date" Format="dd/MM/yyyy" />
+                        <TemplateColumn Title="Status">
+                            <CellTemplate>
+                                <MudChip Color="@(context.Item.IsActive ? Color.Success : Color.Default)" 
+                                         Size="Size.Small">
+                                    @(context.Item.IsActive ? "Active" : "Inactive")
+                                </MudChip>
+                            </CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn Title="Actions">
+                            <CellTemplate>
+                                <MudIconButton Icon="@Icons.Material.Filled.Edit" 
+                                              Size="Size.Small" 
+                                              Color="Color.Primary" />
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                                              Size="Size.Small" 
+                                              Color="Color.Error" />
+                            </CellTemplate>
+                        </TemplateColumn>
+                    </Columns>
+                </MudDataGrid>
+            }
         </MudCardContent>
     </MudCard>
 </MudContainer>
 
 @code {
     private string searchText = "";
-    private string selectedLevel = "";
+    private string statusFilter = "";
+    private bool isLoading = true;
     
-    private List<StudentInfo> students = new()
-    {
-        new StudentInfo { Name = "Anna Kowalska", Email = "anna.kowalska@email.com", Phone = "123-456-789", Level = "P2", JoinDate = DateTime.Now.AddMonths(-3) },
-        new StudentInfo { Name = "Piotr Nowak", Email = "piotr.nowak@email.com", Phone = "234-567-890", Level = "S1", JoinDate = DateTime.Now.AddMonths(-6) },
-        new StudentInfo { Name = "Maria Wiśniewska", Email = "maria.wisniewska@email.com", Phone = "345-678-901", Level = "P3", JoinDate = DateTime.Now.AddMonths(-2) },
-        new StudentInfo { Name = "Tomasz Wójcik", Email = "tomasz.wojcik@email.com", Phone = "456-789-012", Level = "S2", JoinDate = DateTime.Now.AddMonths(-8) },
-        new StudentInfo { Name = "Katarzyna Krawczyk", Email = "katarzyna.krawczyk@email.com", Phone = "567-890-123", Level = "P1", JoinDate = DateTime.Now.AddMonths(-1) }
-    };
+    private List<StudentDto> students = new();
     
-    public class StudentInfo
+    private IEnumerable<StudentDto> filteredStudents => 
+        students.Where(s => 
+            (string.IsNullOrEmpty(searchText) || 
+             s.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+             s.Email.Contains(searchText, StringComparison.OrdinalIgnoreCase)) &&
+            (string.IsNullOrEmpty(statusFilter) ||
+             (statusFilter == "active" && s.IsActive) ||
+             (statusFilter == "inactive" && !s.IsActive))
+        );
+
+    protected override async Task OnInitializedAsync()
     {
-        public string Name { get; set; } = "";
-        public string Email { get; set; } = "";
-        public string Phone { get; set; } = "";
-        public string Level { get; set; } = "";
-        public DateTime JoinDate { get; set; }
+        await LoadStudents();
+    }
+
+    private async Task LoadStudents()
+    {
+        try
+        {
+            isLoading = true;
+            students = await StudentService.GetAllStudentsAsync();
+        }
+        catch (Exception ex)
+        {
+            // In a real app, you'd want to show a proper error message to the user
+            Console.WriteLine($"Error loading students: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
     }
 }

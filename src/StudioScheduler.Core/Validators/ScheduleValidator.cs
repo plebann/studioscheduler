@@ -56,5 +56,13 @@ public class ScheduleValidator : AbstractValidator<Schedule>
             .WithMessage("Room is required")
             .NotEqual(Guid.Empty)
             .WithMessage("Room is required");
+
+        // Validation for recurring schedules
+        RuleFor(x => x.EffectiveTo)
+            .NotNull()
+            .WithMessage("Recurrence end date must be after effective from date")
+            .GreaterThan(x => x.EffectiveFrom)
+            .WithMessage("Recurrence end date must be after effective from date")
+            .When(x => x.IsRecurring);
     }
 }
