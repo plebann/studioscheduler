@@ -20,34 +20,35 @@
                 </MudItem>
                 
                 <MudItem xs="12" sm="6">
-                    <MudSelect @bind-Value="Schedule.Level" Label="Level" Required="true">
-                        <MudSelectItem Value="@("P1")">Level P1</MudSelectItem>
-                        <MudSelectItem Value="@("P2")">Level P2</MudSelectItem>
-                        <MudSelectItem Value="@("P3")">Level P3</MudSelectItem>
-                        <MudSelectItem Value="@("S1")">Level S1</MudSelectItem>
-                        <MudSelectItem Value="@("S2")">Level S2</MudSelectItem>
-                        <MudSelectItem Value="@("S3")">Level S3</MudSelectItem>
-                        <MudSelectItem Value="@("OPEN")">OPEN level</MudSelectItem>
+                    <MudTextField @bind-Value="Schedule.Level" 
+                                 Label="Level" 
+                                 Required="true" />
+                </MudItem>
+                
+                <MudItem xs="12" sm="6">
+                    <MudSelect @bind-Value="Schedule.DayOfWeek" 
+                              Label="Day of Week" 
+                              Required="true">
+                        <MudSelectItem Value="DayOfWeek.Monday">Monday</MudSelectItem>
+                        <MudSelectItem Value="DayOfWeek.Tuesday">Tuesday</MudSelectItem>
+                        <MudSelectItem Value="DayOfWeek.Wednesday">Wednesday</MudSelectItem>
+                        <MudSelectItem Value="DayOfWeek.Thursday">Thursday</MudSelectItem>
+                        <MudSelectItem Value="DayOfWeek.Friday">Friday</MudSelectItem>
+                        <MudSelectItem Value="DayOfWeek.Saturday">Saturday</MudSelectItem>
+                        <MudSelectItem Value="DayOfWeek.Sunday">Sunday</MudSelectItem>
                     </MudSelect>
                 </MudItem>
                 
                 <MudItem xs="12" sm="6">
-                    <MudDatePicker Date="@startDateOnly" DateChanged="@(date => OnStartDateChanged(date ?? DateTime.Today))" 
-                                  Label="Start Date" 
-                                  Required="true" />
+                    <MudTimePicker @bind-Time="startTimeNullable" 
+                                  Label="Start Time" />
                 </MudItem>
                 
                 <MudItem xs="12" sm="6">
-                    <MudTimePicker Time="@startTimeOnly" TimeChanged="@(time => OnStartTimeChanged(time ?? TimeSpan.Zero))" 
-                                  Label="Start Time" 
-                                  Required="true" />
-                </MudItem>
-                
-                <MudItem xs="12" sm="6">
-                    <MudNumericField @bind-Value="durationHours" 
-                                    Label="Duration (hours)" 
+                    <MudNumericField @bind-Value="Schedule.Duration" 
+                                    Label="Duration (minutes)" 
                                     Required="true"
-                                    Min="0.5" Max="4" Step="0.5" />
+                                    Min="30" Max="200" Step="15" />
                 </MudItem>
                 
                 <MudItem xs="12" sm="6">
@@ -65,8 +66,9 @@
                 @if (Schedule.IsRecurring)
                 {
                     <MudItem xs="12" sm="6">
-                        <MudTextField @bind-Value="Schedule.RecurrencePattern" 
-                                     Label="Recurrence Pattern (e.g., 'Weekly')" />
+                        <MudText Typo="Typo.body2" Class="mt-4">
+                            Recurrence: Weekly (every week on the same day)
+                        </MudText>
                     </MudItem>
                     
                     <MudItem xs="12" sm="6">
@@ -111,18 +113,24 @@
 
     private MudForm? form;
     private bool isValid;
-    private double durationHours = 1.0;
-    private TimeSpan startTimeOnly = TimeSpan.Zero;
-    private DateTime startDateOnly = DateTime.Today;
     private DateTime effectiveFromDate = DateTime.Today;
+    
+    private TimeSpan? startTimeNullable
+    {
+        get => Schedule?.StartTime;
+        set
+        {
+            if (Schedule != null && value.HasValue)
+            {
+                Schedule.StartTime = value.Value;
+            }
+        }
+    }
 
     protected override void OnParametersSet()
     {
         if (Schedule != null)
         {
-            durationHours = Schedule.Duration.TotalHours;
-            startTimeOnly = Schedule.StartTime.TimeOfDay;
-            startDateOnly = Schedule.StartTime.Date;
             effectiveFromDate = Schedule.EffectiveFrom;
         }
     }
@@ -131,10 +139,7 @@
     {
         if (Schedule != null)
         {
-            // Update the start time with the date and time components
-            Schedule.StartTime = startDateOnly.Add(startTimeOnly);
             Schedule.EffectiveFrom = effectiveFromDate;
-            Schedule.Duration = TimeSpan.FromHours(durationHours);
             await OnSave.InvokeAsync(Schedule);
         }
     }
@@ -142,16 +147,6 @@
     private async Task HandleCancel()
     {
         await OnCancel.InvokeAsync();
-    }
-
-    private void OnStartDateChanged(DateTime date)
-    {
-        startDateOnly = date;
-    }
-
-    private void OnStartTimeChanged(TimeSpan time)
-    {
-        startTimeOnly = time;
     }
 
     private void OnRecurrenceEndDateChanged(DateTime? date)

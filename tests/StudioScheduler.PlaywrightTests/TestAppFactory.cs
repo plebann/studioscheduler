@@ -177,8 +177,9 @@ public static class TestAppFactory
             Name = "Monday Salsa",
             LocationId = testLocation.Id,
             DanceClassId = salsaClass.Id,
-            StartTime = GetNextWeekday(DayOfWeek.Monday).AddHours(19), // Next Monday 7 PM
-            Duration = TimeSpan.FromHours(1),
+            DayOfWeek = DayOfWeek.Monday,
+            StartTime = TimeSpan.FromHours(19), // 7 PM
+            Duration = 60,
             EffectiveFrom = DateTime.UtcNow.AddDays(-30),
             IsActive = true,
             IsCancelled = false,
@@ -192,8 +193,9 @@ public static class TestAppFactory
             Name = "Tuesday Bachata",
             LocationId = testLocation.Id,
             DanceClassId = bachataClass.Id,
-            StartTime = GetNextWeekday(DayOfWeek.Tuesday).AddHours(20), // Next Tuesday 8 PM
-            Duration = TimeSpan.FromHours(1),
+            DayOfWeek = DayOfWeek.Tuesday,
+            StartTime = TimeSpan.FromHours(20), // 8 PM
+            Duration = 60,
             EffectiveFrom = DateTime.UtcNow.AddDays(-30),
             IsActive = true,
             IsCancelled = false,
@@ -207,8 +209,9 @@ public static class TestAppFactory
             Name = "Wednesday Kizomba",
             LocationId = testLocation.Id,
             DanceClassId = salsaClass.Id, // Reuse salsa class but different schedule
-            StartTime = GetNextWeekday(DayOfWeek.Wednesday).AddHours(18), // Next Wednesday 6 PM
-            Duration = TimeSpan.FromMinutes(90),
+            DayOfWeek = DayOfWeek.Wednesday,
+            StartTime = TimeSpan.FromHours(18), // 6 PM
+            Duration = 90,
             EffectiveFrom = DateTime.UtcNow.AddDays(-30),
             IsActive = true,
             IsCancelled = false,

@@ -64,9 +64,9 @@ public class DanceClassService : IDanceClassService
         return await _scheduleRepository.GetByDanceClassAsync(classId);
     }
 
-    public async Task<bool> IsInstructorAvailableAsync(Guid instructorId, DateTime startTime, TimeSpan duration)
+    public async Task<bool> IsInstructorAvailableAsync(Guid instructorId, DayOfWeek dayOfWeek, TimeSpan startTime, TimeSpan duration)
     {
-        return await _repository.IsInstructorAvailableAsync(instructorId, startTime, duration);
+        return await _repository.IsInstructorAvailableAsync(instructorId, dayOfWeek, startTime, duration);
     }
 
     public async Task<int> GetCurrentEnrollmentAsync(Guid classId)

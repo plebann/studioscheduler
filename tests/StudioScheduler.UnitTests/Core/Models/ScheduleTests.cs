@@ -21,8 +21,9 @@ public class ScheduleTests
             LocationId = locationId,
             EffectiveFrom = DateTime.UtcNow,
             DanceClassId = danceClassId,
-            StartTime = DateTime.UtcNow.AddDays(1),
-            Duration = TimeSpan.FromMinutes(60),
+            DayOfWeek = DayOfWeek.Monday,
+            StartTime = new TimeSpan(19, 0, 0), // 7 PM
+            Duration = 60,
             Level = "Beginner",
             Capacity = 20
         };
@@ -35,10 +36,10 @@ public class ScheduleTests
         schedule.EffectiveFrom.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
         schedule.EffectiveTo.Should().BeNull();
         schedule.IsActive.Should().BeTrue();
-        schedule.StartTime.Should().BeCloseTo(DateTime.UtcNow.AddDays(1), TimeSpan.FromSeconds(5));
-        schedule.Duration.Should().Be(TimeSpan.FromMinutes(60));
+        schedule.DayOfWeek.Should().Be(DayOfWeek.Monday);
+        schedule.StartTime.Should().Be(new TimeSpan(19, 0, 0));
+        schedule.Duration.Should().Be(60);
         schedule.IsRecurring.Should().BeFalse();
-        schedule.RecurrencePattern.Should().BeNull();
         schedule.RecurrenceEndDate.Should().BeNull();
         schedule.IsCancelled.Should().BeFalse();
         schedule.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
@@ -57,8 +58,9 @@ public class ScheduleTests
             LocationId = Guid.NewGuid(),
             EffectiveFrom = DateTime.UtcNow,
             DanceClassId = Guid.NewGuid(),
-            StartTime = DateTime.UtcNow.AddDays(1),
-            Duration = TimeSpan.FromMinutes(60),
+            DayOfWeek = DayOfWeek.Tuesday,
+            StartTime = new TimeSpan(20, 0, 0), // 8 PM
+            Duration = 60,
             Level = "Beginner",
             Capacity = 20
         };
@@ -91,9 +93,9 @@ public class ScheduleTests
             LocationId = Guid.NewGuid(),
             EffectiveFrom = DateTime.UtcNow,
             DanceClassId = Guid.NewGuid(),
-            StartTime = startDate,
-            Duration = TimeSpan.FromMinutes(60),
-            RecurrencePattern = "FREQ=WEEKLY;BYDAY=MO,WE,FR",
+            DayOfWeek = DayOfWeek.Wednesday,
+            StartTime = new TimeSpan(18, 30, 0), // 6:30 PM
+            Duration = 60,
             RecurrenceEndDate = endDate,
             IsRecurring = true,
             Level = "Intermediate",
@@ -102,7 +104,6 @@ public class ScheduleTests
 
         // Assert
         schedule.IsRecurring.Should().BeTrue();
-        schedule.RecurrencePattern.Should().Be("FREQ=WEEKLY;BYDAY=MO,WE,FR");
         schedule.RecurrenceEndDate.Should().Be(endDate);
     }
 
@@ -119,8 +120,9 @@ public class ScheduleTests
             LocationId = Guid.NewGuid(),
             EffectiveFrom = DateTime.UtcNow,
             DanceClassId = Guid.NewGuid(),
-            StartTime = DateTime.UtcNow.AddDays(1),
-            Duration = TimeSpan.FromMinutes(invalidDurationMinutes),
+            DayOfWeek = DayOfWeek.Thursday,
+            StartTime = new TimeSpan(19, 0, 0),
+            Duration = invalidDurationMinutes,
             Level = "Beginner",
             Capacity = 20
         };
@@ -135,7 +137,7 @@ public class ScheduleTests
     }
 
     [Fact]
-    public void Schedule_StartTime_MustBeInFuture()
+    public void Schedule_StartTime_ShouldBeValidTimeOfDay()
     {
         // Arrange
         var validator = new ScheduleValidator();
@@ -145,53 +147,24 @@ public class ScheduleTests
             LocationId = Guid.NewGuid(),
             EffectiveFrom = DateTime.UtcNow,
             DanceClassId = Guid.NewGuid(),
-            StartTime = DateTime.UtcNow.AddMinutes(-1),
-            Duration = TimeSpan.FromMinutes(60),
+            DayOfWeek = DayOfWeek.Friday,
+            StartTime = new TimeSpan(21, 0, 0), // 9 PM - valid time
+            Duration = 60,
             Level = "Beginner",
-            Capacity = 20
+            Capacity = 20,
+            InstructorId = Guid.NewGuid(), // Required by validator
+            RoomId = Guid.NewGuid() // Required by validator
         };
 
         // Act
         var result = validator.Validate(schedule);
 
         // Assert
-        result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(error => 
-            error.ErrorMessage.Contains("Start time must be in the future"));
+        result.IsValid.Should().BeTrue(); // Start time is now just time of day, so it should be valid
     }
 
     [Fact]
-    public void Schedule_RecurringEndDate_MustBeAfterStartTime()
-    {
-        // Arrange
-        var validator = new ScheduleValidator();
-        var startTime = DateTime.UtcNow.AddDays(1);
-        var schedule = new Schedule
-        {
-            Name = "Test Schedule",
-            LocationId = Guid.NewGuid(),
-            EffectiveFrom = DateTime.UtcNow,
-            DanceClassId = Guid.NewGuid(),
-            StartTime = startTime,
-            Duration = TimeSpan.FromMinutes(60),
-            RecurrencePattern = "FREQ=WEEKLY;BYDAY=MO",
-            RecurrenceEndDate = startTime.AddDays(-1),
-            IsRecurring = true,
-            Level = "Beginner",
-            Capacity = 20
-        };
-
-        // Act
-        var result = validator.Validate(schedule);
-
-        // Assert
-        result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(error => 
-            error.ErrorMessage.Contains("Recurrence end date must be after start time"));
-    }
-
-    [Fact]
-    public void Schedule_MustHaveRecurrencePattern_WhenIsRecurring()
+    public void Schedule_RecurringEndDate_MustBeAfterEffectiveFrom()
     {
         // Arrange
         var validator = new ScheduleValidator();
@@ -201,12 +174,15 @@ public class ScheduleTests
             LocationId = Guid.NewGuid(),
             EffectiveFrom = DateTime.UtcNow,
             DanceClassId = Guid.NewGuid(),
-            StartTime = DateTime.UtcNow.AddDays(1),
-            Duration = TimeSpan.FromMinutes(60),
+            DayOfWeek = DayOfWeek.Saturday,
+            StartTime = new TimeSpan(10, 0, 0), // 10 AM
+            Duration = 60,
+            RecurrenceEndDate = DateTime.UtcNow.AddDays(-1), // Past date for validation test
             IsRecurring = true,
-            RecurrenceEndDate = DateTime.UtcNow.AddMonths(1),
             Level = "Beginner",
-            Capacity = 20
+            Capacity = 20,
+            InstructorId = Guid.NewGuid(), // Required by validator
+            RoomId = Guid.NewGuid() // Required by validator
         };
 
         // Act
@@ -215,6 +191,6 @@ public class ScheduleTests
         // Assert
         result.IsValid.Should().BeFalse();
         result.Errors.Should().Contain(error => 
-            error.ErrorMessage.Contains("Recurrence pattern is required for recurring schedules"));
+            error.ErrorMessage.Contains("Recurrence end date must be after effective from date"));
     }
 }

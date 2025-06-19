@@ -14,10 +14,10 @@ public class Schedule
     
     public required Guid DanceClassId { get; set; }
     public DanceClass? DanceClass { get; set; }
-    public required DateTime StartTime { get; set; }
-    public required TimeSpan Duration { get; set; }
+    public required DayOfWeek DayOfWeek { get; set; }
+    public required TimeSpan StartTime { get; set; }
+    public required int Duration { get; set; }
     public bool IsRecurring { get; set; }
-    public string? RecurrencePattern { get; set; }
     public DateTime? RecurrenceEndDate { get; set; }
     public bool IsCancelled { get; set; }
     

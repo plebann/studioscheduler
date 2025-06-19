@@ -21,13 +21,17 @@ public class ScheduleValidator : AbstractValidator<Schedule>
 
         RuleFor(x => x.StartTime)
             .NotEmpty()
-            .WithMessage("Start time is required")
-            .GreaterThan(DateTime.UtcNow)
-            .WithMessage("Start time must be in the future");
+            .WithMessage("Start time is required");
+
+        RuleFor(x => x.DayOfWeek)
+            .IsInEnum()
+            .WithMessage("Day of week must be valid");
 
         RuleFor(x => x.Duration)
-            .GreaterThan(TimeSpan.Zero)
-            .WithMessage("Duration must be positive");
+            .GreaterThan(0)
+            .WithMessage("Duration must be positive")
+            .LessThanOrEqualTo(200)
+            .WithMessage("Duration cannot exceed 200 minutes");
 
         RuleFor(x => x.EffectiveFrom)
             .NotEmpty()
@@ -53,14 +57,9 @@ public class ScheduleValidator : AbstractValidator<Schedule>
             .NotEqual(Guid.Empty)
             .WithMessage("Room is required");
 
-        RuleFor(x => x.RecurrencePattern)
-            .NotEmpty()
-            .When(x => x.IsRecurring)
-            .WithMessage("Recurrence pattern is required for recurring schedules");
-
         RuleFor(x => x.RecurrenceEndDate)
-            .Must((schedule, endDate) => !endDate.HasValue || endDate.Value > schedule.StartTime)
+            .Must((schedule, endDate) => !endDate.HasValue || endDate.Value > schedule.EffectiveFrom)
             .When(x => x.IsRecurring)
-            .WithMessage("Recurrence end date must be after start time");
+            .WithMessage("Recurrence end date must be after effective from date");
     }
 }

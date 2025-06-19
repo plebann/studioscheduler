@@ -82,14 +82,15 @@ public class RoomRepository : IRoomRepository
             .ToListAsync();
     }
 
-    public async Task<bool> IsAvailableAsync(Guid roomId, DateTime startTime, TimeSpan duration)
+    public async Task<bool> IsAvailableAsync(Guid roomId, DayOfWeek dayOfWeek, TimeSpan startTime, TimeSpan duration)
     {
-        var endTime = startTime.Add(duration);
+        var endTime = startTime.Add(TimeSpan.FromMinutes(duration.TotalMinutes));
         
-        // Check if there are any overlapping schedules for this room
+        // Check if there are any overlapping schedules for this room on the same day
         var overlappingSchedules = await _context.Schedules
             .Where(s => s.RoomId == roomId)
-            .Where(s => s.StartTime < endTime && s.StartTime.Add(s.Duration) > startTime)
+            .Where(s => s.DayOfWeek == dayOfWeek)
+            .Where(s => s.StartTime < endTime && s.StartTime.Add(TimeSpan.FromMinutes(s.Duration)) > startTime)
             .AnyAsync();
 
         return !overlappingSchedules;

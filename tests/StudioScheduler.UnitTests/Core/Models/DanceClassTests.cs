@@ -98,8 +98,9 @@ public class DanceClassTests
             LocationId = Guid.NewGuid(),
             EffectiveFrom = DateTime.UtcNow,
             DanceClassId = danceClass.Id,
-            StartTime = DateTime.UtcNow.AddDays(1),
-            Duration = TimeSpan.FromHours(1),
+            DayOfWeek = DayOfWeek.Monday,
+            StartTime = TimeSpan.FromHours(19), // 7 PM
+            Duration = 60,
             Level = "Beginner",
             Capacity = 20
         };

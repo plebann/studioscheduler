@@ -86,10 +86,10 @@ public class ScheduleRepository : IScheduleRepository
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Schedule>> GetByDateRangeAsync(DateTime startDate, DateTime endDate)
+    public async Task<IEnumerable<Schedule>> GetByDayOfWeekAsync(DayOfWeek dayOfWeek)
     {
         return await _context.Schedules
-            .Where(s => s.StartTime >= startDate && s.StartTime <= endDate)
+            .Where(s => s.DayOfWeek == dayOfWeek)
             .Include(s => s.Location)
             .Include(s => s.DanceClass)
             .Include(s => s.Instructor)
@@ -119,13 +119,14 @@ public class ScheduleRepository : IScheduleRepository
             .ToListAsync();
     }
 
-    public async Task<bool> IsTimeSlotAvailableAsync(Guid roomId, DateTime startTime, TimeSpan duration)
+    public async Task<bool> IsTimeSlotAvailableAsync(Guid roomId, DayOfWeek dayOfWeek, TimeSpan startTime, TimeSpan duration)
     {
-        var endTime = startTime.Add(duration);
+        var endTime = startTime.Add(TimeSpan.FromMinutes(duration.TotalMinutes));
         
         var hasConflict = await _context.Schedules
             .Where(s => s.RoomId == roomId)
-            .Where(s => s.StartTime < endTime && s.StartTime.Add(s.Duration) > startTime)
+            .Where(s => s.DayOfWeek == dayOfWeek)
+            .Where(s => s.StartTime < endTime && s.StartTime.Add(TimeSpan.FromMinutes(s.Duration)) > startTime)
             .AnyAsync();
 
         return !hasConflict;
@@ -146,13 +147,14 @@ public class ScheduleRepository : IScheduleRepository
         return Math.Max(0, schedule.Capacity - enrollmentCount);
     }
 
-    public async Task<bool> HasScheduleConflictAsync(Guid roomId, DateTime startTime, TimeSpan duration, Guid? excludeScheduleId = null)
+    public async Task<bool> HasScheduleConflictAsync(Guid roomId, DayOfWeek dayOfWeek, TimeSpan startTime, TimeSpan duration, Guid? excludeScheduleId = null)
     {
-        var endTime = startTime.Add(duration);
+        var endTime = startTime.Add(TimeSpan.FromMinutes(duration.TotalMinutes));
         
         var query = _context.Schedules
             .Where(s => s.RoomId == roomId)
-            .Where(s => s.StartTime < endTime && s.StartTime.Add(s.Duration) > startTime);
+            .Where(s => s.DayOfWeek == dayOfWeek)
+            .Where(s => s.StartTime < endTime && s.StartTime.Add(TimeSpan.FromMinutes(s.Duration)) > startTime);
 
         if (excludeScheduleId.HasValue)
         {

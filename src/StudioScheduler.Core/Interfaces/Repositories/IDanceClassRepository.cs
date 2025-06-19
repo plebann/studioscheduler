@@ -13,7 +13,7 @@ public interface IDanceClassRepository
     Task<IEnumerable<DanceClass>> GetByStyleAsync(string style);
     Task<IEnumerable<Schedule>> GetSchedulesAsync(Guid classId);
     Task<int> GetCurrentEnrollmentAsync(Guid classId);
-    Task<bool> IsInstructorAvailableAsync(Guid instructorId, DateTime startTime, TimeSpan duration);
+    Task<bool> IsInstructorAvailableAsync(Guid instructorId, DayOfWeek dayOfWeek, TimeSpan startTime, TimeSpan duration);
     Task SaveChangesAsync();
     Task<DanceClass?> GetByNameAsync(string name);
 }

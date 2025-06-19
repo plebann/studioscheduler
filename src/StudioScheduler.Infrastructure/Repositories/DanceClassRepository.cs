@@ -88,14 +88,15 @@ public class DanceClassRepository : IDanceClassRepository
             .CountAsync();
     }
 
-    public async Task<bool> IsInstructorAvailableAsync(Guid instructorId, DateTime startTime, TimeSpan duration)
+    public async Task<bool> IsInstructorAvailableAsync(Guid instructorId, DayOfWeek dayOfWeek, TimeSpan startTime, TimeSpan duration)
     {
-        var endTime = startTime.Add(duration);
+        var endTime = startTime.Add(TimeSpan.FromMinutes(duration.TotalMinutes));
         
-        // Check if there are any overlapping schedules for this instructor
+        // Check if there are any overlapping schedules for this instructor on the same day
         var overlappingSchedules = await _context.Schedules
             .Where(s => s.InstructorId == instructorId)
-            .Where(s => s.StartTime < endTime && s.StartTime.Add(s.Duration) > startTime)
+            .Where(s => s.DayOfWeek == dayOfWeek)
+            .Where(s => s.StartTime < endTime && s.StartTime.Add(TimeSpan.FromMinutes(s.Duration)) > startTime)
             .AnyAsync();
 
         return !overlappingSchedules;

@@ -76,9 +76,9 @@ public class RoomService : IRoomService
         return await _roomRepository.ExistsAsync(id);
     }
 
-    public async Task<bool> IsRoomAvailableAsync(Guid roomId, DateTime startTime, TimeSpan duration)
+    public async Task<bool> IsRoomAvailableAsync(Guid roomId, DayOfWeek dayOfWeek, TimeSpan startTime, TimeSpan duration)
     {
-        return await _roomRepository.IsAvailableAsync(roomId, startTime, duration);
+        return await _roomRepository.IsAvailableAsync(roomId, dayOfWeek, startTime, duration);
     }
 
     public async Task<IEnumerable<Schedule>> GetRoomSchedulesAsync(Guid roomId)

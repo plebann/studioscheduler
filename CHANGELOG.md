@@ -2,6 +2,39 @@
 
 All notable changes to the Studio Scheduler project will be documented in this file.
 
+## [Major Refactoring] - 2025-06-19
+
+### 🎉 Major Schedule Model Refactoring
+- ✅ **Enhanced Schedule Model**: Split `StartTime` from single `DateTime` into separate `DayOfWeek` and `TimeSpan` properties
+- ✅ **Better Weekly Recurring Patterns**: Schedules now properly represent weekly recurring classes instead of specific dates
+- ✅ **Improved UI/UX**: Separate day picker and time picker components for better user experience
+- ✅ **Cleaner API Design**: Better separation of day and time concerns across all endpoints
+- ✅ **Enhanced Validation**: More appropriate validation rules for recurring weekly schedules
+- ✅ **Future-Proof Architecture**: Solid foundation for complex scheduling features
+
+### Updated Components
+- ✅ **Core Models**: Updated `Schedule` entity with new properties and validation
+- ✅ **Entity Framework**: Updated database configuration and migrations
+- ✅ **DTOs**: Updated all data transfer objects and mapping methods
+- ✅ **Controllers**: Fixed all API endpoints for new structure
+- ✅ **Services & Repositories**: Updated all business logic and data access methods
+- ✅ **UI Components**: Fixed all Blazor components with proper day/time pickers
+- ✅ **Validation**: Updated `ScheduleValidator` for new schedule structure
+
+### Test Coverage
+- ✅ **All 112 Tests Passing**: Complete test coverage across all test projects
+- ✅ **Unit Tests**: Fixed all core business logic and validation tests
+- ✅ **Integration Tests**: Updated Entity Framework integration tests
+- ✅ **API Tests**: Fixed all 19 Playwright end-to-end tests
+- ✅ **Model Tests**: Updated validation scenarios and error messages
+
+### Technical Benefits
+- **Better Data Model**: Weekly recurring patterns instead of specific dates
+- **Improved User Experience**: Intuitive day and time selection
+- **Cleaner Architecture**: Proper separation of concerns
+- **Enhanced Maintainability**: More logical and testable code structure
+- **Production Ready**: Fully tested and validated implementation
+
 ## [Unreleased] - 2025-06-16
 
 ### Added

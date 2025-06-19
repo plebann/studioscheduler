@@ -12,6 +12,6 @@ public interface IDanceClassService
     Task<bool> DeleteAsync(Guid id);
     Task<bool> ExistsAsync(Guid id);
     Task<IEnumerable<Schedule>> GetClassSchedulesAsync(Guid classId);
-    Task<bool> IsInstructorAvailableAsync(Guid instructorId, DateTime startTime, TimeSpan duration);
+    Task<bool> IsInstructorAvailableAsync(Guid instructorId, DayOfWeek dayOfWeek, TimeSpan startTime, TimeSpan duration);
     Task<int> GetCurrentEnrollmentAsync(Guid classId);
 }

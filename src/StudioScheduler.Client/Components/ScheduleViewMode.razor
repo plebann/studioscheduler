@@ -50,12 +50,12 @@
                         </MudListItem>
                         <MudListItem T="string">
                             <MudText Typo="Typo.body2">
-                                <strong>Time:</strong> @Schedule.StartTime.ToString("HH:mm") - @Schedule.StartTime.Add(Schedule.Duration).ToString("HH:mm")
+                                <strong>Time:</strong> @Schedule.StartTime.ToString(@"hh\:mm") - @(Schedule.StartTime.Add(TimeSpan.FromMinutes(Schedule.Duration)).ToString(@"hh\:mm"))
                             </MudText>
                         </MudListItem>
                         <MudListItem T="string">
                             <MudText Typo="Typo.body2">
-                                <strong>Day:</strong> @Schedule.StartTime.ToString("dddd")
+                                <strong>Day:</strong> @Schedule.DayOfWeek.ToString()
                             </MudText>
                         </MudListItem>
                         <MudListItem T="string">
@@ -99,4 +99,4 @@
 
 @code {
     [Parameter] public ScheduleDto? Schedule { get; set; }
-} 
+}

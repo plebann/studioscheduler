@@ -178,10 +178,10 @@ public class DataSeedingService
                     EffectiveTo = scheduleData.EffectiveTo,
                     IsActive = scheduleData.IsActive,
                     DanceClassId = Guid.Parse(scheduleData.DanceClassId),
-                    StartTime = scheduleData.StartTime,
+                    DayOfWeek = scheduleData.StartTime.DayOfWeek,
+                    StartTime = scheduleData.StartTime.TimeOfDay,
                     Duration = scheduleData.Duration,
                     IsRecurring = scheduleData.IsRecurring,
-                    RecurrencePattern = scheduleData.RecurrencePattern,
                     RecurrenceEndDate = scheduleData.RecurrenceEndDate,
                     IsCancelled = scheduleData.IsCancelled,
                     CreatedAt = scheduleData.CreatedAt,
@@ -358,7 +358,7 @@ public class DataSeedingService
         public bool IsActive { get; set; }
         public string DanceClassId { get; set; } = string.Empty;
         public DateTime StartTime { get; set; }
-        public TimeSpan Duration { get; set; }
+        public int Duration { get; set; }
         public bool IsRecurring { get; set; }
         public string? RecurrencePattern { get; set; }
         public DateTime? RecurrenceEndDate { get; set; }

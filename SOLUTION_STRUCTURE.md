@@ -138,6 +138,8 @@ Based on analysis of https://salsame.pl/en/price-list/, our system models a real
 ### Current Implementation Status
 - ✅ **Basic pass model** with core fields
 - ✅ **PassType enum** (needs expansion for SalsaMe types)
+- ✅ **Enhanced Schedule Model** with DayOfWeek + TimeSpan for weekly recurring patterns (2025-06-19)
+- ✅ **Comprehensive Test Coverage** - All 112 tests passing across all test projects
 - ❌ **Pricing system** not implemented
 - ❌ **28-day validity calculation** not implemented
 - ❌ **Make-up class tracking** not implemented
@@ -258,4 +260,4 @@ Based on analysis of https://salsame.pl/en/price-list/, our system models a real
 
 ---
 
-*Last updated: 2025-06-15 - Added SalsaMe business model analysis and pass system requirements*
+*Last updated: 2025-06-19 - Added major schedule model refactoring with DayOfWeek + TimeSpan and comprehensive test coverage*

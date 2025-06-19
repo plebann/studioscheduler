@@ -7,7 +7,7 @@ public class ClassAttendanceDto
     public required string ScheduleId { get; set; }
     public required string ClassName { get; set; }
     public required string DayOfWeek { get; set; }
-    public required DateTime StartTime { get; set; }
+    public required string StartTime { get; set; }
     public required string Instructor { get; set; }
     public required string Level { get; set; }
     public required string Style { get; set; }

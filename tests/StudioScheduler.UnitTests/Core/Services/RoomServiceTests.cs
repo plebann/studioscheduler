@@ -341,18 +341,18 @@ public class RoomServiceTests
         // Arrange
         var roomId = Guid.NewGuid();
         var startTime = DateTime.UtcNow.AddDays(1);
-        var duration = TimeSpan.FromHours(1);
+        var duration = TimeSpan.FromMinutes(60);
 
         _mockRoomRepository
-            .Setup(x => x.IsAvailableAsync(roomId, startTime, duration))
+            .Setup(x => x.IsAvailableAsync(roomId, DayOfWeek.Monday, startTime.TimeOfDay, duration))
             .ReturnsAsync(true);
 
         // Act
-        var result = await _roomService.IsRoomAvailableAsync(roomId, startTime, duration);
+        var result = await _roomService.IsRoomAvailableAsync(roomId, DayOfWeek.Monday, startTime.TimeOfDay, duration);
 
         // Assert
         result.Should().BeTrue();
-        _mockRoomRepository.Verify(x => x.IsAvailableAsync(roomId, startTime, duration), Times.Once);
+        _mockRoomRepository.Verify(x => x.IsAvailableAsync(roomId, DayOfWeek.Monday, startTime.TimeOfDay, duration), Times.Once);
     }
 
     [Fact]
@@ -368,8 +368,9 @@ public class RoomServiceTests
                 LocationId = Guid.NewGuid(),
                 EffectiveFrom = DateTime.UtcNow,
                 DanceClassId = Guid.NewGuid(),
-                StartTime = DateTime.UtcNow.AddDays(1),
-                Duration = TimeSpan.FromHours(1),
+                DayOfWeek = DayOfWeek.Monday,
+                StartTime = TimeSpan.FromHours(19), // 7 PM
+                Duration = 60,
                 Level = "Beginner",
                 Capacity = 20
             }

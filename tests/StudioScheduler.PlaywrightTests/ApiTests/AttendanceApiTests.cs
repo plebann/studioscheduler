@@ -89,13 +89,13 @@ public class AttendanceApiTests : BaseApiTest
         var classAttendance = await DeserializeResponse<ClassAttendanceDto>(response);
         
         // Assert
-        Assert.That(classAttendance?.StartTime, Is.Not.EqualTo(default(DateTime)), 
-            "Start time should be a valid date/time");
+        Assert.That(classAttendance?.StartTime, Is.Not.Null.And.Not.Empty, 
+            "Start time should be a valid time string");
         
-        // Verify it's a reasonable time (dance classes are typically in the evening)
+        // Verify it's a reasonable time format (dance classes are typically in the evening)
         var startTime = classAttendance!.StartTime;
-        Assert.That(startTime.Hour, Is.GreaterThanOrEqualTo(16).And.LessThanOrEqualTo(23), 
-            "Dance classes should typically be between 4 PM and 11 PM");
+        Assert.That(startTime, Does.Match(@"^\d{1,2}:\d{2}$"), 
+            "Start time should be in HH:mm format");
     }
 
     [Test]

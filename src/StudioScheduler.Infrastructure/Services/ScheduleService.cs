@@ -31,8 +31,8 @@ public class ScheduleService : IScheduleService
     public async Task<IEnumerable<Schedule>> GetByLocationAsync(Guid locationId)
         => await _scheduleRepository.GetByLocationAsync(locationId);
 
-    public async Task<IEnumerable<Schedule>> GetByDateRangeAsync(DateTime startDate, DateTime endDate)
-        => await _scheduleRepository.GetByDateRangeAsync(startDate, endDate);
+    public async Task<IEnumerable<Schedule>> GetByDayOfWeekAsync(DayOfWeek dayOfWeek)
+        => await _scheduleRepository.GetByDayOfWeekAsync(dayOfWeek);
 
     public async Task<IEnumerable<Schedule>> GetByDanceClassAsync(Guid danceClassId)
         => await _scheduleRepository.GetByDanceClassAsync(danceClassId);
@@ -43,8 +43,8 @@ public class ScheduleService : IScheduleService
     public async Task<bool> CancelClassAsync(Guid scheduleId)
         => await _scheduleRepository.CancelScheduleAsync(scheduleId);
 
-    public async Task<bool> IsTimeSlotAvailableAsync(Guid roomId, DateTime startTime, TimeSpan duration)
-        => await _scheduleRepository.IsTimeSlotAvailableAsync(roomId, startTime, duration);
+    public async Task<bool> IsTimeSlotAvailableAsync(Guid roomId, DayOfWeek dayOfWeek, TimeSpan startTime, TimeSpan duration)
+        => await _scheduleRepository.IsTimeSlotAvailableAsync(roomId, dayOfWeek, startTime, duration);
 
     public async Task<IEnumerable<Schedule>> GetActiveSchedulesAsync()
         => await _scheduleRepository.GetActiveSchedulesAsync();
@@ -55,6 +55,6 @@ public class ScheduleService : IScheduleService
     public async Task<int> GetAvailableSpotsAsync(Guid scheduleId)
         => await _scheduleRepository.GetAvailableSpotsAsync(scheduleId);
 
-    public async Task<bool> IsScheduleConflictAsync(Guid roomId, DateTime startTime, TimeSpan duration, Guid? excludeScheduleId = null)
-        => await _scheduleRepository.HasScheduleConflictAsync(roomId, startTime, duration, excludeScheduleId);
+    public async Task<bool> IsScheduleConflictAsync(Guid roomId, DayOfWeek dayOfWeek, TimeSpan startTime, TimeSpan duration, Guid? excludeScheduleId = null)
+        => await _scheduleRepository.HasScheduleConflictAsync(roomId, dayOfWeek, startTime, duration, excludeScheduleId);
 }

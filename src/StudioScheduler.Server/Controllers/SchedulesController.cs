@@ -28,6 +28,7 @@ public class SchedulesController : ControllerBase
             Name = s.Name,
             LocationName = s.Location?.Name,
             DanceClassName = s.DanceClass?.Name,
+            DayOfWeek = s.DayOfWeek,
             StartTime = s.StartTime,
             Duration = s.Duration,
             IsActive = s.IsActive,
@@ -58,10 +59,10 @@ public class SchedulesController : ControllerBase
             LocationName = schedule.Location?.Name,
             DanceClassId = schedule.DanceClassId,
             DanceClassName = schedule.DanceClass?.Name,
+            DayOfWeek = schedule.DayOfWeek,
             StartTime = schedule.StartTime,
             Duration = schedule.Duration,
             IsRecurring = schedule.IsRecurring,
-            RecurrencePattern = schedule.RecurrencePattern,
             RecurrenceEndDate = schedule.RecurrenceEndDate,
             IsCancelled = schedule.IsCancelled,
             EffectiveFrom = schedule.EffectiveFrom,
@@ -88,10 +89,10 @@ public class SchedulesController : ControllerBase
             Name = createDto.Name,
             LocationId = createDto.LocationId,
             DanceClassId = createDto.DanceClassId,
+            DayOfWeek = createDto.DayOfWeek,
             StartTime = createDto.StartTime,
             Duration = createDto.Duration,
             IsRecurring = createDto.IsRecurring,
-            RecurrencePattern = createDto.RecurrencePattern,
             RecurrenceEndDate = createDto.RecurrenceEndDate,
             EffectiveFrom = createDto.EffectiveFrom,
             EffectiveTo = createDto.EffectiveTo,
@@ -113,10 +114,10 @@ public class SchedulesController : ControllerBase
             LocationName = created.Location?.Name,
             DanceClassId = created.DanceClassId,
             DanceClassName = created.DanceClass?.Name,
+            DayOfWeek = created.DayOfWeek,
             StartTime = created.StartTime,
             Duration = created.Duration,
             IsRecurring = created.IsRecurring,
-            RecurrencePattern = created.RecurrencePattern,
             RecurrenceEndDate = created.RecurrenceEndDate,
             IsCancelled = created.IsCancelled,
             EffectiveFrom = created.EffectiveFrom,
@@ -150,10 +151,10 @@ public class SchedulesController : ControllerBase
             Name = updateDto.Name,
             LocationId = existingSchedule.LocationId,
             DanceClassId = existingSchedule.DanceClassId,
+            DayOfWeek = updateDto.DayOfWeek,
             StartTime = updateDto.StartTime,
             Duration = updateDto.Duration,
             IsRecurring = updateDto.IsRecurring,
-            RecurrencePattern = updateDto.RecurrencePattern,
             RecurrenceEndDate = updateDto.RecurrenceEndDate,
             EffectiveFrom = updateDto.EffectiveFrom,
             EffectiveTo = updateDto.EffectiveTo,
@@ -177,10 +178,10 @@ public class SchedulesController : ControllerBase
             LocationName = updated.Location?.Name,
             DanceClassId = updated.DanceClassId,
             DanceClassName = updated.DanceClass?.Name,
+            DayOfWeek = updated.DayOfWeek,
             StartTime = updated.StartTime,
             Duration = updated.Duration,
             IsRecurring = updated.IsRecurring,
-            RecurrencePattern = updated.RecurrencePattern,
             RecurrenceEndDate = updated.RecurrenceEndDate,
             IsCancelled = updated.IsCancelled,
             EffectiveFrom = updated.EffectiveFrom,
@@ -233,8 +234,7 @@ public class SchedulesController : ControllerBase
         // Group schedules by day of week
         foreach (var schedule in activeSchedules)
         {
-            var dayOfWeek = schedule.StartTime.DayOfWeek;
-            var dayName = dayOfWeek switch
+            var dayName = schedule.DayOfWeek switch
             {
                 DayOfWeek.Monday => "Monday",
                 DayOfWeek.Tuesday => "Tuesday", 
@@ -246,8 +246,8 @@ public class SchedulesController : ControllerBase
                 _ => "Monday"
             };
 
-            var endTime = schedule.StartTime.Add(schedule.Duration);
-            var timeSlot = $"{schedule.StartTime:HH:mm} - {endTime:HH:mm}";
+            var endTime = schedule.StartTime.Add(TimeSpan.FromMinutes(schedule.Duration));
+            var timeSlot = $"{schedule.StartTime:hh\\:mm} - {endTime:hh\\:mm}";
 
             // Get the dance class information
             DanceClass? danceClass = null;
@@ -287,7 +287,7 @@ public class SchedulesController : ControllerBase
         foreach (var day in weeklySchedule.Keys)
         {
             weeklySchedule[day] = weeklySchedule[day]
-                .OrderBy(s => DateTime.ParseExact(s.TimeSlot.Split(" - ")[0], "HH:mm", null))
+                .OrderBy(s => TimeSpan.ParseExact(s.TimeSlot.Split(" - ")[0], @"hh\:mm", null))
                 .ToList();
         }
 

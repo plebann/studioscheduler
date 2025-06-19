@@ -8,10 +8,10 @@ public record ScheduleDto
     public string? LocationName { get; init; }
     public required Guid DanceClassId { get; init; }
     public string? DanceClassName { get; init; }
-    public required DateTime StartTime { get; init; }
-    public required TimeSpan Duration { get; init; }
+    public required DayOfWeek DayOfWeek { get; init; }
+    public required TimeSpan StartTime { get; init; }
+    public required int Duration { get; init; }
     public bool IsRecurring { get; init; }
-    public string? RecurrencePattern { get; init; }
     public DateTime? RecurrenceEndDate { get; init; }
     public bool IsCancelled { get; init; }
     public required DateTime EffectiveFrom { get; init; }
@@ -37,10 +37,10 @@ public record ScheduleEditDto
     public string? LocationName { get; set; }
     public Guid DanceClassId { get; set; }
     public string? DanceClassName { get; set; }
-    public DateTime StartTime { get; set; }
-    public TimeSpan Duration { get; set; }
+    public DayOfWeek DayOfWeek { get; set; }
+    public TimeSpan StartTime { get; set; }
+    public int Duration { get; set; }
     public bool IsRecurring { get; set; }
-    public string? RecurrencePattern { get; set; }
     public DateTime? RecurrenceEndDate { get; set; }
     public bool IsCancelled { get; set; }
     public DateTime EffectiveFrom { get; set; }
@@ -66,10 +66,10 @@ public record ScheduleEditDto
             LocationName = dto.LocationName,
             DanceClassId = dto.DanceClassId,
             DanceClassName = dto.DanceClassName,
+            DayOfWeek = dto.DayOfWeek,
             StartTime = dto.StartTime,
             Duration = dto.Duration,
             IsRecurring = dto.IsRecurring,
-            RecurrencePattern = dto.RecurrencePattern,
             RecurrenceEndDate = dto.RecurrenceEndDate,
             IsCancelled = dto.IsCancelled,
             EffectiveFrom = dto.EffectiveFrom,
@@ -96,10 +96,10 @@ public record ScheduleEditDto
             LocationName = LocationName,
             DanceClassId = DanceClassId,
             DanceClassName = DanceClassName,
+            DayOfWeek = DayOfWeek,
             StartTime = StartTime,
             Duration = Duration,
             IsRecurring = IsRecurring,
-            RecurrencePattern = RecurrencePattern,
             RecurrenceEndDate = RecurrenceEndDate,
             IsCancelled = IsCancelled,
             EffectiveFrom = EffectiveFrom,
@@ -122,10 +122,10 @@ public record CreateScheduleDto
     public required string Name { get; init; }
     public required Guid LocationId { get; init; }
     public required Guid DanceClassId { get; init; }
-    public required DateTime StartTime { get; init; }
-    public required TimeSpan Duration { get; init; }
+    public required DayOfWeek DayOfWeek { get; init; }
+    public required TimeSpan StartTime { get; init; }
+    public required int Duration { get; init; }
     public bool IsRecurring { get; init; }
-    public string? RecurrencePattern { get; init; }
     public DateTime? RecurrenceEndDate { get; init; }
     public required DateTime EffectiveFrom { get; init; }
     public DateTime? EffectiveTo { get; init; }
@@ -140,10 +140,10 @@ public record CreateScheduleDto
 public record UpdateScheduleDto
 {
     public required string Name { get; init; }
-    public required DateTime StartTime { get; init; }
-    public required TimeSpan Duration { get; init; }
+    public required DayOfWeek DayOfWeek { get; init; }
+    public required TimeSpan StartTime { get; init; }
+    public required int Duration { get; init; }
     public bool IsRecurring { get; init; }
-    public string? RecurrencePattern { get; init; }
     public DateTime? RecurrenceEndDate { get; init; }
     public required DateTime EffectiveFrom { get; init; }
     public DateTime? EffectiveTo { get; init; }
@@ -163,8 +163,9 @@ public record ScheduleSummaryDto
     public required string Name { get; init; }
     public string? LocationName { get; init; }
     public string? DanceClassName { get; init; }
-    public required DateTime StartTime { get; init; }
-    public required TimeSpan Duration { get; init; }
+    public required DayOfWeek DayOfWeek { get; init; }
+    public required TimeSpan StartTime { get; init; }
+    public required int Duration { get; init; }
     public bool IsActive { get; init; }
     public bool IsCancelled { get; init; }
     

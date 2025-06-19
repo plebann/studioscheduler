@@ -5,6 +5,41 @@ The schedule system is designed to manage dance classes across multiple location
 
 ## Data Model
 
+### Schedule Model Refactoring (2025-06-19)
+
+**Major Architectural Improvement**: The Schedule model has been refactored to better represent weekly recurring class patterns:
+
+#### Previous Structure (DateTime-based)
+```csharp
+class Schedule {
+    DateTime StartTime;  // Specific date and time
+    // Problems: 
+    // - Required specific dates for recurring classes
+    // - UI confusion with datetime picker
+    // - Complex logic for weekly patterns
+}
+```
+
+#### Current Structure (DayOfWeek + TimeSpan)
+```csharp
+class Schedule {
+    DayOfWeek DayOfWeek;  // Monday, Tuesday, etc.
+    TimeSpan StartTime;   // 19:00:00 (7 PM)
+    // Benefits:
+    // - Perfect for weekly recurring patterns
+    // - Intuitive UI with day picker + time picker
+    // - Cleaner business logic
+    // - Future-proof for complex scheduling
+}
+```
+
+#### Benefits Achieved
+- **Better Data Model**: Schedules properly represent weekly recurring classes
+- **Improved UX**: Separate day picker and time picker components
+- **Cleaner APIs**: Better separation of day and time concerns
+- **Enhanced Validation**: More appropriate rules for recurring schedules
+- **Future-Proof**: Solid foundation for advanced scheduling features
+
 ### Location Management
 ```mermaid
 classDiagram
@@ -44,7 +79,8 @@ classDiagram
         +string level
         +int instructorId
         +int roomId
-        +DateTime startTime
+        +DayOfWeek dayOfWeek
+        +TimeSpan startTime
         +TimeSpan duration
         +bool isRecurring
         +bool isActive
