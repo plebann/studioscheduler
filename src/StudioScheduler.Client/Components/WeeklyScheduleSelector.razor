@@ -1,0 +1,113 @@
+@using MudBlazor
+@using StudioScheduler.Shared.Dtos
+
+<MudGrid>
+    @foreach (var day in Enum.GetValues<DayOfWeek>())
+    {
+        var daySchedules = GetSchedulesForDay(day);
+        @if (daySchedules.Any())
+        {
+            <MudItem xs="12" md="6" lg="4">
+                <MudCard>
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">@day</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        @foreach (var schedule in daySchedules)
+                        {
+                            <MudCheckBox Value="@schedule.IsSelected"
+                                        Disabled="@(!CanSelectMore() && !schedule.IsSelected)"
+                                        Label="@GetScheduleDisplayText(schedule)"
+                                        Class="mb-2"
+                                        T="bool"
+                                        ValueChanged="@((bool value) => OnSelectionChanged(schedule, value))" />
+                        }
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        }
+    }
+</MudGrid>
+
+<MudPaper Class="pa-3 mt-3" Elevation="1">
+    <MudText Typo="Typo.body1">
+        <strong>Selected:</strong> @selectedCount / @RequiredCount classes
+        @if (selectedCount == RequiredCount)
+        {
+            <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Class="ml-2" />
+        }
+        else if (selectedCount > RequiredCount)
+        {
+            <MudIcon Icon="@Icons.Material.Filled.Error" Color="Color.Error" Class="ml-2" />
+            <MudText Typo="Typo.body2" Color="Color.Error">
+                Too many classes selected. Please deselect @(selectedCount - RequiredCount) class(es).
+            </MudText>
+        }
+    </MudText>
+</MudPaper>
+
+@code {
+    [Parameter] public required List<ScheduleSelectionDto> AvailableSchedules { get; set; }
+    [Parameter] public required int RequiredCount { get; set; }
+    [Parameter] public List<ScheduleSelectionDto> SelectedSchedules { get; set; } = new();
+    [Parameter] public EventCallback<List<ScheduleSelectionDto>> SelectedSchedulesChanged { get; set; }
+
+    private int selectedCount => SelectedSchedules.Count(s => s.IsSelected);
+
+    protected override void OnParametersSet()
+    {
+        // Ensure SelectedSchedules is synchronized with AvailableSchedules
+        foreach (var available in AvailableSchedules)
+        {
+            var existing = SelectedSchedules.FirstOrDefault(s => s.ScheduleId == available.ScheduleId);
+            if (existing != null)
+            {
+                available.IsSelected = existing.IsSelected;
+            }
+        }
+    }
+
+    private List<ScheduleSelectionDto> GetSchedulesForDay(DayOfWeek day)
+    {
+        return AvailableSchedules
+            .Where(s => s.DayOfWeek == day)
+            .OrderBy(s => s.StartTime)
+            .ToList();
+    }
+
+    private string GetScheduleDisplayText(ScheduleSelectionDto schedule)
+    {
+        var timeStr = schedule.StartTime.ToString(@"hh\:mm");
+        var instructor = !string.IsNullOrEmpty(schedule.InstructorName) 
+            ? $" ({schedule.InstructorName})" 
+            : "";
+        
+        return $"{timeStr} - {schedule.DanceClass} {schedule.Level}{instructor}";
+    }
+
+    private bool CanSelectMore()
+    {
+        return selectedCount < RequiredCount;
+    }
+
+    private async Task OnSelectionChanged(ScheduleSelectionDto schedule, bool isSelected)
+    {
+        schedule.IsSelected = isSelected;
+
+        // Update the SelectedSchedules list
+        if (isSelected && !SelectedSchedules.Any(s => s.ScheduleId == schedule.ScheduleId))
+        {
+            SelectedSchedules.Add(schedule);
+        }
+        else if (!isSelected)
+        {
+            SelectedSchedules.RemoveAll(s => s.ScheduleId == schedule.ScheduleId);
+        }
+
+        // Notify parent component
+        await SelectedSchedulesChanged.InvokeAsync(SelectedSchedules);
+        StateHasChanged();
+    }
+}

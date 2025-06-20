@@ -3,28 +3,28 @@ namespace StudioScheduler.Shared.Dtos;
 public record ScheduleDto
 {
     public Guid Id { get; init; }
-    public required string Name { get; init; }
-    public required Guid LocationId { get; init; }
+    public string Name { get; init; } = string.Empty;
+    public Guid LocationId { get; init; }
     public string? LocationName { get; init; }
-    public required Guid DanceClassId { get; init; }
+    public Guid DanceClassId { get; init; }
     public string? DanceClassName { get; init; }
-    public required DayOfWeek DayOfWeek { get; init; }
-    public required TimeSpan StartTime { get; init; }
-    public required int Duration { get; init; }
+    public DayOfWeek DayOfWeek { get; init; }
+    public TimeSpan StartTime { get; init; }
+    public int Duration { get; init; }
     public bool IsRecurring { get; init; }
     public bool IsCancelled { get; init; }
-    public required DateTime EffectiveFrom { get; init; }
+    public DateTime EffectiveFrom { get; init; }
     public DateTime? EffectiveTo { get; init; }
     public bool IsActive { get; init; }
     public DateTime CreatedAt { get; init; }
     public DateTime? UpdatedAt { get; init; }
     
-    public required string Level { get; init; }
+    public string Level { get; init; } = string.Empty;
     public Guid? InstructorId { get; init; }
     public string? InstructorName { get; init; }
     public Guid? RoomId { get; init; }
     public string? RoomName { get; init; }
-    public required int Capacity { get; init; }
+    public int Capacity { get; init; }
 }
 
 public record ScheduleEditDto

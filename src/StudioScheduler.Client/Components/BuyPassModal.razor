@@ -1,0 +1,258 @@
+@using MudBlazor
+@using StudioScheduler.Shared.Dtos
+@using StudioScheduler.Core.Enums
+@using StudioScheduler.Client.Services
+@inject IPassService PassService
+@inject IScheduleService ScheduleService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.CreditCard" Class="mr-3" />
+            Buy Pass
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        @if (isLoading)
+        {
+            <MudProgressCircular Indeterminate="true" />
+            <MudText>Loading...</MudText>
+        }
+        else
+        {
+            <!-- Student Info Display -->
+            <MudPaper Class="pa-3 mb-4" Elevation="1">
+                <MudText Typo="Typo.subtitle1">
+                    <strong>Student:</strong> @Student.Name (@Student.Email)
+                </MudText>
+            </MudPaper>
+
+            <!-- Pass Type Selection -->
+            <MudSelect @bind-Value="selectedPassType" 
+                      Label="Select Pass Type" 
+                      Variant="Variant.Outlined" 
+                      Class="mb-4"
+                      T="string">
+                @foreach (var passType in monthlyPassTypes)
+                {
+                    <MudSelectItem Value="@passType.Type">
+                        @passType.DisplayName
+                    </MudSelectItem>
+                }
+            </MudSelect>
+
+            <!-- Weekly Schedule Selector (conditional) -->
+            @if (!string.IsNullOrEmpty(selectedPassType) && IsMonthlyPass(selectedPassType))
+            {
+                <MudDivider Class="mb-4" />
+                <MudText Typo="Typo.h6" Class="mb-3">Select Classes</MudText>
+                <MudText Typo="Typo.body2" Class="mb-3">
+                    Select exactly @GetRequiredClassCount() classes for @GetPassTypeDisplayName(selectedPassType)
+                </MudText>
+                
+                <WeeklyScheduleSelector @bind-SelectedSchedules="selectedSchedules"
+                                      RequiredCount="GetRequiredClassCount()"
+                                      AvailableSchedules="availableSchedules" />
+            }
+
+            <!-- Start Date Picker -->
+            @if (selectedSchedules.Count > 0)
+            {
+                <MudDivider Class="my-4" />
+                <MudDatePicker @bind-Date="startDate"
+                              Label="Start Date"
+                              Variant="Variant.Outlined"
+                              Class="mb-3"
+                              IsDateDisabledFunc="IsDateDisabled" />
+                
+                @if (GetValidationError() is string error)
+                {
+                    <MudAlert Severity="Severity.Warning" Class="mb-3">
+                        @error
+                    </MudAlert>
+                }
+            }
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" 
+                  Variant="Variant.Filled" 
+                  OnClick="PurchasePass"
+                  Disabled="@(!CanPurchase() || isPurchasing)">
+            @if (isPurchasing)
+            {
+                <MudProgressCircular Class="mr-2" Size="Size.Small" Indeterminate="true" />
+                <text>Purchasing...</text>
+            }
+            else
+            {
+                <text>Purchase Pass</text>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public required StudentDto Student { get; set; }
+
+    private List<MonthlyPassTypeDto> monthlyPassTypes = new();
+    private List<ScheduleSelectionDto> availableSchedules = new();
+    private List<ScheduleSelectionDto> selectedSchedules = new();
+    
+    private string selectedPassType = "";
+    private DateTime? startDate = DateTime.Today;
+    private bool isLoading = true;
+    private bool isPurchasing = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            isLoading = true;
+            
+            // Load pass types and schedules in parallel
+            var passTypesTask = LoadPassTypesAsync();
+            var schedulesTask = ScheduleService.GetSchedulesForSelectionAsync();
+            
+            await Task.WhenAll(passTypesTask, schedulesTask);
+            
+            monthlyPassTypes = passTypesTask.Result;
+            availableSchedules = schedulesTask.Result;
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading data: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task<List<MonthlyPassTypeDto>> LoadPassTypesAsync()
+    {
+        // Create hardcoded monthly pass types for now since API returns generic objects
+        var passTypes = new List<MonthlyPassTypeDto>
+        {
+            new() { Type = "Monthly1Course", DisplayName = "Monthly 1 Course - 1 class per week", ClassesPerWeek = 1 },
+            new() { Type = "Monthly2Courses", DisplayName = "Monthly 2 Courses - 2 classes per week", ClassesPerWeek = 2 },
+            new() { Type = "Monthly3Courses", DisplayName = "Monthly 3 Courses - 3 classes per week", ClassesPerWeek = 3 },
+            new() { Type = "Monthly4Courses", DisplayName = "Monthly 4 Courses - 4 classes per week", ClassesPerWeek = 4 },
+            new() { Type = "Monthly5Courses", DisplayName = "Monthly 5 Courses - 5 classes per week", ClassesPerWeek = 5 }
+        };
+        
+        return await Task.FromResult(passTypes);
+    }
+
+    private string GetPassTypeDisplayName(string passType)
+    {
+        var matchingType = monthlyPassTypes.FirstOrDefault(pt => pt.Type == passType);
+        return matchingType?.DisplayName ?? passType;
+    }
+
+    private int GetRequiredClassCount()
+    {
+        if (string.IsNullOrEmpty(selectedPassType))
+            return 0;
+            
+        var matchingType = monthlyPassTypes.FirstOrDefault(pt => pt.Type == selectedPassType);
+        return matchingType?.ClassesPerWeek ?? 0;
+    }
+
+    private bool IsMonthlyPass(string passType)
+    {
+        return passType.StartsWith("Monthly") && !string.IsNullOrEmpty(passType);
+    }
+
+    private bool IsDateDisabled(DateTime date)
+    {
+        if (selectedSchedules.Count == 0)
+            return false;
+            
+        var selectedDays = selectedSchedules.Select(s => s.DayOfWeek).Distinct().ToList();
+        return !selectedDays.Contains(date.DayOfWeek);
+    }
+
+    private string? GetValidationError()
+    {
+        if (startDate == null || selectedSchedules.Count == 0)
+            return null;
+            
+        var selectedDays = selectedSchedules.Select(s => s.DayOfWeek).Distinct().ToList();
+        if (!selectedDays.Contains(startDate.Value.DayOfWeek))
+        {
+            var dayNames = string.Join(", ", selectedDays.Select(d => d.ToString()));
+            return $"Start date must be on one of the selected class days: {dayNames}";
+        }
+        
+        return null;
+    }
+
+    private bool CanPurchase()
+    {
+        return !string.IsNullOrEmpty(selectedPassType) &&
+               selectedSchedules.Count == GetRequiredClassCount() &&
+               startDate.HasValue &&
+               GetValidationError() == null;
+    }
+
+    private async Task PurchasePass()
+    {
+        if (!CanPurchase())
+            return;
+
+        try
+        {
+            isPurchasing = true;
+            
+            var passTypeEnum = Enum.Parse<PassType>(selectedPassType);
+            var request = new BuyPassRequestDto
+            {
+                StudentId = Student.Id,
+                PassType = passTypeEnum,
+                StartDate = startDate!.Value,
+                SelectedScheduleIds = selectedSchedules.Select(s => s.ScheduleId).ToList()
+            };
+
+            var response = await PassService.PurchasePassAsync(request);
+            
+            if (response.Success)
+            {
+                Snackbar.Add("Pass purchased successfully!", Severity.Success);
+                MudDialog.Close(DialogResult.Ok(response.PassId));
+            }
+            else
+            {
+                Snackbar.Add($"Error purchasing pass: {response.ErrorMessage}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error purchasing pass: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isPurchasing = false;
+        }
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    public class MonthlyPassTypeDto
+    {
+        public required string Type { get; set; }
+        public required string DisplayName { get; set; }
+        public required int ClassesPerWeek { get; set; }
+    }
+}

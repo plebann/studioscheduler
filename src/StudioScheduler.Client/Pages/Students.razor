@@ -2,7 +2,11 @@
 @using MudBlazor
 @using StudioScheduler.Client.Services
 @using StudioScheduler.Shared.Dtos
+@using StudioScheduler.Client.Components
 @inject IStudentService StudentService
+@inject IPassService PassService
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
 
 <PageTitle>Students - Studio Scheduler</PageTitle>
 
@@ -51,21 +55,37 @@
             }
             else
             {
-                <MudDataGrid Items="@filteredStudents" 
+                <MudDataGrid Items="@studentsWithPassStatus" 
                             Filterable="true" 
                             SortMode="@SortMode.Multiple" 
                             Groupable="false">
                     <Columns>
-                        <PropertyColumn Property="x => x.Name" Title="Name" />
-                        <PropertyColumn Property="x => x.Email" Title="Email" />
-                        <PropertyColumn Property="x => x.Phone" Title="Phone" />
-                        <PropertyColumn Property="x => x.JoinDate" Title="Join Date" Format="dd/MM/yyyy" />
+                        <PropertyColumn Property="x => x.Student.Name" Title="Name" />
+                        <PropertyColumn Property="x => x.Student.Email" Title="Email" />
+                        <PropertyColumn Property="x => x.Student.Phone" Title="Phone" />
+                        <PropertyColumn Property="x => x.Student.JoinDate" Title="Join Date" Format="dd/MM/yyyy" />
                         <TemplateColumn Title="Status">
                             <CellTemplate>
-                                <MudChip Color="@(context.Item.IsActive ? Color.Success : Color.Default)" 
+                                <MudChip Color="@(context.Item.Student.IsActive ? Color.Success : Color.Default)" 
                                          Size="Size.Small">
-                                    @(context.Item.IsActive ? "Active" : "Inactive")
+                                    @(context.Item.Student.IsActive ? "Active" : "Inactive")
                                 </MudChip>
+                            </CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn Title="Pass Status">
+                            <CellTemplate>
+                                @if (context.Item.HasValidPass)
+                                {
+                                    <MudChip Color="Color.Success" Size="Size.Small">
+                                        Valid Pass
+                                    </MudChip>
+                                }
+                                else
+                                {
+                                    <MudChip Color="Color.Warning" Size="Size.Small">
+                                        No Valid Pass
+                                    </MudChip>
+                                }
                             </CellTemplate>
                         </TemplateColumn>
                         <TemplateColumn Title="Actions">
@@ -76,6 +96,16 @@
                                 <MudIconButton Icon="@Icons.Material.Filled.Delete" 
                                               Size="Size.Small" 
                                               Color="Color.Error" />
+                                @if (!context.Item.HasValidPass && context.Item.Student.IsActive)
+                                {
+                                    <MudButton StartIcon="@Icons.Material.Filled.CreditCard"
+                                              Size="Size.Small"
+                                              Color="Color.Secondary"
+                                              Variant="Variant.Filled"
+                                              OnClick="@(() => OpenBuyPassModal(context.Item.Student))">
+                                        Buy Pass
+                                    </MudButton>
+                                }
                             </CellTemplate>
                         </TemplateColumn>
                     </Columns>
@@ -91,15 +121,16 @@
     private bool isLoading = true;
     
     private List<StudentDto> students = new();
+    private List<StudentWithPassStatus> studentsWithPassStatusList = new();
     
-    private IEnumerable<StudentDto> filteredStudents => 
-        students.Where(s => 
+    private IEnumerable<StudentWithPassStatus> studentsWithPassStatus => 
+        studentsWithPassStatusList.Where(s => 
             (string.IsNullOrEmpty(searchText) || 
-             s.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
-             s.Email.Contains(searchText, StringComparison.OrdinalIgnoreCase)) &&
+             s.Student.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+             s.Student.Email.Contains(searchText, StringComparison.OrdinalIgnoreCase)) &&
             (string.IsNullOrEmpty(statusFilter) ||
-             (statusFilter == "active" && s.IsActive) ||
-             (statusFilter == "inactive" && !s.IsActive))
+             (statusFilter == "active" && s.Student.IsActive) ||
+             (statusFilter == "inactive" && !s.Student.IsActive))
         );
 
     protected override async Task OnInitializedAsync()
@@ -113,15 +144,84 @@
         {
             isLoading = true;
             students = await StudentService.GetAllStudentsAsync();
+            
+            // Check pass status for each student
+            studentsWithPassStatusList = new List<StudentWithPassStatus>();
+            foreach (var student in students)
+            {
+                var hasValidPass = await CheckStudentHasValidPass(student.Id);
+                studentsWithPassStatusList.Add(new StudentWithPassStatus
+                {
+                    Student = student,
+                    HasValidPass = hasValidPass
+                });
+            }
         }
         catch (Exception ex)
         {
-            // In a real app, you'd want to show a proper error message to the user
-            Console.WriteLine($"Error loading students: {ex.Message}");
+            Snackbar.Add($"Error loading students: {ex.Message}", Severity.Error);
         }
         finally
         {
             isLoading = false;
         }
+    }
+
+    private async Task<bool> CheckStudentHasValidPass(Guid studentId)
+    {
+        try
+        {
+            var currentPass = await PassService.GetCurrentActivePassAsync(studentId);
+            var hasValidPass = currentPass != null && currentPass.IsActive && 
+                              (currentPass.PassStatus == "Active" || currentPass.PassStatus == "NotYetStarted");
+            
+            // Log for debugging
+            if (currentPass != null)
+            {
+                Console.WriteLine($"Student {studentId}: Pass found - ID: {currentPass.Id}, Status: {currentPass.PassStatus}, IsActive: {currentPass.IsActive}, HasValidPass: {hasValidPass}");
+            }
+            else
+            {
+                Console.WriteLine($"Student {studentId}: No pass found");
+            }
+            
+            return hasValidPass;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error checking pass for student {studentId}: {ex.Message}");
+            return false;
+        }
+    }
+
+    private async Task OpenBuyPassModal(StudentDto student)
+    {
+        var parameters = new DialogParameters<BuyPassModal>
+        {
+            { x => x.Student, student }
+        };
+
+        var options = new DialogOptions 
+        { 
+            MaxWidth = MaxWidth.Large,
+            FullWidth = true,
+            CloseButton = true,
+            BackdropClick = false
+        };
+
+        var dialog = await DialogService.ShowAsync<BuyPassModal>("Buy Pass", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            Snackbar.Add("Pass purchased successfully!", Severity.Success);
+            await LoadStudents(); // Refresh the list to update pass status
+        }
+    }
+
+    private class StudentWithPassStatus
+    {
+        public required StudentDto Student { get; set; }
+        public required bool HasValidPass { get; set; }
     }
 }

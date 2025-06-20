@@ -11,14 +11,14 @@
 
 ### 1. Get Class Schedule and Attendance Info
 # Expected: Should return class details with enrolled students and their attendance info
-GET {{baseUrl}}/api/attendance/class/c1a2b3c4-1234-5678-9abc-def012345614
+GET {{baseUrl}}/api/attendance/class/c1a2b3c4-1234-5678-9abc-def012345629
 Accept: application/json
 
 ###
 
 ### 2. Search Students (Minimum 3 characters)
 # Expected: Should return students matching the search term
-GET {{baseUrl}}/api/attendance/search?searchTerm=Anna
+GET {{baseUrl}}/api/attendance/search?searchTerm=Nowak
 Accept: application/json
 
 ###

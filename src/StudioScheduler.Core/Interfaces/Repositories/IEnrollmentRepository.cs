@@ -9,6 +9,7 @@ public interface IEnrollmentRepository
     Task<IEnumerable<Enrollment>> GetByStudentIdAsync(Guid studentId);
     Task<IEnumerable<Enrollment>> GetByScheduleIdAsync(Guid scheduleId);
     Task<Enrollment> CreateAsync(Enrollment enrollment);
+    Task<IEnumerable<Enrollment>> CreateBatchAsync(IEnumerable<Enrollment> enrollments);
     Task<Enrollment> UpdateAsync(Enrollment enrollment);
     Task<bool> DeleteAsync(Guid id);
 }

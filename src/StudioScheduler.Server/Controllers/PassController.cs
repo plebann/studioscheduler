@@ -4,6 +4,7 @@ using StudioScheduler.Core.Interfaces.Repositories;
 using StudioScheduler.Core.Models;
 using StudioScheduler.Core.Enums;
 using StudioScheduler.Shared.Dtos;
+using StudioScheduler.Core.Services;
 
 namespace StudioScheduler.Server.Controllers;
 
@@ -447,6 +448,85 @@ public class PassController : ControllerBase
         {
             _logger.LogError(ex, "Error retrieving pass types");
             return StatusCode(500, new { message = "An error occurred while retrieving pass types" });
+        }
+    }
+
+    /// <summary>
+    /// Purchase a new pass with class selection
+    /// </summary>
+    [HttpPost("purchase")]
+    public async Task<ActionResult<PassPurchaseResponseDto>> PurchasePass([FromBody] BuyPassRequestDto request)
+    {
+        try
+        {
+            _logger.LogInformation("Processing pass purchase for student {StudentId} of type {PassType}", 
+                request.StudentId, request.PassType);
+
+            var createdPass = await _passService.PurchasePassAsync(
+                request.StudentId, 
+                request.PassType, 
+                request.StartDate, 
+                request.SelectedScheduleIds);
+
+            _logger.LogInformation("Successfully purchased pass {PassId} for student {StudentId}", 
+                createdPass.Id, request.StudentId);
+
+            return Ok(new PassPurchaseResponseDto
+            {
+                Success = true,
+                PassId = createdPass.Id,
+                ErrorMessage = null
+            });
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning("Invalid pass purchase request: {Message}", ex.Message);
+            return BadRequest(new PassPurchaseResponseDto
+            {
+                Success = false,
+                PassId = null,
+                ErrorMessage = ex.Message
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error purchasing pass for student {StudentId}", request.StudentId);
+            return StatusCode(500, new PassPurchaseResponseDto
+            {
+                Success = false,
+                PassId = null,
+                ErrorMessage = "An error occurred while purchasing the pass"
+            });
+        }
+    }
+
+    /// <summary>
+    /// Get available monthly pass types for purchase
+    /// </summary>
+    [HttpGet("types/monthly")]
+    public ActionResult<IEnumerable<object>> GetAvailableMonthlyPassTypes()
+    {
+        try
+        {
+            _logger.LogInformation("Getting available monthly pass types for purchase");
+            
+            var monthlyPassTypes = PassConfigurationService.GetAvailableMonthlyPasses()
+                .Select(passType => new
+                {
+                    Type = passType.ToString(),
+                    DisplayName = PassConfigurationService.GetPassDisplayName(passType),
+                    ClassesPerWeek = PassConfigurationService.GetClassesPerWeek(passType),
+                    TotalClasses = PassConfigurationService.GetTotalClasses(passType)
+                })
+                .ToList();
+
+            _logger.LogInformation("Retrieved {Count} monthly pass types", monthlyPassTypes.Count);
+            return Ok(monthlyPassTypes);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving monthly pass types");
+            return StatusCode(500, new { message = "An error occurred while retrieving monthly pass types" });
         }
     }
 

@@ -9,7 +9,7 @@ GET {{baseUrl}}/pass/types
 GET {{baseUrl}}/pass
 
 ### Get passes for a specific user (replace with actual user ID)
-@userId = 550e8400-e29b-41d4-a716-446655440000
+@userId = a1b2c3d4-5678-9abc-def0-123456789002
 GET {{baseUrl}}/pass/user/{{userId}}
 
 ### Get current active pass for a user

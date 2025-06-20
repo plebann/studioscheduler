@@ -1,4 +1,5 @@
 using StudioScheduler.Core.Models;
+using StudioScheduler.Core.Enums;
 
 namespace StudioScheduler.Core.Interfaces.Services;
 
@@ -21,4 +22,5 @@ public interface IPassService
     Task<IEnumerable<Pass>> GetPassesByTypeAsync(string passType);
     Task<int> GetPassUsageStatsAsync(Guid passId, DateTime? fromDate = null);
     Task<bool> IsPassValidForDateAsync(Guid passId, DateTime date);
+    Task<Pass> PurchasePassAsync(Guid studentId, PassType passType, DateTime startDate, List<Guid> selectedScheduleIds);
 }

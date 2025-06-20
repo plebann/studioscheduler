@@ -2,6 +2,7 @@ using StudioScheduler.Core.Interfaces.Repositories;
 using StudioScheduler.Core.Interfaces.Services;
 using StudioScheduler.Core.Models;
 using StudioScheduler.Core.Enums;
+using StudioScheduler.Core.Services;
 
 namespace StudioScheduler.Infrastructure.Services;
 
@@ -9,11 +10,15 @@ public class PassService : IPassService
 {
     private readonly IPassRepository _passRepository;
     private readonly IAttendanceRepository _attendanceRepository;
+    private readonly IEnrollmentRepository _enrollmentRepository;
+    private readonly IScheduleRepository _scheduleRepository;
 
-    public PassService(IPassRepository passRepository, IAttendanceRepository attendanceRepository)
+    public PassService(IPassRepository passRepository, IAttendanceRepository attendanceRepository, IEnrollmentRepository enrollmentRepository, IScheduleRepository scheduleRepository)
     {
         _passRepository = passRepository;
         _attendanceRepository = attendanceRepository;
+        _enrollmentRepository = enrollmentRepository;
+        _scheduleRepository = scheduleRepository;
     }
 
     public async Task<Pass?> GetByIdAsync(Guid id)
@@ -155,6 +160,57 @@ public class PassService : IPassService
         return pass.IsValidOn(date);
     }
 
+    public async Task<Pass> PurchasePassAsync(Guid studentId, PassType passType, DateTime startDate, List<Guid> selectedScheduleIds)
+    {
+        // Validate input
+        if (!PassConfigurationService.IsMonthlyPass(passType))
+            throw new ArgumentException($"Pass type {passType} is not supported for purchase");
+
+        if (selectedScheduleIds.Count != PassConfigurationService.GetClassesPerWeek(passType))
+            throw new ArgumentException($"Must select exactly {PassConfigurationService.GetClassesPerWeek(passType)} classes for {passType}");
+
+        // Validate start date aligns with selected schedule days
+        await ValidateStartDateWithSchedules(startDate, selectedScheduleIds);
+
+        // Create the pass
+        var pass = new Pass
+        {
+            Id = Guid.NewGuid(),
+            UserId = studentId,
+            Type = passType,
+            StartDate = startDate,
+            EndDate = startDate.AddDays(28), // 28-day validity
+            ClassesPerWeek = PassConfigurationService.GetClassesPerWeek(passType),
+            TotalClasses = PassConfigurationService.GetTotalClasses(passType),
+            IsActive = true
+        };
+
+        // Create enrollments for 4 consecutive weeks
+        var enrollments = new List<Enrollment>();
+        
+        foreach (var scheduleId in selectedScheduleIds)
+        {
+            for (int week = 0; week < 4; week++)
+            {
+                var enrollment = new Enrollment
+                {
+                    Id = Guid.NewGuid(),
+                    StudentId = studentId,
+                    ScheduleId = scheduleId,
+                    EnrolledDate = DateTime.UtcNow,
+                    IsActive = true
+                };
+                enrollments.Add(enrollment);
+            }
+        }
+
+        // Save to database
+        var createdPass = await _passRepository.AddAsync(pass);
+        await _enrollmentRepository.CreateBatchAsync(enrollments);
+
+        return createdPass;
+    }
+
     // Private helper methods
     private static void ValidatePassDates(Pass pass)
     {
@@ -209,6 +265,27 @@ public class PassService : IPassService
             var validityPeriod = (pass.EndDate - pass.StartDate).Days + 1;
             if (validityPeriod != 28)
                 throw new ArgumentException($"SalsaMe passes must have exactly 28-day validity period, got {validityPeriod} days");
+        }
+    }
+
+    private async Task ValidateStartDateWithSchedules(DateTime startDate, List<Guid> selectedScheduleIds)
+    {
+        var selectedDays = new List<DayOfWeek>();
+        
+        foreach (var scheduleId in selectedScheduleIds)
+        {
+            var schedule = await _scheduleRepository.GetByIdAsync(scheduleId);
+            if (schedule == null)
+                throw new ArgumentException($"Schedule with ID {scheduleId} not found");
+            
+            selectedDays.Add(schedule.DayOfWeek);
+        }
+
+        // Start date must match one of the selected class days
+        if (!selectedDays.Contains(startDate.DayOfWeek))
+        {
+            var selectedDayNames = string.Join(", ", selectedDays.Select(d => d.ToString()));
+            throw new ArgumentException($"Start date ({startDate:yyyy-MM-dd}) is on {startDate.DayOfWeek}, but selected classes are on: {selectedDayNames}. Start date must match one of the selected class days.");
         }
     }
 }

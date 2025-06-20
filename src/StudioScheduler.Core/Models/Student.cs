@@ -13,8 +13,17 @@ public class Student : User
     public ICollection<Attendance> AttendanceRecords { get; init; } = new List<Attendance>();
     
     // Helper properties
-    public Pass? CurrentPass => Passes
-        .Where(p => p.IsActive && p.EndDate > DateTime.UtcNow)
-        .OrderByDescending(p => p.StartDate)
-        .FirstOrDefault();
+    public Pass? CurrentPass
+    {
+        get
+        {
+            var today = DateTime.Today;
+            return Passes
+                .Where(p => p.IsActive && 
+                           p.StartDate <= today && 
+                           p.EndDate >= today)
+                .OrderByDescending(p => p.StartDate)
+                .FirstOrDefault();
+        }
+    }
 }

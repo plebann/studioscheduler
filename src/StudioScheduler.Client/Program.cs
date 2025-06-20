@@ -10,6 +10,8 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5224/") });
 builder.Services.AddScoped<IStudentService, StudentService>();
+builder.Services.AddScoped<IPassService, PassService>();
+builder.Services.AddScoped<IScheduleService, ScheduleService>();
 builder.Services.AddMudServices();
 
 await builder.Build().RunAsync();

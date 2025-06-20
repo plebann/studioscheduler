@@ -64,6 +64,13 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(p => p.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        // Student-Pass relationship (Student inherits from User)
+        modelBuilder.Entity<Student>()
+            .HasMany(s => s.Passes)
+            .WithOne()
+            .HasForeignKey(p => p.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         modelBuilder.Entity<Student>()
             .HasMany(s => s.Enrollments)
             .WithOne(e => e.Student)

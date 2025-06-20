@@ -49,6 +49,13 @@ public class EnrollmentRepository : IEnrollmentRepository
         return enrollment;
     }
 
+    public async Task<IEnumerable<Enrollment>> CreateBatchAsync(IEnumerable<Enrollment> enrollments)
+    {
+        _context.Enrollments.AddRange(enrollments);
+        await _context.SaveChangesAsync();
+        return enrollments;
+    }
+
     public async Task<Enrollment> UpdateAsync(Enrollment enrollment)
     {
         _context.Entry(enrollment).State = EntityState.Modified;
