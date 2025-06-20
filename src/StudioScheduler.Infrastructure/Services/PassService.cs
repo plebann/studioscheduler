@@ -185,28 +185,24 @@ public class PassService : IPassService
             IsActive = true
         };
 
-        // Create enrollments for 4 consecutive weeks
         var enrollments = new List<Enrollment>();
         
         foreach (var scheduleId in selectedScheduleIds)
         {
-            for (int week = 0; week < 4; week++)
+            var enrollment = new Enrollment
             {
-                var enrollment = new Enrollment
-                {
-                    Id = Guid.NewGuid(),
-                    StudentId = studentId,
-                    ScheduleId = scheduleId,
-                    EnrolledDate = DateTime.UtcNow,
-                    IsActive = true
-                };
-                enrollments.Add(enrollment);
-            }
+                Id = Guid.NewGuid(),
+                StudentId = studentId,
+                ScheduleId = scheduleId,
+                EnrolledDate = startDate, // Use actual start date, not current time
+                IsActive = true
+            };
+            
+            var createdEnrollment = await _enrollmentRepository.CreateOrReactivateAsync(enrollment);
+            enrollments.Add(createdEnrollment);
         }
 
-        // Save to database
         var createdPass = await _passRepository.AddAsync(pass);
-        await _enrollmentRepository.CreateBatchAsync(enrollments);
 
         return createdPass;
     }

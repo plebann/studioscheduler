@@ -53,11 +53,15 @@ public class AttendanceController : ControllerBase
                 return NotFound($"Schedule not found for ID {scheduleId}");
             }
 
-            // Get enrolled students from repository data
-            var enrollments = await _enrollmentRepository.GetByScheduleIdAsync(scheduleGuid);
+            var enrollments = await _enrollmentRepository.GetActiveEnrollmentsByScheduleAsync(scheduleGuid);
             var enrolledStudents = new List<StudentAttendanceDto>();
 
-            foreach (var enrollment in enrollments.Where(e => e.IsActive))
+            var distinctEnrollments = enrollments
+                .GroupBy(e => e.StudentId)
+                .Select(g => g.OrderByDescending(e => e.EnrolledDate).First()) // Take most recent enrollment per student
+                .ToList();
+
+            foreach (var enrollment in distinctEnrollments)
             {
                 var student = await _studentRepository.GetByIdAsync(enrollment.StudentId);
                 if (student == null) continue;
