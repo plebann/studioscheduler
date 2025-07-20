@@ -161,7 +161,7 @@ cd tests/StudioScheduler.UnitTests && dotnet test
 
 ### Implementation Process
 - Follow the task list in `docs/tasks-{timestamp}.md` file
-- Mark tasks as completed `[x]` in the task list as you progress
+- Mark tasks as completed `[x]` in the task list when you finishes working on this task
 - Implement changes according to the documented plan
 - Check if elements have already been implemented in the existing codebase before adding new code
 - Commit all work to the branch upon completion

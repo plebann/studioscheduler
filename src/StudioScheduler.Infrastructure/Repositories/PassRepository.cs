@@ -72,8 +72,7 @@ public class PassRepository : IPassRepository
         var today = DateTime.Today;
         return await _context.Passes
             .Where(p => p.UserId == userId && 
-                       p.IsActive && 
-                       p.StartDate <= today && 
+                       p.IsActive &&
                        p.EndDate >= today)
             .Include(p => p.User)
             .OrderByDescending(p => p.StartDate)
@@ -86,8 +85,7 @@ public class PassRepository : IPassRepository
         var today = DateTime.Today;
         
         return await _context.Passes
-            .Where(p => p.IsActive && 
-                       p.StartDate <= today && 
+            .Where(p => p.IsActive &&
                        p.EndDate >= today &&
                        p.EndDate <= cutoffDate)
             .Include(p => p.User)

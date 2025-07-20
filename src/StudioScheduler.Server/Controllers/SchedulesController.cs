@@ -295,6 +295,7 @@ public class SchedulesController : ControllerBase
             "ZOUK" => "#6A1B9A",
             "KIZOMBA" => "#007C5A",
             "STYLE" => "#E40046", // For styling classes
+            "UNISEX" => "#046BD2", // Example for unisex classes
             _ => "#999999"
         };
     }

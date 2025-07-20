@@ -26,8 +26,8 @@ public class Pass
     {
         if (currentDate == default) currentDate = DateTime.Today;
         
-        // Pass expired or not yet started
-        if (currentDate > EndDate || currentDate < StartDate) return 0;
+        // Pass expired
+        if (currentDate > EndDate) return 0;
         if (!IsActive) return 0;
 
         return Type switch

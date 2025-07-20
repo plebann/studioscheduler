@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using StudioScheduler.Core.Interfaces.Services;
 using StudioScheduler.Core.Interfaces.Repositories;
+using StudioScheduler.Core.Models;
 using StudioScheduler.Shared.Dtos;
 
 namespace StudioScheduler.Server.Controllers;
@@ -13,6 +14,7 @@ public class AttendanceController : ControllerBase
     private readonly IEnrollmentRepository _enrollmentRepository;
     private readonly IStudentRepository _studentRepository;
     private readonly IAttendanceRepository _attendanceRepository;
+    private readonly IPassRepository _passRepository;
     private readonly ILogger<AttendanceController> _logger;
 
     public AttendanceController(
@@ -20,12 +22,14 @@ public class AttendanceController : ControllerBase
         IEnrollmentRepository enrollmentRepository,
         IStudentRepository studentRepository,
         IAttendanceRepository attendanceRepository,
+        IPassRepository passRepository,
         ILogger<AttendanceController> logger)
     {
         _classAttendanceService = classAttendanceService;
         _enrollmentRepository = enrollmentRepository;
         _studentRepository = studentRepository;
         _attendanceRepository = attendanceRepository;
+        _passRepository = passRepository;
         _logger = logger;
     }
 
@@ -69,17 +73,44 @@ public class AttendanceController : ControllerBase
                 // Get attendance history for this student and schedule
                 var attendanceHistory = await _attendanceRepository.GetByStudentAndScheduleAsync(enrollment.StudentId, scheduleGuid);
                 
-                // Cache the current pass to avoid multiple computed property evaluations
+                // Get all passes for the student to check for future passes
+                var allPasses = await _passRepository.GetByUserIdAsync(enrollment.StudentId);
+                var today = DateTime.Today;
+                
+                // Get current active pass (valid today)
                 var currentPass = student.CurrentPass;
+                
+                // Check for future passes (passes that haven't started yet)
+                var futurePass = allPasses
+                    .Where(p => p.IsActive && p.StartDate > today)
+                    .OrderBy(p => p.StartDate)
+                    .FirstOrDefault();
+                
+                // Determine which pass to display (current or future)
+                var passToDisplay = currentPass ?? futurePass;
                 
                 // Check if pass is expired
                 var isPassExpired = currentPass != null && currentPass.EndDate < DateTime.UtcNow;
                 var hasActivePass = currentPass?.IsActive == true && !isPassExpired;
                 
                 // Check if student is marked present for today
-                var today = DateTime.Today;
                 var isMarkedPresentToday = attendanceHistory.Any(a => 
                     a.ClassDate.Date == today && a.WasPresent);
+                
+                // Determine attendance note based on pass status
+                string? attendanceNote = null;
+                if (currentPass != null && isPassExpired)
+                {
+                    attendanceNote = "Pass expired";
+                }
+                else if (currentPass == null && futurePass != null)
+                {
+                    attendanceNote = "Not started yet";
+                }
+                else if (currentPass == null && futurePass == null)
+                {
+                    attendanceNote = "No active pass";
+                }
                 
                 // Map student to StudentAttendanceDto
                 var studentDto = new StudentAttendanceDto
@@ -89,22 +120,21 @@ public class AttendanceController : ControllerBase
                     LastName = student.LastName,
                     IsMarkedPresentToday = isMarkedPresentToday,
                     CanAttendToday = hasActivePass,
-                    AttendanceNote = isPassExpired ? "Pass expired" : 
-                                   currentPass == null ? "No active pass" : null,
-                    CurrentPass = currentPass != null ? new StudentPassDto
+                    AttendanceNote = attendanceNote,
+                    CurrentPass = passToDisplay != null ? new StudentPassDto
                     {
-                        PassId = currentPass.Id.ToString(),
-                        PassType = currentPass.Type.ToString(),
-                        StartDate = currentPass.StartDate,
-                        EndDate = currentPass.EndDate,
-                        TotalClasses = currentPass.TotalClasses,
-                        RemainingClasses = currentPass.CalculateRemainingClasses(attendanceHistory),
-                        ClassesPerWeek = currentPass.ClassesPerWeek,
+                        PassId = passToDisplay.Id.ToString(),
+                        PassType = passToDisplay.Type.ToString(),
+                        StartDate = passToDisplay.StartDate,
+                        EndDate = passToDisplay.EndDate,
+                        TotalClasses = passToDisplay.TotalClasses,
+                        RemainingClasses = passToDisplay.CalculateRemainingClasses(attendanceHistory),
+                        ClassesPerWeek = passToDisplay.ClassesPerWeek,
                         Price = 200.00m,
-                        IsActive = currentPass.IsActive,
-                        IsExpired = isPassExpired,
+                        IsActive = passToDisplay.IsActive,
+                        IsExpired = passToDisplay.EndDate < DateTime.UtcNow,
                         ClassesUsedForThisClass = attendanceHistory.Count(a => a.WasPresent),
-                        MaxClassesForThisClassType = currentPass.TotalClasses
+                        MaxClassesForThisClassType = passToDisplay.TotalClasses
                     } : null,
                     AttendanceHistory = attendanceHistory.Select(a => new AttendanceRecordDto
                     {

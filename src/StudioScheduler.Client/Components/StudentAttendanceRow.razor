@@ -70,8 +70,11 @@
             }
             else
             {
-                <MudChip T="string" Color="Color.Error" Size="Size.Small" Variant="Variant.Outlined">
-                    No Pass
+                <MudChip T="string" 
+                         Color="@GetNoPassColor()" 
+                         Size="Size.Small" 
+                         Variant="Variant.Outlined">
+                    @GetNoPassText()
                 </MudChip>
             }
             
@@ -155,5 +158,21 @@
             return "No classes remaining on current pass";
             
         return "Cannot attend today";
+    }
+
+    private Color GetNoPassColor()
+    {
+        if (Student.AttendanceNote == "Not started yet")
+            return Color.Info;
+            
+        return Color.Error;
+    }
+
+    private string GetNoPassText()
+    {
+        if (Student.AttendanceNote == "Not started yet")
+            return "Not Started Yet";
+            
+        return "No Pass";
     }
 }
