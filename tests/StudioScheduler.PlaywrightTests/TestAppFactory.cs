@@ -174,7 +174,6 @@ public static class TestAppFactory
         var mondaySchedule = new Schedule
         {
             Id = Guid.Parse("44444444-4444-4444-4444-444444444444"),
-            Name = "Monday Salsa",
             LocationId = testLocation.Id,
             DanceClassId = salsaClass.Id,
             DayOfWeek = DayOfWeek.Monday,
@@ -190,7 +189,6 @@ public static class TestAppFactory
         var tuesdaySchedule = new Schedule
         {
             Id = Guid.Parse("55555555-5555-5555-5555-555555555555"),
-            Name = "Tuesday Bachata",
             LocationId = testLocation.Id,
             DanceClassId = bachataClass.Id,
             DayOfWeek = DayOfWeek.Tuesday,
@@ -206,7 +204,6 @@ public static class TestAppFactory
         var wednesdaySchedule = new Schedule
         {
             Id = Guid.Parse("88888888-8888-8888-8888-888888888888"),
-            Name = "Wednesday Kizomba",
             LocationId = testLocation.Id,
             DanceClassId = salsaClass.Id, // Reuse salsa class but different schedule
             DayOfWeek = DayOfWeek.Wednesday,

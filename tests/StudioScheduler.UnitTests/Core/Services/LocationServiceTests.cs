@@ -284,7 +284,6 @@ public class LocationServiceTests
         {
             new()
             {
-                Name = "Monday Schedule",
                 LocationId = locationId,
                 EffectiveFrom = DateTime.UtcNow,
                 DanceClassId = Guid.NewGuid(),

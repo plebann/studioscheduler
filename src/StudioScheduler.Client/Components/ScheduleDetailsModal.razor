@@ -62,7 +62,6 @@
             EditSchedule = new ScheduleEditDto
             {
                 Id = Guid.Empty,
-                Name = "",
                 LocationId = Guid.Empty,
                 DanceClassId = Guid.Empty,
                 DayOfWeek = DayOfWeek.Monday,
@@ -126,7 +125,6 @@
             {
                 var createDto = new CreateScheduleDto
                 {
-                    Name = updatedSchedule.Name,
                     LocationId = updatedSchedule.LocationId,
                     DanceClassId = updatedSchedule.DanceClassId,
                     DayOfWeek = updatedSchedule.DayOfWeek,
@@ -147,7 +145,6 @@
             {
                 var updateDto = new UpdateScheduleDto
                 {
-                    Name = updatedSchedule.Name,
                     DayOfWeek = updatedSchedule.DayOfWeek,
                     StartTime = updatedSchedule.StartTime,
                     Duration = updatedSchedule.Duration,

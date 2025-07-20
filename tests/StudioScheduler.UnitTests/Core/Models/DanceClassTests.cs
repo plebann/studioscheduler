@@ -94,7 +94,6 @@ public class DanceClassTests
 
         var schedule = new Schedule
         {
-            Name = "Monday Evening Salsa",
             LocationId = Guid.NewGuid(),
             EffectiveFrom = DateTime.UtcNow,
             DanceClassId = danceClass.Id,

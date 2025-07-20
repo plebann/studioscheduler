@@ -364,7 +364,6 @@ public class RoomServiceTests
         {
             new()
             {
-                Name = "Monday Evening Salsa",
                 LocationId = Guid.NewGuid(),
                 EffectiveFrom = DateTime.UtcNow,
                 DanceClassId = Guid.NewGuid(),

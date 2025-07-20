@@ -17,7 +17,6 @@ public class ScheduleTests
         // Act
         var schedule = new Schedule
         {
-            Name = "Monday Evening Salsa",
             LocationId = locationId,
             EffectiveFrom = DateTime.UtcNow,
             DanceClassId = danceClassId,
@@ -30,7 +29,6 @@ public class ScheduleTests
 
         // Assert
         schedule.Id.Should().NotBeEmpty();
-        schedule.Name.Should().Be("Monday Evening Salsa");
         schedule.LocationId.Should().Be(locationId);
         schedule.DanceClassId.Should().Be(danceClassId);
         schedule.EffectiveFrom.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
@@ -53,7 +51,6 @@ public class ScheduleTests
         // Arrange & Act
         var schedule = new Schedule
         {
-            Name = "Test Schedule",
             LocationId = Guid.NewGuid(),
             EffectiveFrom = DateTime.UtcNow,
             DanceClassId = Guid.NewGuid(),
@@ -67,15 +64,8 @@ public class ScheduleTests
         // Assert
         // Properties with init-only setters cannot be modified after creation
         // This test documents the immutable behavior of Name
-        schedule.Name.Should().Be("Test Schedule");
         
         // Verify that the property is init-only by checking it exists
-        var nameProperty = typeof(Schedule).GetProperty(nameof(Schedule.Name));
-        
-        nameProperty.Should().NotBeNull();
-        
-        // Init-only property has a setter but it's only accessible during initialization
-        nameProperty!.CanWrite.Should().BeTrue();
     }
 
     [Fact]
@@ -88,7 +78,6 @@ public class ScheduleTests
         // Act
         var schedule = new Schedule
         {
-            Name = "Weekly Salsa Class",
             LocationId = Guid.NewGuid(),
             EffectiveFrom = DateTime.UtcNow,
             DanceClassId = Guid.NewGuid(),
@@ -113,7 +102,6 @@ public class ScheduleTests
         var validator = new ScheduleValidator();
         var schedule = new Schedule
         {
-            Name = "Test Schedule",
             LocationId = Guid.NewGuid(),
             EffectiveFrom = DateTime.UtcNow,
             DanceClassId = Guid.NewGuid(),
@@ -140,7 +128,6 @@ public class ScheduleTests
         var validator = new ScheduleValidator();
         var schedule = new Schedule
         {
-            Name = "Test Schedule",
             LocationId = Guid.NewGuid(),
             EffectiveFrom = DateTime.UtcNow,
             DanceClassId = Guid.NewGuid(),
@@ -167,7 +154,6 @@ public class ScheduleTests
         var validator = new ScheduleValidator();
         var schedule = new Schedule
         {
-            Name = "Test Schedule",
             LocationId = Guid.NewGuid(),
             EffectiveFrom = DateTime.UtcNow,
             DanceClassId = Guid.NewGuid(),

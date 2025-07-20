@@ -3,7 +3,6 @@ namespace StudioScheduler.Shared.Dtos;
 public record ScheduleDto
 {
     public Guid Id { get; init; }
-    public string Name { get; init; } = string.Empty;
     public Guid LocationId { get; init; }
     public string? LocationName { get; init; }
     public Guid DanceClassId { get; init; }
@@ -30,7 +29,6 @@ public record ScheduleDto
 public record ScheduleEditDto
 {
     public Guid Id { get; set; }
-    public string Name { get; set; } = string.Empty;
     public Guid LocationId { get; set; }
     public string? LocationName { get; set; }
     public Guid DanceClassId { get; set; }
@@ -58,7 +56,6 @@ public record ScheduleEditDto
         return new ScheduleEditDto
         {
             Id = dto.Id,
-            Name = dto.Name,
             LocationId = dto.LocationId,
             LocationName = dto.LocationName,
             DanceClassId = dto.DanceClassId,
@@ -87,7 +84,6 @@ public record ScheduleEditDto
         return new ScheduleDto
         {
             Id = Id,
-            Name = Name,
             LocationId = LocationId,
             LocationName = LocationName,
             DanceClassId = DanceClassId,
@@ -114,7 +110,6 @@ public record ScheduleEditDto
 
 public record CreateScheduleDto
 {
-    public required string Name { get; init; }
     public required Guid LocationId { get; init; }
     public required Guid DanceClassId { get; init; }
     public required DayOfWeek DayOfWeek { get; init; }
@@ -132,7 +127,6 @@ public record CreateScheduleDto
 
 public record UpdateScheduleDto
 {
-    public required string Name { get; init; }
     public required DayOfWeek DayOfWeek { get; init; }
     public required TimeSpan StartTime { get; init; }
     public required int Duration { get; init; }
@@ -151,7 +145,6 @@ public record UpdateScheduleDto
 public record ScheduleSummaryDto
 {
     public Guid Id { get; init; }
-    public required string Name { get; init; }
     public string? LocationName { get; init; }
     public string? DanceClassName { get; init; }
     public required DayOfWeek DayOfWeek { get; init; }

@@ -25,7 +25,6 @@ public class SchedulesController : ControllerBase
         var summaries = schedules.Select(s => new ScheduleSummaryDto
         {
             Id = s.Id,
-            Name = s.Name,
             LocationName = s.Location?.Name,
             DanceClassName = s.DanceClass?.Name,
             DayOfWeek = s.DayOfWeek,
@@ -54,7 +53,7 @@ public class SchedulesController : ControllerBase
         var scheduleDto = new ScheduleDto
         {
             Id = schedule.Id,
-            Name = schedule.Name,
+            // Name removed: use DanceClassName for UI
             LocationId = schedule.LocationId,
             LocationName = schedule.Location?.Name,
             DanceClassId = schedule.DanceClassId,
@@ -85,7 +84,7 @@ public class SchedulesController : ControllerBase
     {
         var schedule = new Schedule
         {
-            Name = createDto.Name,
+            // Name removed: use DanceClassName for UI
             LocationId = createDto.LocationId,
             DanceClassId = createDto.DanceClassId,
             DayOfWeek = createDto.DayOfWeek,
@@ -107,7 +106,7 @@ public class SchedulesController : ControllerBase
         var scheduleDto = new ScheduleDto
         {
             Id = created.Id,
-            Name = created.Name,
+            // Name removed: use DanceClassName for UI
             LocationId = created.LocationId,
             LocationName = created.Location?.Name,
             DanceClassId = created.DanceClassId,
@@ -145,7 +144,7 @@ public class SchedulesController : ControllerBase
         var updatedSchedule = new Schedule
         {
             Id = existingSchedule.Id,
-            Name = updateDto.Name,
+            // Name removed: use DanceClassName for UI
             LocationId = existingSchedule.LocationId,
             DanceClassId = existingSchedule.DanceClassId,
             DayOfWeek = updateDto.DayOfWeek,
@@ -169,7 +168,7 @@ public class SchedulesController : ControllerBase
         var scheduleDto = new ScheduleDto
         {
             Id = updated.Id,
-            Name = updated.Name,
+            // Name removed: use DanceClassName for UI
             LocationId = updated.LocationId,
             LocationName = updated.Location?.Name,
             DanceClassId = updated.DanceClassId,
@@ -237,7 +236,7 @@ public class SchedulesController : ControllerBase
             danceClassDict.TryGetValue(schedule.DanceClassId, out DanceClass? danceClass);
 
             // Use dance class information for accurate data
-            var danceName = danceClass?.Name ?? schedule.Name;
+            var danceName = danceClass?.Name ?? "UNKNOWN";
             var level = schedule.Level;
             var style = danceClass?.Style ?? "UNKNOWN";
 

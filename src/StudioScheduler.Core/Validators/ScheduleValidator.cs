@@ -7,9 +7,6 @@ public class ScheduleValidator : AbstractValidator<Schedule>
 {
     public ScheduleValidator()
     {
-        RuleFor(x => x.Name)
-            .NotEmpty()
-            .WithMessage("Name is required");
 
         RuleFor(x => x.LocationId)
             .NotEqual(Guid.Empty)

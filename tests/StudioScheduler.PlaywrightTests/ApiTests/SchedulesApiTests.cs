@@ -211,7 +211,6 @@ public class SchedulesApiTests : BaseApiTest
         // Verify first schedule structure
         var firstSchedule = schedules.First();
         Assert.That(firstSchedule.Id, Is.Not.EqualTo(Guid.Empty), "Schedule should have valid ID");
-        Assert.That(firstSchedule.Name, Is.Not.Null.And.Not.Empty, "Schedule should have name");
         Assert.That(firstSchedule.Level, Is.Not.Null.And.Not.Empty, "Schedule should have level");
         Assert.That(firstSchedule.Capacity, Is.GreaterThan(0), "Schedule should have positive capacity");
     }
@@ -253,7 +252,6 @@ public class SchedulesApiTests : BaseApiTest
         
         Assert.That(schedule, Is.Not.Null, "Schedule should not be null");
         Assert.That(schedule.Id, Is.EqualTo(testScheduleId), "Schedule ID should match requested ID");
-        Assert.That(schedule.Name, Is.Not.Null.And.Not.Empty, "Schedule should have name");
         Assert.That(schedule.LocationId, Is.Not.EqualTo(Guid.Empty), "Schedule should have location ID");
         Assert.That(schedule.DanceClassId, Is.Not.EqualTo(Guid.Empty), "Schedule should have dance class ID");
         Assert.That(schedule.Level, Is.Not.Null.And.Not.Empty, "Schedule should have level");
@@ -304,7 +302,6 @@ public class SchedulesApiTests : BaseApiTest
 
         var createDto = new CreateScheduleDto
         {
-            Name = "Test Schedule",
             LocationId = locationId,
             DanceClassId = danceClassId,
             DayOfWeek = DayOfWeek.Monday,
@@ -332,7 +329,6 @@ public class SchedulesApiTests : BaseApiTest
         
         Assert.That(schedule, Is.Not.Null, "Created schedule should not be null");
         Assert.That(schedule.Id, Is.Not.EqualTo(Guid.Empty), "Created schedule should have valid ID");
-        Assert.That(schedule.Name, Is.EqualTo(createDto.Name), "Schedule name should match");
         Assert.That(schedule.LocationId, Is.EqualTo(createDto.LocationId), "Location ID should match");
         Assert.That(schedule.DanceClassId, Is.EqualTo(createDto.DanceClassId), "Dance class ID should match");
         Assert.That(schedule.DayOfWeek, Is.EqualTo(createDto.DayOfWeek), "Day of week should match");
@@ -350,7 +346,6 @@ public class SchedulesApiTests : BaseApiTest
         // Arrange
         var createDto = new CreateScheduleDto
         {
-            Name = "Test Schedule",
             LocationId = Guid.NewGuid(), // Non-existent location
             DanceClassId = Guid.NewGuid(),
             DayOfWeek = DayOfWeek.Monday,
@@ -395,7 +390,6 @@ public class SchedulesApiTests : BaseApiTest
 
         var updateDto = new UpdateScheduleDto
         {
-            Name = "Updated Schedule Name",
             DayOfWeek = DayOfWeek.Tuesday, // Different from original
             StartTime = TimeSpan.FromHours(20), // 8 PM
             Duration = 120, // 2 hours
@@ -423,7 +417,6 @@ public class SchedulesApiTests : BaseApiTest
         
         Assert.That(updatedSchedule, Is.Not.Null, "Updated schedule should not be null");
         Assert.That(updatedSchedule.Id, Is.EqualTo(testScheduleId), "Schedule ID should remain same");
-        Assert.That(updatedSchedule.Name, Is.EqualTo(updateDto.Name), "Name should be updated");
         Assert.That(updatedSchedule.DayOfWeek, Is.EqualTo(updateDto.DayOfWeek), "Day of week should be updated");
         Assert.That(updatedSchedule.StartTime, Is.EqualTo(updateDto.StartTime), "Start time should be updated");
         Assert.That(updatedSchedule.Duration, Is.EqualTo(updateDto.Duration), "Duration should be updated");
@@ -447,7 +440,6 @@ public class SchedulesApiTests : BaseApiTest
         var nonExistentId = Guid.NewGuid();
         var updateDto = new UpdateScheduleDto
         {
-            Name = "Updated Name",
             DayOfWeek = DayOfWeek.Monday,
             StartTime = TimeSpan.FromHours(19),
             Duration = 90,
@@ -492,7 +484,6 @@ public class SchedulesApiTests : BaseApiTest
 
         var createDto = new CreateScheduleDto
         {
-            Name = "Schedule to Delete",
             LocationId = locationId,
             DanceClassId = danceClassId,
             DayOfWeek = DayOfWeek.Friday,

@@ -153,7 +153,7 @@ public class AttendanceController : ControllerBase
             var classAttendanceDto = new ClassAttendanceDto
             {
                 ScheduleId = schedule.Id.ToString(),
-                ClassName = schedule.DanceClass?.Name ?? schedule.Name,
+                ClassName = schedule.DanceClass?.Name ?? "Unknown",
                 DayOfWeek = schedule.DayOfWeek.ToString(),
                 StartTime = schedule.StartTime.ToString(@"hh\:mm"),
                 Instructor = schedule.Instructor != null ? $"{schedule.Instructor.FirstName} {schedule.Instructor.LastName}" : "TBD",

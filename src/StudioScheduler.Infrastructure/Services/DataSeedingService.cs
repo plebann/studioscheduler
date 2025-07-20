@@ -172,7 +172,6 @@ public class DataSeedingService
                 var schedule = new Schedule
                 {
                     Id = Guid.Parse(scheduleData.Id),
-                    Name = scheduleData.Name,
                     LocationId = Guid.Parse(scheduleData.LocationId),
                     EffectiveFrom = scheduleData.EffectiveFrom,
                     EffectiveTo = scheduleData.EffectiveTo,

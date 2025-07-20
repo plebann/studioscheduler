@@ -4,7 +4,6 @@ public class Schedule
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     
-    public required string Name { get; init; }
     
     public required Guid LocationId { get; set; }
     public Location? Location { get; set; }
