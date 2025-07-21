@@ -317,6 +317,17 @@ public class AttendanceRepository : IAttendanceRepository
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<Attendance>> GetByScheduleAndDateAsync(Guid scheduleId, DateTime classDate)
+    {
+        return await _context.Attendances
+            .Where(a => a.ScheduleId == scheduleId && a.ClassDate.Date == classDate.Date)
+            .Include(a => a.Student)
+            .Include(a => a.Schedule)
+            .ThenInclude(s => s.DanceClass)
+            .Include(a => a.Pass)
+            .ToListAsync();
+    }
+
     public async Task SaveChangesAsync()
     {
         await _context.SaveChangesAsync();

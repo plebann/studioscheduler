@@ -34,85 +34,104 @@ public class AttendanceController : ControllerBase
     }
 
     /// <summary>
-    /// Get class schedule information
+    /// Get class schedule information with 4-week attendance/enrollment/cancellation window
     /// </summary>
-    /// <param name="scheduleId">The schedule ID of the class</param>
-    /// <returns>Schedule data</returns>
     [HttpGet("class/{scheduleId}")]
     public async Task<ActionResult<ClassAttendanceDto>> GetClassSchedule(string scheduleId)
     {
         try
         {
             if (!Guid.TryParse(scheduleId, out var scheduleGuid))
-            {
                 return BadRequest("Invalid schedule ID format");
-            }
 
             _logger.LogInformation("Getting class schedule for schedule {ScheduleId}", scheduleId);
 
             var schedule = await _classAttendanceService.GetClassAttendanceAsync(scheduleGuid);
             if (schedule == null)
-            {
-                _logger.LogWarning("Schedule not found for ID {ScheduleId}", scheduleId);
                 return NotFound($"Schedule not found for ID {scheduleId}");
-            }
 
             var enrollments = await _enrollmentRepository.GetActiveEnrollmentsByScheduleAsync(scheduleGuid);
             var enrolledStudents = new List<StudentAttendanceDto>();
 
             var distinctEnrollments = enrollments
                 .GroupBy(e => e.StudentId)
-                .Select(g => g.OrderByDescending(e => e.EnrolledDate).First()) // Take most recent enrollment per student
+                .Select(g => g.OrderByDescending(e => e.EnrolledDate).First())
                 .ToList();
+
+            // Calculate the last 4 calendar weeks' class dates (including this week)
+            var today = DateTime.Today;
+            var classDayOfWeek = schedule.DayOfWeek;
+            var classDates = new List<DateTime>();
+            for (int i = 3; i >= 0; i--)
+            {
+                var weekStart = today.AddDays(-7 * i);
+                var classDate = weekStart.AddDays(((int)classDayOfWeek - (int)weekStart.DayOfWeek + 7) % 7);
+                if (classDate > today) classDate = classDate.AddDays(-7); // Don't go into the future
+                classDates.Add(classDate);
+            }
 
             foreach (var enrollment in distinctEnrollments)
             {
                 var student = await _studentRepository.GetByIdAsync(enrollment.StudentId);
                 if (student == null) continue;
 
-                // Get attendance history for this student and schedule
                 var attendanceHistory = await _attendanceRepository.GetByStudentAndScheduleAsync(enrollment.StudentId, scheduleGuid);
-                
-                // Get all passes for the student to check for future passes
                 var allPasses = await _passRepository.GetByUserIdAsync(enrollment.StudentId);
-                var today = DateTime.Today;
-                
-                // Get current active pass (valid today)
+
                 var currentPass = student.CurrentPass;
-                
-                // Check for future passes (passes that haven't started yet)
                 var futurePass = allPasses
                     .Where(p => p.IsActive && p.StartDate > today)
                     .OrderBy(p => p.StartDate)
                     .FirstOrDefault();
-                
-                // Determine which pass to display (current or future)
                 var passToDisplay = currentPass ?? futurePass;
-                
-                // Check if pass is expired
                 var isPassExpired = currentPass != null && currentPass.EndDate < DateTime.UtcNow;
                 var hasActivePass = currentPass?.IsActive == true && !isPassExpired;
-                
+
+                // Attendance per week logic
+                var attendanceRecords = new List<AttendanceRecordDto>();
+                for (int i = 0; i < classDates.Count; i++)
+                {
+                    var classDate = classDates[i];
+                    var weekOffset = -(3 - i);
+
+                    // Was the student enrolled for this week?
+                    bool isEnrolled = enrollment.EnrolledDate.Date <= classDate.Date && enrollment.IsActive;
+
+                    // Was the class canceled/skipped? (No explicit per-date cancellation, so infer: if no attendance for any student, treat as canceled)
+                    bool isCanceled = false;
+                    var anyAttendance = await _attendanceRepository.GetByScheduleAndDateAsync(scheduleGuid, classDate);
+                    if (!anyAttendance.Any())
+                        isCanceled = true;
+
+                    // Was the student present?
+                    var attendance = attendanceHistory.FirstOrDefault(a => a.ClassDate.Date == classDate.Date);
+                    bool wasPresent = attendance?.WasPresent ?? false;
+
+                    attendanceRecords.Add(new AttendanceRecordDto
+                    {
+                        ClassDate = classDate,
+                        WeekOffset = weekOffset,
+                        WasPresent = wasPresent,
+                        IsEnrolled = isEnrolled,
+                        IsCanceled = isCanceled,
+                        PassUsed = attendance?.PassUsed?.ToString(),
+                        PassClassNumber = attendance?.PassClassNumber ?? 0,
+                        IsPassActive = attendance?.Pass?.IsActive ?? false
+                    });
+                }
+
                 // Check if student is marked present for today
-                var isMarkedPresentToday = attendanceHistory.Any(a => 
-                    a.ClassDate.Date == today && a.WasPresent);
-                
+                var isMarkedPresentToday = attendanceHistory.Any(a => a.ClassDate.Date == today && a.WasPresent);
+
                 // Determine attendance note based on pass status
                 string? attendanceNote = null;
                 if (currentPass != null && isPassExpired)
-                {
                     attendanceNote = "Pass expired";
-                }
                 else if (currentPass == null && futurePass != null)
-                {
                     attendanceNote = "Not started yet";
-                }
                 else if (currentPass == null && futurePass == null)
-                {
                     attendanceNote = "No active pass";
-                }
-                
-                // Map student to StudentAttendanceDto
+
                 var studentDto = new StudentAttendanceDto
                 {
                     StudentId = student.Id.ToString(),
@@ -136,15 +155,7 @@ public class AttendanceController : ControllerBase
                         ClassesUsedForThisClass = attendanceHistory.Count(a => a.WasPresent),
                         MaxClassesForThisClassType = passToDisplay.TotalClasses
                     } : null,
-                    AttendanceHistory = attendanceHistory.Select(a => new AttendanceRecordDto
-                    {
-                        ClassDate = a.ClassDate,
-                        WeekOffset = (int)Math.Floor((DateTime.Now - a.ClassDate).TotalDays / 7),
-                        WasPresent = a.WasPresent,
-                        PassUsed = a.PassUsed?.ToString() ?? null,
-                        PassClassNumber = a.PassClassNumber,
-                        IsPassActive = a.Pass?.IsActive ?? false
-                    }).ToList()
+                    AttendanceHistory = attendanceRecords
                 };
 
                 enrolledStudents.Add(studentDto);
@@ -172,11 +183,6 @@ public class AttendanceController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Mark a student's attendance for a specific class
-    /// </summary>
-    /// <param name="request">Attendance marking request</param>
-    /// <returns>Result of the attendance marking operation</returns>
     [HttpPost("mark")]
     public async Task<ActionResult<MarkAttendanceResponseDto>> MarkAttendance([FromBody] MarkAttendanceRequestDto request)
     {
@@ -227,11 +233,6 @@ public class AttendanceController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Search for students by name
-    /// </summary>
-    /// <param name="searchTerm">Search term (minimum 3 characters)</param>
-    /// <returns>List of matching students</returns>
     [HttpGet("search")]
     public async Task<ActionResult> SearchStudents([FromQuery] string searchTerm)
     {

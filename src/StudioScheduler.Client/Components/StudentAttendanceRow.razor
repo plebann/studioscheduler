@@ -18,20 +18,20 @@
         <!-- Attendance History and Controls -->
         <div class="d-flex align-center gap-1">
             <!-- Historical Attendance -->
-            @foreach (var record in Student.AttendanceHistory.OrderByDescending(r => r.WeekOffset))
+            @foreach (var record in Student.AttendanceHistory.OrderBy(r => r.WeekOffset))
             {
                 <MudTooltip Text="@GetTooltipText(record)">
                     <MudChip T="string" 
                              Color="@GetAttendanceColor(record)" 
                              Size="Size.Small" 
-                             Variant="Variant.Filled">
+                             Variant="Variant.Filled"
+                             Style="@GetChipStyle(record)">
                         @record.WeekLabel
                     </MudChip>
                 </MudTooltip>
             }
-            
             <!-- Today's Attendance Checkbox - Only show if not yet marked present -->
-            @if (!Student.IsMarkedPresentToday)
+            @if (!Student.IsMarkedPresentToday && Student.CurrentPass != null && Student.CurrentPass.IsActive && !Student.CurrentPass.IsExpired)
             {
                 <MudTooltip Text="Mark present for today's class">
                     <MudCheckBox T="bool"
@@ -103,12 +103,13 @@
 
     private Color GetAttendanceColor(AttendanceRecordDto record)
     {
-        if (record.WeekOffset == 0) // Today
-        {
-            return Color.Primary;
-        }
-        
-        return record.WasPresent ? Color.Success : Color.Default;
+        if (record.IsCanceled)
+            return Color.Default; // Use custom style for light-gray background
+        if (!record.IsEnrolled)
+            return Color.Default; // White for not enrolled (add border in chip style)
+        if (record.WasPresent)
+            return Color.Success; // Green for present
+        return Color.Default; // Gray for absent
     }
 
     private Color GetPassColor()
@@ -127,6 +128,10 @@
 
     private string GetTooltipText(AttendanceRecordDto record)
     {
+        if (record.IsCanceled)
+            return $"{record.WeekLabel}: Class canceled/skipped ({record.ClassDate:dd/MM/yyyy})";
+        if (!record.IsEnrolled)
+            return $"{record.WeekLabel}: Not enrolled ({record.ClassDate:dd/MM/yyyy})";
         var status = record.WasPresent ? "Present" : "Absent";
         return $"{record.WeekLabel}: {status} ({record.ClassDate:dd/MM/yyyy})";
     }
@@ -174,5 +179,14 @@
             return "Not Started Yet";
             
         return "No Pass";
+    }
+
+    private string GetChipStyle(AttendanceRecordDto record)
+    {
+        if (record.IsCanceled)
+            return "background-color: #f5f5f5; border: 2px solid red;"; // Light-gray bg, red border
+        if (!record.IsEnrolled)
+            return "background-color: #fff; border: 2px solid gray;"; // White bg, gray border
+        return "";
     }
 }

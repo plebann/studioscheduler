@@ -61,16 +61,20 @@ public class AttendanceRecordDto
     public required DateTime ClassDate { get; set; }
     public required int WeekOffset { get; set; } // -2, -1, 0 (today)
     public required bool WasPresent { get; set; }
+    public bool IsEnrolled { get; set; }
+    public bool IsCanceled { get; set; }
     public string? PassUsed { get; set; }
     public int PassClassNumber { get; set; }
     public bool IsPassActive { get; set; }
     
     public string WeekLabel => WeekOffset switch
     {
-        -2 => "2wk ago",
-        -1 => "Last wk",
-        0 => "Today",
-        _ => $"{Math.Abs(WeekOffset)}wk ago"
+        -3 => "4wk ago",
+        -2 => "3wk ago",
+        -1 => "2wk ago",
+        0 => "Last wk",
+        1 => "Today",
+        _ => $"{(WeekOffset < 0 ? Math.Abs(WeekOffset) + 1 : WeekOffset)}wk ago"
     };
 }
 
