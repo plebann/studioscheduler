@@ -25,14 +25,12 @@ public class AttendanceApiTests : BaseApiTest
             if (allSchedules?.Any() == true)
             {
                 _validScheduleId = allSchedules.First().Id!.ToString();
-                Console.WriteLine($"DEBUG: Using schedule ID from weekly schedule: {_validScheduleId}");
                 return _validScheduleId;
             }
         }
 
         // Fallback to a hardcoded ID (this will fail, but at least we'll know why)
         _validScheduleId = "C1A2B3C4-1234-5678-9ABC-DEF012345614";
-        Console.WriteLine($"DEBUG: No schedules found in weekly schedule, using fallback: {_validScheduleId}");
         return _validScheduleId;
     }
 

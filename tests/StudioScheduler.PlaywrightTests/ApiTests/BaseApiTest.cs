@@ -30,7 +30,6 @@ public abstract class BaseApiTest
         
         // Get the actual running URL (with dynamic port)
         _testAppBaseUrl = TestApp.Urls.First();
-        Console.WriteLine($"DEBUG: Test app running at: {_testAppBaseUrl}");
         
         // Create HttpClient that points to the test app
         HttpClient = new HttpClient();

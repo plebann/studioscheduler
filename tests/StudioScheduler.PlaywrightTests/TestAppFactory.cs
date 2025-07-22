@@ -127,7 +127,6 @@ public static class TestAppFactory
             .Take(5)
             .Select(s => s.Id.ToString())
             .ToListAsync();
-        Console.WriteLine($"DEBUG: Created {await context.Schedules.CountAsync()} schedules with IDs: {string.Join(", ", scheduleIds)}");
         
         return context;
     }
