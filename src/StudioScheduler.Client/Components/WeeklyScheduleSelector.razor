@@ -2,7 +2,7 @@
 @using StudioScheduler.Shared.Dtos
 
 <MudGrid>
-    @foreach (var day in Enum.GetValues<DayOfWeek>())
+    @foreach (var day in Enum.GetValues<DayOfWeek>().OrderBy(d => ((int)d + 6) % 7))
     {
         var daySchedules = GetSchedulesForDay(day);
         @if (daySchedules.Any())

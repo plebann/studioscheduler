@@ -66,6 +66,7 @@ public class AttendanceRecordDto
     public string? PassUsed { get; set; }
     public int PassClassNumber { get; set; }
     public bool IsPassActive { get; set; }
+    public bool IsVisible { get; set; } = true;
     
     public string WeekLabel => WeekOffset switch
     {

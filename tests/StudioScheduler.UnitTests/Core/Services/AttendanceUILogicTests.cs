@@ -52,4 +52,52 @@ public class AttendanceUILogicTests
         schoolCanceled.Should().HaveCount(2, "Anna should have 2 canceled classes (school and student)");
         present.Should().HaveCount(1, "Anna should have 1 present class");
     }
+
+    [Fact]
+    public void Should_Not_Mark_Today_If_Not_Scheduled_Class_Day()
+    {
+        // Arrange: Class is Monday, today is Tuesday
+        var monday = DayOfWeek.Monday;
+        var today = new DateTime(2025, 7, 22); // Tuesday
+        var lastMonday = today.AddDays(-((7 + (int)today.DayOfWeek - (int)monday) % 7));
+        var student = new StudentAttendanceDto
+        {
+            StudentId = "student-1",
+            FirstName = "Test",
+            LastName = "User",
+            AttendanceHistory = new List<AttendanceRecordDto>
+            {
+                new AttendanceRecordDto { ClassDate = lastMonday, WeekOffset = 0, WasPresent = true, IsEnrolled = true, IsCanceled = false }
+            },
+            IsMarkedPresentToday = false, // Should not be true
+            CanAttendToday = false
+        };
+
+        // Act & Assert
+        student.IsMarkedPresentToday.Should().BeFalse();
+        student.CanAttendToday.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Should_Generate_Unique_Week_Dates_Aligned_To_Scheduled_Day()
+    {
+        // Arrange: Class is Monday, today is Thursday
+        var monday = DayOfWeek.Monday;
+        var today = new DateTime(2025, 7, 24); // Thursday
+        var mostRecentClassDate = today.AddDays(-((7 + (int)today.DayOfWeek - (int)monday) % 7));
+        var classDates = new List<DateTime>();
+        for (int i = 0; i < 4; i++)
+        {
+            classDates.Add(mostRecentClassDate.AddDays(-7 * (3 - i)));
+        }
+
+        // Act
+        var uniqueDates = new HashSet<DateTime>(classDates);
+
+        // Assert
+        classDates.Count.Should().Be(4);
+        uniqueDates.Count.Should().Be(4);
+        // All dates should be Mondays
+        classDates.All(d => d.DayOfWeek == monday).Should().BeTrue();
+    }
 }

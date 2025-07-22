@@ -14,7 +14,6 @@ public class EnrollmentRepository : IEnrollmentRepository
         _context = context;
     }
 
-    // CUSTOM EXCEPTIONS FOR DUPLICATE PREVENTION
     public class DuplicateEnrollmentException : Exception
     {
         public Guid StudentId { get; }
@@ -28,41 +27,13 @@ public class EnrollmentRepository : IEnrollmentRepository
         }
     }
 
-    public async Task<Enrollment?> GetByIdAsync(Guid id)
-    {
-        return await _context.Enrollments
-            .Include(e => e.Student)
-            .Include(e => e.Schedule)
-            .ThenInclude(s => s.DanceClass)
-            .Include(e => e.Schedule)
-            .ThenInclude(s => s.Room)
-            .ThenInclude(r => r.Location)
-            .Include(e => e.Schedule)
-            .ThenInclude(s => s.Instructor)
-            .FirstOrDefaultAsync(e => e.Id == id);
-    }
-
-    public async Task<IEnumerable<Enrollment>> GetAllAsync()
-    {
-        return await _context.Enrollments
-            .Include(e => e.Student)
-            .Include(e => e.Schedule)
-            .ThenInclude(s => s.DanceClass)
-            .Include(e => e.Schedule)
-            .ThenInclude(s => s.Room)
-            .ThenInclude(r => r.Location)
-            .Include(e => e.Schedule)
-            .ThenInclude(s => s.Instructor)
-            .ToListAsync();
-    }
-
     public async Task<Enrollment> CreateAsync(Enrollment enrollment)
     {
         // DUPLICATE PREVENTION: Check for existing active enrollment
-        var existingEnrollment = await GetActiveByStudentAndScheduleAsync(
+        var existingEnrollment = await HasActiveEnrollmentAsync(
             enrollment.StudentId, enrollment.ScheduleId);
-        
-        if (existingEnrollment != null)
+
+        if (existingEnrollment)
         {
             throw new DuplicateEnrollmentException(
                 $"Active enrollment already exists for Student {enrollment.StudentId} and Schedule {enrollment.ScheduleId}",
@@ -74,62 +45,32 @@ public class EnrollmentRepository : IEnrollmentRepository
         return enrollment;
     }
 
-    public async Task<IEnumerable<Enrollment>> CreateBatchAsync(IEnumerable<Enrollment> enrollments)
-    {
-        // DUPLICATE PREVENTION: Validate each enrollment before batch creation
-        foreach (var enrollment in enrollments)
-        {
-            var existingEnrollment = await GetActiveByStudentAndScheduleAsync(
-                enrollment.StudentId, enrollment.ScheduleId);
-            
-            if (existingEnrollment != null)
-            {
-                throw new DuplicateEnrollmentException(
-                    $"Active enrollment already exists for Student {enrollment.StudentId} and Schedule {enrollment.ScheduleId}",
-                    enrollment.StudentId, enrollment.ScheduleId);
-            }
-        }
-        
-        _context.Enrollments.AddRange(enrollments);
-        await _context.SaveChangesAsync();
-        return enrollments;
-    }
-
-    // NEW METHOD: Get active enrollment for student and schedule
-    public async Task<Enrollment?> GetActiveByStudentAndScheduleAsync(Guid studentId, Guid scheduleId)
-    {
-        return await _context.Enrollments
-            .FirstOrDefaultAsync(e => e.StudentId == studentId 
-                                && e.ScheduleId == scheduleId 
-                                && e.IsActive);
-    }
-
-    // NEW METHOD: Create or reactivate enrollment (single enrollment logic)
     public async Task<Enrollment> CreateOrReactivateAsync(Enrollment newEnrollment)
     {
-        // Check for ANY existing enrollment (active or inactive)
-        var existingEnrollment = await _context.Enrollments
-            .FirstOrDefaultAsync(e => e.StudentId == newEnrollment.StudentId 
-                                && e.ScheduleId == newEnrollment.ScheduleId);
-        
-        if (existingEnrollment != null)
+        Enrollment? existingEnrollment = await GetExistingEnrollment(newEnrollment.StudentId, newEnrollment.ScheduleId);
+
+        if (existingEnrollment is null)
         {
-            // REACTIVATION LOGIC: Update existing enrollment
-            existingEnrollment.IsActive = true;
-            existingEnrollment.EnrolledDate = newEnrollment.EnrolledDate;
-            existingEnrollment.UpdatedAt = DateTime.UtcNow;
-            
-            await _context.SaveChangesAsync();
-            return existingEnrollment;
+            return await CreateAsync(newEnrollment);
         }
         else
         {
-            // CREATE NEW: No existing enrollment found
-            return await CreateAsync(newEnrollment);
+            existingEnrollment.IsActive = true;
+            existingEnrollment.EnrolledDate = newEnrollment.EnrolledDate;
+            existingEnrollment.UpdatedAt = DateTime.UtcNow;
+
+            return await UpdateAsync(existingEnrollment);
         }
     }
 
-    // NEW METHOD: Check if active enrollment exists
+    private async Task<Enrollment?> GetExistingEnrollment(Guid studentId, Guid scheduleId)
+    {
+        // Check for ANY existing enrollment (active or inactive)
+        return await _context.Enrollments
+            .FirstOrDefaultAsync(e => e.StudentId == studentId
+                                && e.ScheduleId == scheduleId);
+    }
+
     public async Task<bool> HasActiveEnrollmentAsync(Guid studentId, Guid scheduleId)
     {
         return await _context.Enrollments
@@ -138,17 +79,7 @@ public class EnrollmentRepository : IEnrollmentRepository
                         && e.IsActive);
     }
 
-    // NEW METHOD: Get distinct student count for schedule (proper capacity calculation)
-    public async Task<int> GetDistinctStudentCountAsync(Guid scheduleId)
-    {
-        return await _context.Enrollments
-            .Where(e => e.ScheduleId == scheduleId && e.IsActive)
-            .Select(e => e.StudentId)
-            .Distinct()
-            .CountAsync();
-    }
-
-    // NEW METHOD: Get all active enrollments for schedule (distinct students only)
+    // Get all active enrollments for schedule (distinct students only)
     public async Task<IEnumerable<Enrollment>> GetActiveEnrollmentsByScheduleAsync(Guid scheduleId)
     {
         return await _context.Enrollments

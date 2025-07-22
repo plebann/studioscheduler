@@ -1,15 +1,7 @@
 using System.Net.Http.Json;
 using StudioScheduler.Shared.Dtos;
-using StudioScheduler.Core.Enums;
 
 namespace StudioScheduler.Client.Services;
-
-public interface IPassService
-{
-    Task<List<object>> GetMonthlyPassTypesAsync();
-    Task<PassPurchaseResponseDto> PurchasePassAsync(BuyPassRequestDto request);
-    Task<PassDto?> GetCurrentActivePassAsync(Guid userId);
-}
 
 public class PassService : IPassService
 {

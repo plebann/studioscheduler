@@ -194,7 +194,7 @@ public class PassService : IPassService
                 Id = Guid.NewGuid(),
                 StudentId = studentId,
                 ScheduleId = scheduleId,
-                EnrolledDate = startDate, // Use actual start date, not current time
+                EnrolledDate = startDate,
                 IsActive = true
             };
             

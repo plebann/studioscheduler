@@ -45,15 +45,17 @@
                 <MudPaper Class="pa-2" Elevation="1">
                     @if (FilteredStudents.Any())
                     {
-                        <MudList T="string">
-                            @foreach (var student in FilteredStudents)
-                            {
-                                <StudentAttendanceRow Student="student" 
-                                                    ScheduleId="@ScheduleId"
-                                                    OnAttendanceChanged="OnAttendanceChanged" />
-                                <MudDivider />
-                            }
-                        </MudList>
+                        <CascadingValue Value="@ClassAttendance?.DayOfWeek">
+                            <MudList T="string">
+                                @foreach (var student in FilteredStudents)
+                                {
+                                    <StudentAttendanceRow Student="student" 
+                                                        ScheduleId="@ScheduleId"
+                                                        OnAttendanceChanged="OnAttendanceChanged" />
+                                    <MudDivider />
+                                }
+                            </MudList>
+                        </CascadingValue>
                     }
                     else
                     {

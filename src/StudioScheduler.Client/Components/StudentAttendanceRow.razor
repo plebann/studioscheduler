@@ -20,18 +20,31 @@
             <!-- Historical Attendance -->
             @foreach (var record in Student.AttendanceHistory.OrderBy(r => r.WeekOffset))
             {
-                <MudTooltip Text="@GetTooltipText(record)">
-                    <MudChip T="string" 
-                             Color="@GetAttendanceColor(record)" 
-                             Size="Size.Small" 
-                             Variant="Variant.Filled"
-                             Style="@GetChipStyle(record)">
-                        @record.WeekLabel
-                    </MudChip>
-                </MudTooltip>
+                // Hide 'Today' flag if today is scheduled class day and checkbox is visible (attendance not yet marked)
+                if (record.WeekLabel == "Today" && !Student.IsMarkedPresentToday && DateTime.Today.DayOfWeek == GetScheduledClassDay())
+                {
+                    <MudChip T="string" Size="Size.Small" Class="attendance-chip-invisible">&nbsp;</MudChip>
+                    continue;
+                }
+                if (record.IsVisible)
+                {
+                    <MudTooltip Text="@GetTooltipText(record)">
+                        <MudChip T="string" 
+                                 Color="@GetAttendanceColor(record)" 
+                                 Size="Size.Small" 
+                                 Variant="Variant.Filled"
+                                 Class="@GetChipClass(record)">
+                            @record.WeekLabel
+                        </MudChip>
+                    </MudTooltip>
+                }
+                else
+                {
+                    <MudChip T="string" Size="Size.Small" Class="attendance-chip-invisible">&nbsp;</MudChip>
+                }
             }
-            <!-- Today's Attendance Checkbox - Only show if not yet marked present -->
-            @if (!Student.IsMarkedPresentToday && Student.CurrentPass != null && Student.CurrentPass.IsActive && !Student.CurrentPass.IsExpired)
+            <!-- Today's Attendance Checkbox - Only show if not yet marked present and today is scheduled class day -->
+            @if (!Student.IsMarkedPresentToday && Student.CurrentPass != null && Student.CurrentPass.IsActive && !Student.CurrentPass.IsExpired && DateTime.Today.DayOfWeek == GetScheduledClassDay())
             {
                 <MudTooltip Text="Mark present for today's class">
                     <MudCheckBox T="bool"
@@ -42,19 +55,7 @@
                                 Disabled="@(!Student.CanAttendToday)" />
                 </MudTooltip>
             }
-            else
-            {
-                <!-- Show present indicator when already marked -->
-                <MudTooltip Text="Marked present for today's class">
-                    <MudChip T="string" 
-                             Color="Color.Success" 
-                             Size="Size.Small" 
-                             Variant="Variant.Filled"
-                             Icon="Icons.Material.Filled.CheckCircle">
-                        Present
-                    </MudChip>
-                </MudTooltip>
-            }
+            <!-- No extra Present chip if today is not scheduled class day -->
             
             <!-- Pass Information -->
             @if (Student.CurrentPass != null)
@@ -95,6 +96,8 @@
     [Parameter] public StudentAttendanceDto Student { get; set; } = null!;
     [Parameter] public string ScheduleId { get; set; } = string.Empty;
     [Parameter] public EventCallback<(string StudentId, bool IsPresent)> OnAttendanceChanged { get; set; }
+
+    [CascadingParameter] public string? ScheduledDayOfWeek { get; set; } // Now received via CascadingValue
 
     private async Task OnAttendanceToggle(bool isChecked)
     {
@@ -181,12 +184,20 @@
         return "No Pass";
     }
 
-    private string GetChipStyle(AttendanceRecordDto record)
+    private string GetChipClass(AttendanceRecordDto record)
     {
         if (record.IsCanceled)
-            return "background-color: #f5f5f5; border: 2px solid red;"; // Light-gray bg, red border
+            return "attendance-chip-canceled";
         if (!record.IsEnrolled)
-            return "background-color: #fff; border: 2px solid gray;"; // White bg, gray border
-        return "";
+            return "attendance-chip-notenrolled";
+        return string.Empty;
+    }
+
+    private DayOfWeek GetScheduledClassDay()
+    {
+        // Try to get from parent, fallback to Monday
+        if (ScheduledDayOfWeek != null && Enum.TryParse<DayOfWeek>(ScheduledDayOfWeek, out var day))
+            return day;
+        return DayOfWeek.Monday;
     }
 }

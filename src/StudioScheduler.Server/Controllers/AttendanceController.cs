@@ -62,13 +62,13 @@ public class AttendanceController : ControllerBase
             var today = DateTime.Today;
             var classDayOfWeek = schedule.DayOfWeek;
             var classDates = new List<DateTime>();
-            for (int i = 3; i >= 0; i--)
+            var mostRecentClassDate = today.AddDays(-((7 + (int)today.DayOfWeek - (int)classDayOfWeek) % 7));
+            for (int i = 0; i < 4; i++)
             {
-                var weekStart = today.AddDays(-7 * i);
-                var classDate = weekStart.AddDays(((int)classDayOfWeek - (int)weekStart.DayOfWeek + 7) % 7);
-                if (classDate > today) classDate = classDate.AddDays(-7); // Don't go into the future
-                classDates.Add(classDate);
+                classDates.Add(mostRecentClassDate.AddDays(-7 * (3 - i)));
             }
+            // Determine if the most recent class date is today
+            bool mostRecentIsToday = mostRecentClassDate == today;
 
             foreach (var enrollment in distinctEnrollments)
             {
@@ -92,23 +92,30 @@ public class AttendanceController : ControllerBase
                 for (int i = 0; i < classDates.Count; i++)
                 {
                     var classDate = classDates[i];
-                    var weekOffset = -(3 - i);
+                    int weekOffset;
+                    if (mostRecentIsToday)
+                    {
+                        weekOffset = 1 - (3 - i);
+                    }
+                    else
+                    {
+                        weekOffset = -(3 - i);
+                    }
 
                     // Was the student enrolled for this week?
                     bool isEnrolled = enrollment.EnrolledDate.Date <= classDate.Date && enrollment.IsActive;
 
                     // --- New cancellation logic ---
-                    // 1. Check for global (school-wide) cancellation
                     var allAttendanceForDate = await _attendanceRepository.GetByScheduleAndDateAsync(scheduleGuid, classDate);
                     bool isCanceled = allAttendanceForDate.Any(a => a.StudentId == null && a.IsCanceled);
-
-                    // 2. If not globally canceled, check for student-specific cancellation
                     if (!isCanceled)
                         isCanceled = allAttendanceForDate.Any(a => a.StudentId == enrollment.StudentId && a.IsCanceled);
 
-                    // Was the student present?
                     var attendance = attendanceHistory.FirstOrDefault(a => a.ClassDate.Date == classDate.Date);
                     bool wasPresent = attendance?.WasPresent ?? false;
+
+                    // Determine pass validity for this week
+                    bool hasValidPass = allPasses.Any(p => p.StartDate <= classDate && p.EndDate >= classDate);
 
                     attendanceRecords.Add(new AttendanceRecordDto
                     {
@@ -119,12 +126,15 @@ public class AttendanceController : ControllerBase
                         IsCanceled = isCanceled,
                         PassUsed = attendance?.PassUsed?.ToString(),
                         PassClassNumber = attendance?.PassClassNumber ?? 0,
-                        IsPassActive = attendance?.Pass?.IsActive ?? false
+                        IsPassActive = attendance?.Pass?.IsActive ?? false,
+                        IsVisible = hasValidPass
                     });
                 }
 
-                // Check if student is marked present for today
-                var isMarkedPresentToday = attendanceHistory.Any(a => a.ClassDate.Date == today && a.WasPresent);
+                // Only set IsMarkedPresentToday and CanAttendToday if today is the scheduled class day
+                bool isClassToday = today.DayOfWeek == classDayOfWeek;
+                var isMarkedPresentToday = isClassToday && attendanceHistory.Any(a => a.ClassDate.Date == today && a.WasPresent);
+                var canAttendToday = isClassToday && hasActivePass;
 
                 // Determine attendance note based on pass status
                 string? attendanceNote = null;
@@ -141,7 +151,7 @@ public class AttendanceController : ControllerBase
                     FirstName = student.FirstName,
                     LastName = student.LastName,
                     IsMarkedPresentToday = isMarkedPresentToday,
-                    CanAttendToday = hasActivePass,
+                    CanAttendToday = canAttendToday,
                     AttendanceNote = attendanceNote,
                     CurrentPass = passToDisplay != null ? new StudentPassDto
                     {
@@ -155,7 +165,7 @@ public class AttendanceController : ControllerBase
                         Price = 200.00m,
                         IsActive = passToDisplay.IsActive,
                         IsExpired = passToDisplay.EndDate < DateTime.UtcNow,
-                        ClassesUsedForThisClass = attendanceHistory.Count(a => a.WasPresent),
+                        ClassesUsedForThisClass = attendanceHistory.Count(),
                         MaxClassesForThisClassType = passToDisplay.TotalClasses
                     } : null,
                     AttendanceHistory = attendanceRecords

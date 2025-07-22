@@ -1,3 +1,17 @@
 /* Studio Scheduler - Compiled from SCSS */
 /* Import the compiled main SCSS file */
 @import '../scss/main.css';
+
+/* Attendance chip styles for StudentAttendanceRow */
+.attendance-chip-canceled {
+    background-color: #f5f5f5 !important;
+    border: 2px solid red !important;
+}
+.attendance-chip-notenrolled {
+    background-color: #fff !important;
+    border: 2px solid gray !important;
+}
+.attendance-chip-invisible {
+    visibility: hidden;
+    width: 56px;
+}
