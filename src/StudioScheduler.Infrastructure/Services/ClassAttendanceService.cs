@@ -11,19 +11,22 @@ public class ClassAttendanceService : IClassAttendanceService
     private readonly IStudentRepository _studentRepository;
     private readonly IEnrollmentRepository _enrollmentRepository;
     private readonly IAttendanceRepository _attendanceRepository;
+    private readonly IPassRepository _passRepository;
 
     public ClassAttendanceService(
         IScheduleRepository scheduleRepository,
         IDanceClassRepository danceClassRepository,
         IStudentRepository studentRepository,
         IEnrollmentRepository enrollmentRepository,
-        IAttendanceRepository attendanceRepository)
+        IAttendanceRepository attendanceRepository,
+        IPassRepository passRepository)
     {
         _scheduleRepository = scheduleRepository;
         _danceClassRepository = danceClassRepository;
         _studentRepository = studentRepository;
         _enrollmentRepository = enrollmentRepository;
         _attendanceRepository = attendanceRepository;
+        _passRepository = passRepository;
     }
 
     public async Task<Schedule?> GetClassAttendanceAsync(Guid scheduleId)
@@ -137,5 +140,13 @@ public class ClassAttendanceService : IClassAttendanceService
         
         // Return the next class number (count of existing + 1)
         return attendanceRecords.Count() + 1;
+    }
+
+    public async Task<IEnumerable<Enrollment>> GetActiveEnrollmentsForScheduleAsync(Guid scheduleId)
+    {
+        var enrollments = await _enrollmentRepository.GetByScheduleIdAsync(scheduleId);
+        var activePasses = await _passRepository.GetActivePassesAsync();
+        var now = DateTime.UtcNow;
+        return enrollments.Where(e => activePasses.Any(p => p.UserId == e.StudentId && p.IsActive && p.StartDate <= now && p.EndDate >= now));
     }
 }

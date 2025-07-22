@@ -291,7 +291,6 @@ public class DataSeedingService
                     StudentId = Guid.Parse(enrollmentData.StudentId),
                     ScheduleId = Guid.Parse(enrollmentData.ScheduleId),
                     EnrolledDate = enrollmentData.EnrolledDate,
-                    IsActive = enrollmentData.IsActive,
                     CreatedAt = enrollmentData.EnrolledDate
                 };
                 _context.Enrollments.Add(enrollment);
@@ -414,6 +413,5 @@ public class DataSeedingService
         public string DayOfWeek { get; set; } = string.Empty;
         public DateTime StartTime { get; set; }
         public DateTime EnrolledDate { get; set; }
-        public bool IsActive { get; set; }
     }
 }

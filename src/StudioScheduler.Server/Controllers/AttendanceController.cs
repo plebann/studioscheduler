@@ -50,16 +50,18 @@ public class AttendanceController : ControllerBase
             if (schedule == null)
                 return NotFound($"Schedule not found for ID {scheduleId}");
 
-            var enrollments = await _enrollmentRepository.GetActiveEnrollmentsByScheduleAsync(scheduleGuid);
+            var enrollments = await _enrollmentRepository.GetByScheduleIdAsync(scheduleGuid);
             var enrolledStudents = new List<StudentAttendanceDto>();
 
-            var distinctEnrollments = enrollments
+            var today = DateTime.Today;
+            // Use only enrollments with a valid pass (active, valid period)
+            var validEnrollments = enrollments.Where(e => e.Pass != null && e.Pass.IsActive && e.Pass.StartDate <= today && e.Pass.EndDate >= today).ToList();
+            var distinctEnrollments = validEnrollments
                 .GroupBy(e => e.StudentId)
                 .Select(g => g.OrderByDescending(e => e.EnrolledDate).First())
                 .ToList();
 
             // Calculate the last 4 calendar weeks' class dates (including this week)
-            var today = DateTime.Today;
             var classDayOfWeek = schedule.DayOfWeek;
             var classDates = new List<DateTime>();
             var mostRecentClassDate = today.AddDays(-((7 + (int)today.DayOfWeek - (int)classDayOfWeek) % 7));
@@ -87,7 +89,6 @@ public class AttendanceController : ControllerBase
                 var isPassExpired = currentPass != null && currentPass.EndDate < DateTime.UtcNow;
                 var hasActivePass = currentPass?.IsActive == true && !isPassExpired;
 
-                // Attendance per week logic
                 var attendanceRecords = new List<AttendanceRecordDto>();
                 for (int i = 0; i < classDates.Count; i++)
                 {
@@ -102,10 +103,8 @@ public class AttendanceController : ControllerBase
                         weekOffset = -(3 - i);
                     }
 
-                    // Was the student enrolled for this week?
-                    bool isEnrolled = enrollment.EnrolledDate.Date <= classDate.Date && enrollment.IsActive;
+                    bool isEnrolled = enrollment.EnrolledDate.Date <= classDate.Date;
 
-                    // --- New cancellation logic ---
                     var allAttendanceForDate = await _attendanceRepository.GetByScheduleAndDateAsync(scheduleGuid, classDate);
                     bool isCanceled = allAttendanceForDate.Any(a => a.StudentId == null && a.IsCanceled);
                     if (!isCanceled)
@@ -114,7 +113,6 @@ public class AttendanceController : ControllerBase
                     var attendance = attendanceHistory.FirstOrDefault(a => a.ClassDate.Date == classDate.Date);
                     bool wasPresent = attendance?.WasPresent ?? false;
 
-                    // Determine pass validity for this week
                     bool hasValidPass = allPasses.Any(p => p.StartDate <= classDate && p.EndDate >= classDate);
 
                     attendanceRecords.Add(new AttendanceRecordDto

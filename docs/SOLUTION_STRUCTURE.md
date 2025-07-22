@@ -140,6 +140,7 @@ Based on analysis of https://salsame.pl/en/price-list/, our system models a real
 - ✅ **PassType enum** (needs expansion for SalsaMe types)
 - ✅ **Enhanced Schedule Model** with DayOfWeek + TimeSpan for weekly recurring patterns (2025-06-19)
 - ✅ **Comprehensive Test Coverage** - All 112 tests passing across all test projects
+- ✅ **Enrollment activity is now determined by Pass state**: Only students with an active, valid Pass are considered enrolled and eligible to attend classes. The `IsActive` property has been removed from Enrollment, and all logic now checks Pass validity (2024-07 update).
 - ❌ **Pricing system** not implemented
 - ❌ **28-day validity calculation** not implemented
 - ❌ **Make-up class tracking** not implemented

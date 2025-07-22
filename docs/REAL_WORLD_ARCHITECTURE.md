@@ -18,6 +18,13 @@ Studio Scheduler is designed around real-world dance studio operations, where th
 - **Instructor assignment**: Can change due to availability, substitution, etc.
 - **Time and location**: Specific weekly schedule in a particular room
 
+### Pass System and Enrollment Validity (2024-07 Update)
+**Purpose**: Models real-world access control and eligibility for class participation
+- **Enrollment activity is now determined by Pass state**: Only students with an active, valid Pass (`Pass.IsActive`, `Pass.StartDate`, `Pass.EndDate`) are considered enrolled and eligible to attend classes.
+- **Removed Enrollment.IsActive**: The `IsActive` property was removed from the Enrollment entity and database. All logic now checks Pass validity.
+- **Business Alignment**: This change ensures that only students with a valid Pass can attend classes, matching SalsaMe's business rules and improving data integrity.
+- **See also**: `SALSAME_BUSINESS_ANALYSIS.md` and `SOLUTION_STRUCTURE.md` for compliance and implementation details.
+
 ## Real-World Business Scenarios
 
 ### Scenario 1: Adding New Bachata P1 Classes
@@ -62,6 +69,7 @@ Studio Scheduler is designed around real-world dance studio operations, where th
 - **Schedule** → **Room**: Each group is held in a specific room
 - **Enrollment** → **Schedule**: Students enroll in specific groups
 - **Attendance** → **Schedule**: Attendance is tracked per group session
+- **Enrollment** → **Pass**: Enrollment validity is now determined by Pass state (2024-07)
 
 ### Constraints
 - Group level must be valid (P1, P2, P3, S1, S2, S3)
@@ -69,4 +77,4 @@ Studio Scheduler is designed around real-world dance studio operations, where th
 - Room must be available at the scheduled time
 - Group capacity must not exceed room capacity
 
-This architecture supports the dynamic nature of dance studio operations while maintaining data integrity and providing clear business logic for common scenarios. 
+This architecture supports the dynamic nature of dance studio operations while maintaining data integrity and providing clear business logic for common scenarios.

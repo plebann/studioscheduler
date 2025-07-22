@@ -194,8 +194,7 @@ public class PassService : IPassService
                 Id = Guid.NewGuid(),
                 StudentId = studentId,
                 ScheduleId = scheduleId,
-                EnrolledDate = startDate,
-                IsActive = true
+                EnrolledDate = startDate
             };
             
             var createdEnrollment = await _enrollmentRepository.CreateOrReactivateAsync(enrollment);
@@ -205,6 +204,14 @@ public class PassService : IPassService
         var createdPass = await _passRepository.AddAsync(pass);
 
         return createdPass;
+    }
+
+    public async Task<IEnumerable<Enrollment>> GetValidEnrollmentsForStudentAsync(Guid studentId)
+    {
+        var enrollments = await _enrollmentRepository.GetByStudentIdAsync(studentId);
+        var activePasses = await _passRepository.GetActivePassesAsync();
+        var now = DateTime.UtcNow;
+        return enrollments.Where(e => activePasses.Any(p => p.UserId == e.StudentId && p.IsActive && p.StartDate <= now && p.EndDate >= now));
     }
 
     // Private helper methods

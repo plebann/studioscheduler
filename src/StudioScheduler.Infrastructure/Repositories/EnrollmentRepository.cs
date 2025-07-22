@@ -29,14 +29,14 @@ public class EnrollmentRepository : IEnrollmentRepository
 
     public async Task<Enrollment> CreateAsync(Enrollment enrollment)
     {
-        // DUPLICATE PREVENTION: Check for existing active enrollment
-        var existingEnrollment = await HasActiveEnrollmentAsync(
+        // DUPLICATE PREVENTION: Check for existing enrollment for this student and schedule
+        var existingEnrollment = await GetExistingEnrollment(
             enrollment.StudentId, enrollment.ScheduleId);
 
-        if (existingEnrollment)
+        if (existingEnrollment != null)
         {
             throw new DuplicateEnrollmentException(
-                $"Active enrollment already exists for Student {enrollment.StudentId} and Schedule {enrollment.ScheduleId}",
+                $"Enrollment already exists for Student {enrollment.StudentId} and Schedule {enrollment.ScheduleId}",
                 enrollment.StudentId, enrollment.ScheduleId);
         }
         
@@ -55,44 +55,19 @@ public class EnrollmentRepository : IEnrollmentRepository
         }
         else
         {
-            existingEnrollment.IsActive = true;
+            // Reactivation logic: just update EnrolledDate and UpdatedAt
             existingEnrollment.EnrolledDate = newEnrollment.EnrolledDate;
             existingEnrollment.UpdatedAt = DateTime.UtcNow;
-
             return await UpdateAsync(existingEnrollment);
         }
     }
 
     private async Task<Enrollment?> GetExistingEnrollment(Guid studentId, Guid scheduleId)
     {
-        // Check for ANY existing enrollment (active or inactive)
+        // Check for ANY existing enrollment
         return await _context.Enrollments
             .FirstOrDefaultAsync(e => e.StudentId == studentId
                                 && e.ScheduleId == scheduleId);
-    }
-
-    public async Task<bool> HasActiveEnrollmentAsync(Guid studentId, Guid scheduleId)
-    {
-        return await _context.Enrollments
-            .AnyAsync(e => e.StudentId == studentId 
-                        && e.ScheduleId == scheduleId 
-                        && e.IsActive);
-    }
-
-    // Get all active enrollments for schedule (distinct students only)
-    public async Task<IEnumerable<Enrollment>> GetActiveEnrollmentsByScheduleAsync(Guid scheduleId)
-    {
-        return await _context.Enrollments
-            .Where(e => e.ScheduleId == scheduleId && e.IsActive)
-            .Include(e => e.Student)
-            .Include(e => e.Schedule)
-            .ThenInclude(s => s.DanceClass)
-            .Include(e => e.Schedule)
-            .ThenInclude(s => s.Room)
-            .ThenInclude(r => r.Location)
-            .Include(e => e.Schedule)
-            .ThenInclude(s => s.Instructor)
-            .ToListAsync();
     }
 
     public async Task<Enrollment> UpdateAsync(Enrollment enrollment)
@@ -187,5 +162,20 @@ public class EnrollmentRepository : IEnrollmentRepository
     public async Task SaveChangesAsync()
     {
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<Enrollment>> GetValidEnrollmentsForScheduleAsync(Guid scheduleId, DbContext context)
+    {
+        // Returns enrollments for a schedule where the linked pass is active and valid
+        return await context.Set<Enrollment>()
+            .Include(e => e.Student)
+            .Include(e => e.Schedule)
+            .Include(e => e.Pass)
+            .Where(e => e.ScheduleId == scheduleId &&
+                        e.Pass != null &&
+                        e.Pass.IsActive &&
+                        e.Pass.StartDate <= DateTime.UtcNow &&
+                        e.Pass.EndDate >= DateTime.UtcNow)
+            .ToListAsync();
     }
 }

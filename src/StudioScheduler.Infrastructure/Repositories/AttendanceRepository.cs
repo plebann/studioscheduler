@@ -95,7 +95,7 @@ public class AttendanceRepository : IAttendanceRepository
     public async Task<IEnumerable<Attendance>> GetByScheduleIdAsync(Guid scheduleId)
     {
         return await _context.Attendances
-            .Where(a => a.ScheduleId == scheduleId)
+            .Where(a => a.ScheduleId == scheduleId && a.Schedule != null && a.Schedule.Room != null && a.Schedule.Room.Location != null && a.Schedule.Instructor != null)
             .Include(a => a.Student)
             .Include(a => a.Schedule)
             .ThenInclude(s => s.DanceClass)
@@ -112,7 +112,7 @@ public class AttendanceRepository : IAttendanceRepository
     public async Task<IEnumerable<Attendance>> GetByClassIdAsync(Guid classId)
     {
         return await _context.Attendances
-            .Where(a => a.Schedule != null && a.Schedule.DanceClassId == classId)
+            .Where(a => a.Schedule != null && a.Schedule.DanceClassId == classId && a.Schedule.Room != null && a.Schedule.Room.Location != null && a.Schedule.Instructor != null)
             .Include(a => a.Student)
             .Include(a => a.Schedule)
             .ThenInclude(s => s.DanceClass)
@@ -201,7 +201,7 @@ public class AttendanceRepository : IAttendanceRepository
     public async Task<IEnumerable<Attendance>> GetByInstructorAsync(Guid instructorId)
     {
         return await _context.Attendances
-            .Where(a => a.Schedule != null && a.Schedule.InstructorId == instructorId)
+            .Where(a => a.Schedule != null && a.Schedule.InstructorId != null && a.Schedule.InstructorId == instructorId && a.Schedule.Room != null && a.Schedule.Room.Location != null && a.Schedule.Instructor != null)
             .Include(a => a.Student)
             .Include(a => a.Schedule)
             .ThenInclude(s => s.DanceClass)
@@ -218,7 +218,7 @@ public class AttendanceRepository : IAttendanceRepository
     public async Task<IEnumerable<Attendance>> GetByRoomAsync(Guid roomId)
     {
         return await _context.Attendances
-            .Where(a => a.Schedule != null && a.Schedule.RoomId == roomId)
+            .Where(a => a.Schedule != null && a.Schedule.RoomId != null && a.Schedule.RoomId == roomId && a.Schedule.Room != null && a.Schedule.Room.Location != null && a.Schedule.Instructor != null)
             .Include(a => a.Student)
             .Include(a => a.Schedule)
             .ThenInclude(s => s.DanceClass)
@@ -235,7 +235,7 @@ public class AttendanceRepository : IAttendanceRepository
     public async Task<IEnumerable<Attendance>> GetByLocationAsync(Guid locationId)
     {
         return await _context.Attendances
-            .Where(a => a.Schedule != null && a.Schedule.LocationId == locationId)
+            .Where(a => a.Schedule != null && a.Schedule.LocationId != null && a.Schedule.LocationId == locationId && a.Schedule.Room != null && a.Schedule.Room.Location != null && a.Schedule.Instructor != null)
             .Include(a => a.Student)
             .Include(a => a.Schedule)
             .ThenInclude(s => s.DanceClass)
@@ -252,7 +252,7 @@ public class AttendanceRepository : IAttendanceRepository
     public async Task<IEnumerable<Attendance>> GetByPassAsync(Guid passId)
     {
         return await _context.Attendances
-            .Where(a => a.PassUsed == passId)
+            .Where(a => a.PassUsed != null && a.PassUsed == passId)
             .Include(a => a.Student)
             .Include(a => a.Schedule)
             .ThenInclude(s => s.DanceClass)
@@ -303,7 +303,7 @@ public class AttendanceRepository : IAttendanceRepository
     public async Task<IEnumerable<Attendance>> GetByPassIdAsync(Guid passId)
     {
         return await _context.Attendances
-            .Where(a => a.PassUsed == passId)
+            .Where(a => a.PassUsed != null && a.PassUsed == passId)
             .Include(a => a.Student)
             .Include(a => a.Schedule)
             .ThenInclude(s => s.DanceClass)
@@ -320,7 +320,7 @@ public class AttendanceRepository : IAttendanceRepository
     public async Task<IEnumerable<Attendance>> GetByScheduleAndDateAsync(Guid scheduleId, DateTime classDate)
     {
         return await _context.Attendances
-            .Where(a => a.ScheduleId == scheduleId && a.ClassDate.Date == classDate.Date)
+            .Where(a => a.ScheduleId == scheduleId && a.ClassDate.Date == classDate.Date && a.Schedule != null && a.Schedule.Room != null && a.Schedule.Room.Location != null && a.Schedule.Instructor != null)
             .Include(a => a.Student)
             .Include(a => a.Schedule)
             .ThenInclude(s => s.DanceClass)

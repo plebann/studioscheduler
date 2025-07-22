@@ -16,6 +16,4 @@ public interface IEnrollmentRepository
     Task<bool> ExistsAsync(Guid id);
     Task SaveChangesAsync();
     Task<Enrollment> CreateOrReactivateAsync(Enrollment newEnrollment);
-    Task<bool> HasActiveEnrollmentAsync(Guid studentId, Guid scheduleId);
-    Task<IEnumerable<Enrollment>> GetActiveEnrollmentsByScheduleAsync(Guid scheduleId);
 }

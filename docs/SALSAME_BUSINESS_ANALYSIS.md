@@ -66,3 +66,24 @@ Analysis of SalsaMe Dance Studio's actual business model based on their official
 - **Testing & Compliance**: Unit tests cover both cancellation scenarios and edge cases, ensuring the logic aligns with business requirements and is robust against regressions.
 
 ---
+
+## StudioScheduler Pass System Compliance (2024-07 Update)
+
+### Migration to Pass-Based Enrollment Activity
+- **Enrollment activity is now determined by Pass state**: Only students with an active, valid Pass (`Pass.IsActive`, `Pass.StartDate`, `Pass.EndDate`) are considered enrolled for attendance and eligibility.
+- **Removed Enrollment.IsActive**: The `IsActive` property was removed from the Enrollment entity and database. All logic now checks Pass validity.
+- **Business Logic Alignment**: This change ensures that only students with a valid Pass can attend classes, matching SalsaMe's business rules.
+- **Data Integrity**: Orphaned or duplicate enrollments are eliminated, and all attendance/eligibility logic is centralized on Pass state.
+
+### Compliance Summary
+- **Pass Validity**: Fully matches SalsaMe's 28-day validity and active-pass requirement.
+- **Attendance Eligibility**: Only students with a valid Pass can attend or be marked present, as in SalsaMe.
+- **Make-up Classes, Freezing, Level Restrictions**: Not yet implemented in StudioScheduler (see `SOLUTION_STRUCTURE.md` for roadmap).
+- **Pricing System**: Not yet implemented.
+
+### Remaining Gaps
+- **Make-up class tracking, pass freezing, and level restrictions** are not yet implemented in StudioScheduler, but are planned for future phases.
+
+---
+
+**Last reviewed:** 2024-07-21

@@ -32,8 +32,7 @@ public class EnrollmentRepositoryTests : IDisposable
             Id = Guid.NewGuid(),
             StudentId = studentId,
             ScheduleId = scheduleId,
-            EnrolledDate = DateTime.UtcNow,
-            IsActive = true
+            EnrolledDate = DateTime.UtcNow
         };
 
         // Act
@@ -42,11 +41,10 @@ public class EnrollmentRepositoryTests : IDisposable
         // Assert
         Assert.NotNull(result);
         Assert.Equal(enrollment.Id, result.Id);
-        Assert.True(result.IsActive);
     }
 
     [Fact]
-    public async Task CreateAsync_WithExistingActiveEnrollment_ShouldThrowDuplicateException()
+    public async Task CreateAsync_WithExistingEnrollment_ShouldThrowDuplicateException()
     {
         // Arrange
         var studentId = Guid.NewGuid();
@@ -58,7 +56,6 @@ public class EnrollmentRepositoryTests : IDisposable
             StudentId = studentId,
             ScheduleId = scheduleId,
             EnrolledDate = DateTime.UtcNow.AddDays(-1),
-            IsActive = true,
             CreatedAt = DateTime.UtcNow.AddDays(-1)
         };
         
@@ -72,7 +69,6 @@ public class EnrollmentRepositoryTests : IDisposable
             StudentId = studentId,
             ScheduleId = scheduleId,
             EnrolledDate = DateTime.UtcNow,
-            IsActive = true,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -85,7 +81,7 @@ public class EnrollmentRepositoryTests : IDisposable
     }
 
     [Fact]
-    public async Task CreateOrReactivateAsync_WithExistingInactiveEnrollment_ShouldReactivate()
+    public async Task CreateOrReactivateAsync_WithExistingEnrollment_ShouldUpdateDate()
     {
         // Arrange
         var studentId = Guid.NewGuid();
@@ -95,8 +91,7 @@ public class EnrollmentRepositoryTests : IDisposable
             Id = Guid.NewGuid(),
             StudentId = studentId,
             ScheduleId = scheduleId,
-            EnrolledDate = DateTime.UtcNow.AddDays(-7),
-            IsActive = false // Inactive
+            EnrolledDate = DateTime.UtcNow.AddDays(-7)
         };
         
         await _context.Enrollments.AddAsync(existingEnrollment);
@@ -107,8 +102,7 @@ public class EnrollmentRepositoryTests : IDisposable
             Id = Guid.NewGuid(),
             StudentId = studentId,
             ScheduleId = scheduleId,
-            EnrolledDate = DateTime.UtcNow,
-            IsActive = true
+            EnrolledDate = DateTime.UtcNow
         };
 
         // Act
@@ -117,7 +111,6 @@ public class EnrollmentRepositoryTests : IDisposable
         // Assert
         Assert.NotNull(result);
         Assert.Equal(existingEnrollment.Id, result.Id); // Should return existing enrollment
-        Assert.True(result.IsActive); // Should be reactivated
         Assert.Equal(newEnrollmentData.EnrolledDate.Date, result.EnrolledDate.Date); // Should update date
     }
 
@@ -132,8 +125,7 @@ public class EnrollmentRepositoryTests : IDisposable
             Id = Guid.NewGuid(),
             StudentId = studentId,
             ScheduleId = scheduleId,
-            EnrolledDate = DateTime.UtcNow,
-            IsActive = true
+            EnrolledDate = DateTime.UtcNow
         };
 
         // Act
@@ -142,46 +134,6 @@ public class EnrollmentRepositoryTests : IDisposable
         // Assert
         Assert.NotNull(result);
         Assert.Equal(enrollment.Id, result.Id);
-        Assert.True(result.IsActive);
-    }
-
-    [Fact]
-    public async Task HasActiveEnrollmentAsync_WithActiveEnrollment_ShouldReturnTrue()
-    {
-        // Arrange
-        var studentId = Guid.NewGuid();
-        var scheduleId = Guid.NewGuid();
-        var enrollment = new Enrollment
-        {
-            Id = Guid.NewGuid(),
-            StudentId = studentId,
-            ScheduleId = scheduleId,
-            EnrolledDate = DateTime.UtcNow,
-            IsActive = true
-        };
-        
-        await _context.Enrollments.AddAsync(enrollment);
-        await _context.SaveChangesAsync();
-
-        // Act
-        var result = await _repository.HasActiveEnrollmentAsync(studentId, scheduleId);
-
-        // Assert
-        Assert.True(result);
-    }
-
-    [Fact]
-    public async Task HasActiveEnrollmentAsync_WithNoActiveEnrollment_ShouldReturnFalse()
-    {
-        // Arrange
-        var studentId = Guid.NewGuid();
-        var scheduleId = Guid.NewGuid();
-
-        // Act
-        var result = await _repository.HasActiveEnrollmentAsync(studentId, scheduleId);
-
-        // Assert
-        Assert.False(result);
     }
 
     public void Dispose()

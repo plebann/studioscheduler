@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudioScheduler.Infrastructure.Data;
 
@@ -10,9 +11,11 @@ using StudioScheduler.Infrastructure.Data;
 namespace StudioScheduler.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250722200310_RemoveIsActiveFromEnrollment")]
+    partial class RemoveIsActiveFromEnrollment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.6");
@@ -108,9 +111,6 @@ namespace StudioScheduler.Infrastructure.Migrations
                     b.Property<DateTime>("EnrolledDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("PassId")
-                        .HasColumnType("TEXT");
-
                     b.Property<Guid>("ScheduleId")
                         .HasColumnType("TEXT");
 
@@ -121,8 +121,6 @@ namespace StudioScheduler.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PassId");
 
                     b.HasIndex("ScheduleId");
 
@@ -402,10 +400,6 @@ namespace StudioScheduler.Infrastructure.Migrations
 
             modelBuilder.Entity("StudioScheduler.Core.Models.Enrollment", b =>
                 {
-                    b.HasOne("StudioScheduler.Core.Models.Pass", "Pass")
-                        .WithMany()
-                        .HasForeignKey("PassId");
-
                     b.HasOne("StudioScheduler.Core.Models.Schedule", "Schedule")
                         .WithMany("Enrollments")
                         .HasForeignKey("ScheduleId")
@@ -417,8 +411,6 @@ namespace StudioScheduler.Infrastructure.Migrations
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Pass");
 
                     b.Navigation("Schedule");
 

@@ -231,8 +231,7 @@ public static class TestAppFactory
             Id = Guid.Parse("77777777-7777-7777-7777-777777777777"),
             StudentId = testStudent.Id,
             ScheduleId = mondaySchedule.Id,
-            EnrolledDate = DateTime.UtcNow.AddDays(-7),
-            IsActive = true
+            EnrolledDate = DateTime.UtcNow.AddDays(-7)
         };
         
         context.Enrollments.Add(enrollment);
