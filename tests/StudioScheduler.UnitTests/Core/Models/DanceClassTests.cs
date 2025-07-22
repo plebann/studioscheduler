@@ -100,8 +100,7 @@ public class DanceClassTests
             DayOfWeek = DayOfWeek.Monday,
             StartTime = TimeSpan.FromHours(19), // 7 PM
             Duration = 60,
-            Level = "Beginner",
-            Capacity = 20
+            Level = "Beginner"
         };
 
         // Act

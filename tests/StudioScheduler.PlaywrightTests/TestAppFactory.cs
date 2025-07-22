@@ -141,7 +141,6 @@ public static class TestAppFactory
             Name = "Test Studio",
             Address = "123 Test Street, Test City, 12345",
             Description = "Test dance studio for integration tests",
-            Capacity = 100,
             OpeningTime = TimeSpan.FromHours(10), // 10 AM
             ClosingTime = TimeSpan.FromHours(23), // 11 PM
             IsActive = true
@@ -181,9 +180,7 @@ public static class TestAppFactory
             Duration = 60,
             EffectiveFrom = DateTime.UtcNow.AddDays(-30),
             IsActive = true,
-            IsCancelled = false,
-            Level = "Level P1",
-            Capacity = 20
+            Level = "Level P1"
         };
 
         var tuesdaySchedule = new Schedule
@@ -196,9 +193,7 @@ public static class TestAppFactory
             Duration = 60,
             EffectiveFrom = DateTime.UtcNow.AddDays(-30),
             IsActive = true,
-            IsCancelled = false,
-            Level = "Level S2", 
-            Capacity = 15
+            Level = "Level S2"
         };
 
         var wednesdaySchedule = new Schedule
@@ -211,9 +206,7 @@ public static class TestAppFactory
             Duration = 90,
             EffectiveFrom = DateTime.UtcNow.AddDays(-30),
             IsActive = true,
-            IsCancelled = false,
-            Level = "Level P1",
-            Capacity = 18
+            Level = "Level P1"
         };
 
         context.Schedules.AddRange(mondaySchedule, tuesdaySchedule, wednesdaySchedule);

@@ -45,13 +45,6 @@
                                     Min="30" Max="200" Step="15" />
                 </MudItem>
                 
-                <MudItem xs="12" sm="6">
-                    <MudNumericField @bind-Value="Schedule.Capacity" 
-                                    Label="Capacity" 
-                                    Required="true"
-                                    Min="1" Max="50" />
-                </MudItem>
-                
                 <MudItem xs="12">
                     <MudCheckBox T="bool" @bind-Value="Schedule.IsRecurring" 
                                 Label="Recurring Class" />
@@ -82,11 +75,6 @@
                     <MudItem xs="12" sm="6">
                         <MudCheckBox T="bool" @bind-Value="Schedule.IsActive" 
                                     Label="Active" />
-                    </MudItem>
-                    
-                    <MudItem xs="12" sm="6">
-                        <MudCheckBox T="bool" @bind-Value="Schedule.IsCancelled" 
-                                    Label="Cancelled" />
                     </MudItem>
                 }
             </MudGrid>

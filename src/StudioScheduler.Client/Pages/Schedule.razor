@@ -126,11 +126,6 @@ else
         <MudIcon Icon="Icons.Material.Filled.Info" Class="mr-2" />
         View Details
     </MudMenuItem>
-    <MudDivider />
-    <MudMenuItem OnClick="() => CancelSchedule(selectedScheduleId)" color="Color.Warning">
-        <MudIcon Icon="Icons.Material.Filled.Cancel" Class="mr-2" />
-        Cancel Class
-    </MudMenuItem>
 </MudMenu>
 
 <div class="action-buttons">
@@ -267,43 +262,6 @@ else
         contextMenuX = e.ClientX;
         contextMenuY = e.ClientY;
         contextMenuOpen = true;
-    }
-
-    private async Task CancelSchedule(string scheduleId)
-    {
-        contextMenuOpen = false;
-        
-        var parameters = new DialogParameters
-        {
-            ["ContentText"] = "Are you sure you want to cancel this class? This action cannot be undone.",
-            ["ButtonText"] = "Cancel Class",
-            ["Color"] = Color.Warning
-        };
-
-        var options = new DialogOptions() { MaxWidth = MaxWidth.ExtraSmall };
-        var dialog = await DialogService.ShowAsync<ConfirmDialog>("Confirm Cancellation", parameters, options);
-        var result = await dialog.Result;
-
-        if (!result.Canceled)
-        {
-            try
-            {
-                var response = await Http.DeleteAsync($"api/schedules/{scheduleId}");
-                if (response.IsSuccessStatusCode)
-                {
-                    Snackbar.Add("Class cancelled successfully", Severity.Success);
-                    await LoadSchedule();
-                }
-                else
-                {
-                    Snackbar.Add("Failed to cancel class", Severity.Error);
-                }
-            }
-            catch (Exception ex)
-            {
-                Snackbar.Add($"Error cancelling class: {ex.Message}", Severity.Error);
-            }
-        }
     }
 
     private List<string> GetAllTimeSlots()

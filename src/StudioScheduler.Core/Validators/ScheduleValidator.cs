@@ -38,10 +38,6 @@ public class ScheduleValidator : AbstractValidator<Schedule>
             .NotEmpty()
             .WithMessage("Level is required");
 
-        RuleFor(x => x.Capacity)
-            .GreaterThan(0)
-            .WithMessage("Capacity must be positive");
-
         RuleFor(x => x.InstructorId)
             .NotNull()
             .WithMessage("Instructor is required")

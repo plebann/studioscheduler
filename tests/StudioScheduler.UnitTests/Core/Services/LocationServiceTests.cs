@@ -28,7 +28,6 @@ public class LocationServiceTests
             Name = "Main Studio",
             Address = "123 Dance Street",
             Description = "Main dance studio location",
-            Capacity = 100,
             OpeningTime = new TimeSpan(8, 0, 0),
             ClosingTime = new TimeSpan(22, 0, 0)
         };
@@ -74,7 +73,6 @@ public class LocationServiceTests
                 Name = "Studio 1",
                 Address = "Address 1",
                 Description = "Description 1",
-                Capacity = 50,
                 OpeningTime = new TimeSpan(8, 0, 0),
                 ClosingTime = new TimeSpan(22, 0, 0)
             },
@@ -83,7 +81,6 @@ public class LocationServiceTests
                 Name = "Studio 2",
                 Address = "Address 2",
                 Description = "Description 2",
-                Capacity = 75,
                 OpeningTime = new TimeSpan(9, 0, 0),
                 ClosingTime = new TimeSpan(21, 0, 0)
             }
@@ -111,7 +108,6 @@ public class LocationServiceTests
             Name = "New Studio",
             Address = "456 New Street",
             Description = "New studio location",
-            Capacity = 80,
             OpeningTime = new TimeSpan(8, 0, 0),
             ClosingTime = new TimeSpan(22, 0, 0)
         };
@@ -143,7 +139,6 @@ public class LocationServiceTests
             Name = "Updated Studio",
             Address = "789 Updated Street",
             Description = "Updated studio location",
-            Capacity = 90,
             OpeningTime = new TimeSpan(8, 0, 0),
             ClosingTime = new TimeSpan(22, 0, 0)
         };
@@ -290,8 +285,8 @@ public class LocationServiceTests
                 DayOfWeek = DayOfWeek.Monday,
                 StartTime = TimeSpan.FromHours(19), // 7 PM
                 Duration = 60,
-                Level = "Beginner",
-                Capacity = 20
+                Level = "Beginner"
+
             }
         };
 

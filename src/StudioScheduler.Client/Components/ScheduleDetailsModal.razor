@@ -70,9 +70,7 @@
                 IsRecurring = false,
                 EffectiveFrom = DateTime.Now,
                 IsActive = true,
-                IsCancelled = false,
-                Level = "P1",
-                Capacity = 20
+                Level = "P1"
             };
             IsLoading = false;
         }
@@ -135,8 +133,7 @@
                     EffectiveTo = updatedSchedule.EffectiveTo,
                     Level = updatedSchedule.Level,
                     InstructorId = updatedSchedule.InstructorId,
-                    RoomId = updatedSchedule.RoomId,
-                    Capacity = updatedSchedule.Capacity
+                    RoomId = updatedSchedule.RoomId
                 };
                 
                 response = await Http.PostAsJsonAsync("api/schedules", createDto);
@@ -152,11 +149,9 @@
                     EffectiveFrom = updatedSchedule.EffectiveFrom,
                     EffectiveTo = updatedSchedule.EffectiveTo,
                     IsActive = updatedSchedule.IsActive,
-                    IsCancelled = updatedSchedule.IsCancelled,
                     Level = updatedSchedule.Level,
                     InstructorId = updatedSchedule.InstructorId,
-                    RoomId = updatedSchedule.RoomId,
-                    Capacity = updatedSchedule.Capacity
+                    RoomId = updatedSchedule.RoomId
                 };
                 
                 response = await Http.PutAsJsonAsync($"api/schedules/{updatedSchedule.Id}", updateDto);

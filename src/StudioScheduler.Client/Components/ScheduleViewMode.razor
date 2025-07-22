@@ -27,11 +27,6 @@
                                 <strong>Instructor:</strong> @(Schedule.InstructorName ?? "TBD")
                             </MudText>
                         </MudListItem>
-                        <MudListItem T="string">
-                            <MudText Typo="Typo.body2">
-                                <strong>Capacity:</strong> @Schedule.Capacity students
-                            </MudText>
-                        </MudListItem>
                     </MudList>
                 </MudItem>
                 
@@ -79,12 +74,6 @@
                     <MudChip T="string" Color="@(Schedule.IsActive ? Color.Success : Color.Error)" Size="Size.Small">
                         @(Schedule.IsActive ? "Active" : "Inactive")
                     </MudChip>
-                    @if (Schedule.IsCancelled)
-                    {
-                        <MudChip T="string" Color="Color.Warning" Size="Size.Small" Class="ml-2">
-                            Cancelled
-                        </MudChip>
-                    }
                     @if (Schedule.IsRecurring)
                     {
                         <MudChip T="string" Color="Color.Info" Size="Size.Small" Class="ml-2">

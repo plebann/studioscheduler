@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using StudioScheduler.Core.Models;
 
 namespace StudioScheduler.Infrastructure.Data;
@@ -102,5 +103,17 @@ public class ApplicationDbContext : DbContext
             .WithMany()
             .HasForeignKey(a => a.PassUsed)
             .OnDelete(DeleteBehavior.SetNull);
+    }
+}
+
+// Design-time factory for EF Core tools
+public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
+{
+    public ApplicationDbContext CreateDbContext(string[] args)
+    {
+        var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+        // Use SQLite for design-time migration (adjust connection string as needed)
+        optionsBuilder.UseSqlite("Data Source=studioscheduler.db");
+        return new ApplicationDbContext(optionsBuilder.Options);
     }
 }

@@ -31,11 +31,10 @@ public class SchedulesController : ControllerBase
             StartTime = s.StartTime,
             Duration = s.Duration,
             IsActive = s.IsActive,
-            IsCancelled = s.IsCancelled,
             Level = s.Level,
             InstructorName = s.Instructor != null ? $"{s.Instructor.FirstName} {s.Instructor.LastName}" : null,
-            RoomName = s.Room?.Name,
-            Capacity = s.Capacity
+            RoomName = s.Room?.Name
+            // Capacity removed
         });
         
         return Ok(summaries);
@@ -62,7 +61,6 @@ public class SchedulesController : ControllerBase
             StartTime = schedule.StartTime,
             Duration = schedule.Duration,
             IsRecurring = schedule.IsRecurring,
-            IsCancelled = schedule.IsCancelled,
             EffectiveFrom = schedule.EffectiveFrom,
             EffectiveTo = schedule.EffectiveTo,
             IsActive = schedule.IsActive,
@@ -72,8 +70,8 @@ public class SchedulesController : ControllerBase
             InstructorId = schedule.InstructorId,
             InstructorName = schedule.Instructor != null ? $"{schedule.Instructor.FirstName} {schedule.Instructor.LastName}" : null,
             RoomId = schedule.RoomId,
-            RoomName = schedule.Room?.Name,
-            Capacity = schedule.Capacity
+            RoomName = schedule.Room?.Name
+            // Capacity removed
         };
 
         return Ok(scheduleDto);
@@ -94,11 +92,10 @@ public class SchedulesController : ControllerBase
             EffectiveFrom = createDto.EffectiveFrom,
             EffectiveTo = createDto.EffectiveTo,
             IsActive = true,
-            IsCancelled = false,
             Level = createDto.Level,
             InstructorId = createDto.InstructorId,
-            RoomId = createDto.RoomId,
-            Capacity = createDto.Capacity
+            RoomId = createDto.RoomId
+            // Capacity removed
         };
 
         var created = await _scheduleService.CreateAsync(schedule);
@@ -115,7 +112,6 @@ public class SchedulesController : ControllerBase
             StartTime = created.StartTime,
             Duration = created.Duration,
             IsRecurring = created.IsRecurring,
-            IsCancelled = created.IsCancelled,
             EffectiveFrom = created.EffectiveFrom,
             EffectiveTo = created.EffectiveTo,
             IsActive = created.IsActive,
@@ -125,8 +121,8 @@ public class SchedulesController : ControllerBase
             InstructorId = created.InstructorId,
             InstructorName = created.Instructor != null ? $"{created.Instructor.FirstName} {created.Instructor.LastName}" : null,
             RoomId = created.RoomId,
-            RoomName = created.Room?.Name,
-            Capacity = created.Capacity
+            RoomName = created.Room?.Name
+            // Capacity removed
         };
 
         return CreatedAtAction(nameof(GetSchedule), new { id = scheduleDto.Id }, scheduleDto);
@@ -154,13 +150,12 @@ public class SchedulesController : ControllerBase
             EffectiveFrom = updateDto.EffectiveFrom,
             EffectiveTo = updateDto.EffectiveTo,
             IsActive = updateDto.IsActive,
-            IsCancelled = updateDto.IsCancelled,
             CreatedAt = existingSchedule.CreatedAt,
             UpdatedAt = DateTime.UtcNow,
             Level = updateDto.Level,
             InstructorId = updateDto.InstructorId,
-            RoomId = updateDto.RoomId,
-            Capacity = updateDto.Capacity
+            RoomId = updateDto.RoomId
+            // Capacity removed
         };
 
         var updated = await _scheduleService.UpdateAsync(updatedSchedule);
@@ -177,7 +172,6 @@ public class SchedulesController : ControllerBase
             StartTime = updated.StartTime,
             Duration = updated.Duration,
             IsRecurring = updated.IsRecurring,
-            IsCancelled = updated.IsCancelled,
             EffectiveFrom = updated.EffectiveFrom,
             EffectiveTo = updated.EffectiveTo,
             IsActive = updated.IsActive,
@@ -187,8 +181,8 @@ public class SchedulesController : ControllerBase
             InstructorId = updated.InstructorId,
             InstructorName = updated.Instructor != null ? $"{updated.Instructor.FirstName} {updated.Instructor.LastName}" : null,
             RoomId = updated.RoomId,
-            RoomName = updated.Room?.Name,
-            Capacity = updated.Capacity
+            RoomName = updated.Room?.Name
+            // Capacity removed
         };
 
         return Ok(scheduleDto);
@@ -210,7 +204,7 @@ public class SchedulesController : ControllerBase
     public async Task<ActionResult<WeeklyScheduleDto>> GetWeeklySchedule()
     {
         var schedules = await _scheduleService.GetAllAsync();
-        var activeSchedules = schedules.Where(s => s.IsActive && !s.IsCancelled).ToList();
+        var activeSchedules = schedules.Where(s => s.IsActive).ToList();
 
         // Load all dance classes to get the proper information
         var danceClasses = await _danceClassService.GetAllAsync();
@@ -258,7 +252,6 @@ public class SchedulesController : ControllerBase
                 Style = displayStyle,
                 BackgroundColor = backgroundColor,
                 EffectiveFrom = schedule.EffectiveFrom.ToString("dd.MM.yyyy"),
-                IsCancelled = schedule.IsCancelled,
                 IsActive = schedule.IsActive
             };
 

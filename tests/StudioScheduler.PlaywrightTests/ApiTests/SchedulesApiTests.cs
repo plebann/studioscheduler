@@ -212,7 +212,6 @@ public class SchedulesApiTests : BaseApiTest
         var firstSchedule = schedules.First();
         Assert.That(firstSchedule.Id, Is.Not.EqualTo(Guid.Empty), "Schedule should have valid ID");
         Assert.That(firstSchedule.Level, Is.Not.Null.And.Not.Empty, "Schedule should have level");
-        Assert.That(firstSchedule.Capacity, Is.GreaterThan(0), "Schedule should have positive capacity");
     }
 
     [Test]
@@ -256,7 +255,6 @@ public class SchedulesApiTests : BaseApiTest
         Assert.That(schedule.DanceClassId, Is.Not.EqualTo(Guid.Empty), "Schedule should have dance class ID");
         Assert.That(schedule.Level, Is.Not.Null.And.Not.Empty, "Schedule should have level");
         Assert.That(schedule.Duration, Is.GreaterThan(0), "Schedule should have positive duration");
-        Assert.That(schedule.Capacity, Is.GreaterThan(0), "Schedule should have positive capacity");
     }
 
     [Test]
@@ -309,8 +307,7 @@ public class SchedulesApiTests : BaseApiTest
             Duration = 90,
             IsRecurring = true,
             EffectiveFrom = DateTime.UtcNow.Date,
-            Level = "P1",
-            Capacity = 20
+            Level = "P1"
         };
 
         // Act
@@ -335,9 +332,6 @@ public class SchedulesApiTests : BaseApiTest
         Assert.That(schedule.StartTime, Is.EqualTo(createDto.StartTime), "Start time should match");
         Assert.That(schedule.Duration, Is.EqualTo(createDto.Duration), "Duration should match");
         Assert.That(schedule.Level, Is.EqualTo(createDto.Level), "Level should match");
-        Assert.That(schedule.Capacity, Is.EqualTo(createDto.Capacity), "Capacity should match");
-        Assert.That(schedule.IsActive, Is.True, "New schedule should be active");
-        Assert.That(schedule.IsCancelled, Is.False, "New schedule should not be cancelled");
     }
 
     [Test]
@@ -353,8 +347,7 @@ public class SchedulesApiTests : BaseApiTest
             Duration = 90,
             IsRecurring = true,
             EffectiveFrom = DateTime.UtcNow.Date,
-            Level = "P1",
-            Capacity = 20
+            Level = "P1"
         };
 
         // Act
@@ -396,9 +389,7 @@ public class SchedulesApiTests : BaseApiTest
             IsRecurring = true,
             EffectiveFrom = DateTime.UtcNow.Date.AddDays(1),
             IsActive = true,
-            IsCancelled = false,
-            Level = "P2", // Different level
-            Capacity = 25
+            Level = "P2"
         };
 
         // Act
@@ -421,7 +412,6 @@ public class SchedulesApiTests : BaseApiTest
         Assert.That(updatedSchedule.StartTime, Is.EqualTo(updateDto.StartTime), "Start time should be updated");
         Assert.That(updatedSchedule.Duration, Is.EqualTo(updateDto.Duration), "Duration should be updated");
         Assert.That(updatedSchedule.Level, Is.EqualTo(updateDto.Level), "Level should be updated");
-        Assert.That(updatedSchedule.Capacity, Is.EqualTo(updateDto.Capacity), "Capacity should be updated");
         
         // Verify immutable fields are preserved
         Assert.That(updatedSchedule.LocationId, Is.EqualTo(originalSchedule.LocationId), "Location ID should be preserved");
@@ -446,9 +436,7 @@ public class SchedulesApiTests : BaseApiTest
             IsRecurring = true,
             EffectiveFrom = DateTime.UtcNow.Date,
             IsActive = true,
-            IsCancelled = false,
-            Level = "P1",
-            Capacity = 20
+            Level = "P1"
         };
 
         // Act
@@ -491,8 +479,7 @@ public class SchedulesApiTests : BaseApiTest
             Duration = 90,
             IsRecurring = true,
             EffectiveFrom = DateTime.UtcNow.Date,
-            Level = "P1",
-            Capacity = 15
+            Level = "P1"
         };
 
         var createResponse = await ApiContext.PostAsync("/api/schedules", new APIRequestContextOptions

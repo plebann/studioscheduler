@@ -11,7 +11,6 @@ public record ScheduleDto
     public TimeSpan StartTime { get; init; }
     public int Duration { get; init; }
     public bool IsRecurring { get; init; }
-    public bool IsCancelled { get; init; }
     public DateTime EffectiveFrom { get; init; }
     public DateTime? EffectiveTo { get; init; }
     public bool IsActive { get; init; }
@@ -23,7 +22,6 @@ public record ScheduleDto
     public string? InstructorName { get; init; }
     public Guid? RoomId { get; init; }
     public string? RoomName { get; init; }
-    public int Capacity { get; init; }
 }
 
 public record ScheduleEditDto
@@ -37,7 +35,6 @@ public record ScheduleEditDto
     public TimeSpan StartTime { get; set; }
     public int Duration { get; set; }
     public bool IsRecurring { get; set; }
-    public bool IsCancelled { get; set; }
     public DateTime EffectiveFrom { get; set; }
     public DateTime? EffectiveTo { get; set; }
     public bool IsActive { get; set; }
@@ -49,7 +46,6 @@ public record ScheduleEditDto
     public string? InstructorName { get; set; }
     public Guid? RoomId { get; set; }
     public string? RoomName { get; set; }
-    public int Capacity { get; set; }
 
     public static ScheduleEditDto FromScheduleDto(ScheduleDto dto)
     {
@@ -64,7 +60,6 @@ public record ScheduleEditDto
             StartTime = dto.StartTime,
             Duration = dto.Duration,
             IsRecurring = dto.IsRecurring,
-            IsCancelled = dto.IsCancelled,
             EffectiveFrom = dto.EffectiveFrom,
             EffectiveTo = dto.EffectiveTo,
             IsActive = dto.IsActive,
@@ -74,8 +69,7 @@ public record ScheduleEditDto
             InstructorId = dto.InstructorId,
             InstructorName = dto.InstructorName,
             RoomId = dto.RoomId,
-            RoomName = dto.RoomName,
-            Capacity = dto.Capacity
+            RoomName = dto.RoomName
         };
     }
 
@@ -92,7 +86,6 @@ public record ScheduleEditDto
             StartTime = StartTime,
             Duration = Duration,
             IsRecurring = IsRecurring,
-            IsCancelled = IsCancelled,
             EffectiveFrom = EffectiveFrom,
             EffectiveTo = EffectiveTo,
             IsActive = IsActive,
@@ -102,8 +95,7 @@ public record ScheduleEditDto
             InstructorId = InstructorId,
             InstructorName = InstructorName,
             RoomId = RoomId,
-            RoomName = RoomName,
-            Capacity = Capacity
+            RoomName = RoomName
         };
     }
 }
@@ -122,7 +114,6 @@ public record CreateScheduleDto
     public required string Level { get; init; }
     public Guid? InstructorId { get; init; }
     public Guid? RoomId { get; init; }
-    public required int Capacity { get; init; }
 }
 
 public record UpdateScheduleDto
@@ -134,12 +125,10 @@ public record UpdateScheduleDto
     public required DateTime EffectiveFrom { get; init; }
     public DateTime? EffectiveTo { get; init; }
     public bool IsActive { get; init; }
-    public bool IsCancelled { get; init; }
     
     public required string Level { get; init; }
     public Guid? InstructorId { get; init; }
     public Guid? RoomId { get; init; }
-    public required int Capacity { get; init; }
 }
 
 public record ScheduleSummaryDto
@@ -151,12 +140,10 @@ public record ScheduleSummaryDto
     public required TimeSpan StartTime { get; init; }
     public required int Duration { get; init; }
     public bool IsActive { get; init; }
-    public bool IsCancelled { get; init; }
     
     public required string Level { get; init; }
     public string? InstructorName { get; init; }
     public string? RoomName { get; init; }
-    public required int Capacity { get; init; }
 }
 
 public record WeeklyScheduleDto
@@ -173,6 +160,5 @@ public record ScheduleSlotDto
     public required string Style { get; init; }
     public required string BackgroundColor { get; init; }
     public string? EffectiveFrom { get; init; }
-    public bool IsCancelled { get; init; }
     public bool IsActive { get; init; }
 }

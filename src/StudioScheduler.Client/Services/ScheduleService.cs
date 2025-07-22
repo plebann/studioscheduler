@@ -42,7 +42,7 @@ public class ScheduleService : IScheduleService
             _logger.LogInformation("Fetching schedules for selection");
             var schedules = await GetAllSchedulesAsync();
             
-            return schedules.Where(s => s.IsActive && !s.IsCancelled)
+            return schedules.Where(s => s.IsActive)
                 .Select(s => new ScheduleSelectionDto
                 {
                     ScheduleId = s.Id,

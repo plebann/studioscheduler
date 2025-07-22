@@ -19,10 +19,6 @@ public class LocationValidator : AbstractValidator<Location>
             .NotEmpty()
             .WithMessage("Description is required");
 
-        RuleFor(x => x.Capacity)
-            .GreaterThan(0)
-            .WithMessage("Capacity must be positive");
-
         RuleFor(x => x.OpeningTime)
             .NotEmpty()
             .WithMessage("Opening time is required");

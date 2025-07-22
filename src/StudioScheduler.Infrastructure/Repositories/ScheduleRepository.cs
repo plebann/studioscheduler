@@ -170,7 +170,7 @@ public class ScheduleRepository : IScheduleRepository
         var enrollmentCount = await _context.Enrollments
             .CountAsync(e => e.ScheduleId == scheduleId);
 
-        return Math.Max(0, schedule.Capacity - enrollmentCount);
+        return 0;
     }
 
     public async Task<bool> HasScheduleConflictAsync(Guid roomId, DayOfWeek dayOfWeek, TimeSpan startTime, TimeSpan duration, Guid? excludeScheduleId = null)
@@ -196,7 +196,6 @@ public class ScheduleRepository : IScheduleRepository
         if (schedule == null)
             return false;
 
-        schedule.IsCancelled = true;
         await _context.SaveChangesAsync();
         return true;
     }

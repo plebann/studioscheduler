@@ -8,7 +8,6 @@ public class Location
     public required string Address { get; init; }
     public string Description { get; init; } = string.Empty;
 
-    public required int Capacity { get; set; }
     public required TimeSpan OpeningTime { get; set; }
     public required TimeSpan ClosingTime { get; set; }
     public bool IsActive { get; set; } = true;

@@ -25,7 +25,6 @@ public class LocationsController : ControllerBase
             Id = l.Id,
             Name = l.Name,
             Address = l.Address,
-            Capacity = l.Capacity,
             IsActive = l.IsActive
         });
         
@@ -47,7 +46,6 @@ public class LocationsController : ControllerBase
             Name = location.Name,
             Address = location.Address,
             Description = location.Description,
-            Capacity = location.Capacity,
             OpeningTime = location.OpeningTime,
             ClosingTime = location.ClosingTime,
             IsActive = location.IsActive,
@@ -66,7 +64,6 @@ public class LocationsController : ControllerBase
             Name = createDto.Name,
             Address = createDto.Address,
             Description = createDto.Description ?? string.Empty,
-            Capacity = createDto.Capacity,
             OpeningTime = createDto.OpeningTime,
             ClosingTime = createDto.ClosingTime,
             IsActive = true
@@ -80,7 +77,6 @@ public class LocationsController : ControllerBase
             Name = created.Name,
             Address = created.Address,
             Description = created.Description,
-            Capacity = created.Capacity,
             OpeningTime = created.OpeningTime,
             ClosingTime = created.ClosingTime,
             IsActive = created.IsActive,
@@ -106,7 +102,6 @@ public class LocationsController : ControllerBase
             Name = updateDto.Name,
             Address = updateDto.Address,
             Description = updateDto.Description ?? string.Empty,
-            Capacity = updateDto.Capacity,
             OpeningTime = updateDto.OpeningTime,
             ClosingTime = updateDto.ClosingTime,
             IsActive = updateDto.IsActive,
@@ -122,7 +117,6 @@ public class LocationsController : ControllerBase
             Name = updated.Name,
             Address = updated.Address,
             Description = updated.Description,
-            Capacity = updated.Capacity,
             OpeningTime = updated.OpeningTime,
             ClosingTime = updated.ClosingTime,
             IsActive = updated.IsActive,

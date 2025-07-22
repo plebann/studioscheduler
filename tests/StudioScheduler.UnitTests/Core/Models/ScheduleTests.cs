@@ -23,8 +23,7 @@ public class ScheduleTests
             DayOfWeek = DayOfWeek.Monday,
             StartTime = new TimeSpan(19, 0, 0), // 7 PM
             Duration = 60,
-            Level = "Beginner",
-            Capacity = 20
+            Level = "Beginner"
         };
 
         // Assert
@@ -38,11 +37,9 @@ public class ScheduleTests
         schedule.StartTime.Should().Be(new TimeSpan(19, 0, 0));
         schedule.Duration.Should().Be(60);
         schedule.IsRecurring.Should().BeFalse();
-        schedule.IsCancelled.Should().BeFalse();
         schedule.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
         schedule.UpdatedAt.Should().BeNull();
         schedule.Level.Should().Be("Beginner");
-        schedule.Capacity.Should().Be(20);
     }
 
     [Fact]
@@ -57,8 +54,7 @@ public class ScheduleTests
             DayOfWeek = DayOfWeek.Tuesday,
             StartTime = new TimeSpan(20, 0, 0), // 8 PM
             Duration = 60,
-            Level = "Beginner",
-            Capacity = 20
+            Level = "Beginner"
         };
 
         // Assert
@@ -85,8 +81,7 @@ public class ScheduleTests
             StartTime = new TimeSpan(18, 30, 0), // 6:30 PM
             Duration = 60,
             IsRecurring = true,
-            Level = "Intermediate",
-            Capacity = 25
+            Level = "Intermediate"
         };
 
         // Assert
@@ -108,8 +103,7 @@ public class ScheduleTests
             DayOfWeek = DayOfWeek.Thursday,
             StartTime = new TimeSpan(19, 0, 0),
             Duration = invalidDurationMinutes,
-            Level = "Beginner",
-            Capacity = 20
+            Level = "Beginner"
         };
 
         // Act
@@ -135,7 +129,6 @@ public class ScheduleTests
             StartTime = new TimeSpan(21, 0, 0), // 9 PM - valid time
             Duration = 60,
             Level = "Beginner",
-            Capacity = 20,
             InstructorId = Guid.NewGuid(), // Required by validator
             RoomId = Guid.NewGuid() // Required by validator
         };
@@ -162,7 +155,6 @@ public class ScheduleTests
             Duration = 60,
             IsRecurring = true,
             Level = "Beginner",
-            Capacity = 20,
             InstructorId = Guid.NewGuid(), // Required by validator
             RoomId = Guid.NewGuid() // Required by validator
         };

@@ -14,7 +14,6 @@ public class LocationTests
             Name = "Main Studio",
             Address = "123 Dance Street",
             Description = "Main dance studio location",
-            Capacity = 100,
             OpeningTime = new TimeSpan(8, 0, 0),
             ClosingTime = new TimeSpan(22, 0, 0)
         };
@@ -24,7 +23,6 @@ public class LocationTests
         location.Name.Should().Be("Main Studio");
         location.Address.Should().Be("123 Dance Street");
         location.Description.Should().Be("Main dance studio location");
-        location.Capacity.Should().Be(100);
         location.OpeningTime.Should().Be(new TimeSpan(8, 0, 0));
         location.ClosingTime.Should().Be(new TimeSpan(22, 0, 0));
         location.IsActive.Should().BeTrue();
@@ -43,7 +41,6 @@ public class LocationTests
             Name = "Test",
             Address = "Test Address",
             Description = "Test Description",
-            Capacity = 50,
             OpeningTime = new TimeSpan(8, 0, 0),
             ClosingTime = new TimeSpan(22, 0, 0)
         };
@@ -70,27 +67,6 @@ public class LocationTests
         descriptionProperty!.CanWrite.Should().BeTrue();
     }
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    [InlineData(-100)]
-    public void Location_Capacity_ShouldAcceptZeroAndNegativeValues(int capacity)
-    {
-        // Arrange & Act
-        var location = new Location
-        {
-            Name = "Test",
-            Address = "Test Address",
-            Description = "Test Description",
-            Capacity = capacity,
-            OpeningTime = new TimeSpan(8, 0, 0),
-            ClosingTime = new TimeSpan(22, 0, 0)
-        };
-
-        // Assert
-        location.Capacity.Should().Be(capacity);
-    }
-
     [Fact]
     public void Location_ShouldAllowModificationOfCollections()
     {
@@ -100,7 +76,6 @@ public class LocationTests
             Name = "Test",
             Address = "Test Address",
             Description = "Test Description",
-            Capacity = 50,
             OpeningTime = new TimeSpan(8, 0, 0),
             ClosingTime = new TimeSpan(22, 0, 0)
         };

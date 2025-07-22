@@ -27,7 +27,7 @@ public class DataSeedingService
             return;
         }
 
-        _logger.LogInformation("Starting data seeding from JSON files...");
+        _logger.LogInformation("Starting data seeding from JSON files ...");
 
         try
         {
@@ -50,9 +50,9 @@ public class DataSeedingService
 
     private async Task SeedLocationsAsync()
     {
-        var locationsJsonPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", 
+        var locationsJsonPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..",
             "StudioScheduler.Infrastructure", "MockRepositories", "Data", "locations.json");
-        
+
         if (!File.Exists(locationsJsonPath))
         {
             _logger.LogWarning("Locations JSON file not found at: {Path}", locationsJsonPath);
@@ -60,9 +60,9 @@ public class DataSeedingService
         }
 
         var json = await File.ReadAllTextAsync(locationsJsonPath);
-        var data = JsonSerializer.Deserialize<LocationsData>(json, new JsonSerializerOptions 
-        { 
-            PropertyNameCaseInsensitive = true 
+        var data = JsonSerializer.Deserialize<LocationsData>(json, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
         });
 
         if (data?.Locations != null)
@@ -77,9 +77,9 @@ public class DataSeedingService
 
     private async Task SeedRoomsAsync()
     {
-        var roomsJsonPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", 
+        var roomsJsonPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..",
             "StudioScheduler.Infrastructure", "MockRepositories", "Data", "rooms.json");
-        
+
         if (!File.Exists(roomsJsonPath))
         {
             _logger.LogWarning("Rooms JSON file not found at: {Path}", roomsJsonPath);
@@ -87,9 +87,9 @@ public class DataSeedingService
         }
 
         var json = await File.ReadAllTextAsync(roomsJsonPath);
-        var data = JsonSerializer.Deserialize<RoomsData>(json, new JsonSerializerOptions 
-        { 
-            PropertyNameCaseInsensitive = true 
+        var data = JsonSerializer.Deserialize<RoomsData>(json, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
         });
 
         if (data?.Rooms != null)
@@ -123,9 +123,9 @@ public class DataSeedingService
 
     private async Task SeedDanceClassesAsync()
     {
-        var classesJsonPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", 
+        var classesJsonPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..",
             "StudioScheduler.Infrastructure", "MockRepositories", "Data", "classes.json");
-        
+
         if (!File.Exists(classesJsonPath))
         {
             _logger.LogWarning("Classes JSON file not found at: {Path}", classesJsonPath);
@@ -133,9 +133,9 @@ public class DataSeedingService
         }
 
         var json = await File.ReadAllTextAsync(classesJsonPath);
-        var data = JsonSerializer.Deserialize<ClassesData>(json, new JsonSerializerOptions 
-        { 
-            PropertyNameCaseInsensitive = true 
+        var data = JsonSerializer.Deserialize<ClassesData>(json, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
         });
 
         if (data?.Classes != null)
@@ -150,9 +150,9 @@ public class DataSeedingService
 
     private async Task SeedSchedulesAsync()
     {
-        var schedulesJsonPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", 
+        var schedulesJsonPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..",
             "StudioScheduler.Infrastructure", "MockRepositories", "Data", "schedules.json");
-        
+
         if (!File.Exists(schedulesJsonPath))
         {
             _logger.LogWarning("Schedules JSON file not found at: {Path}", schedulesJsonPath);
@@ -160,9 +160,9 @@ public class DataSeedingService
         }
 
         var json = await File.ReadAllTextAsync(schedulesJsonPath);
-        var data = JsonSerializer.Deserialize<SchedulesData>(json, new JsonSerializerOptions 
-        { 
-            PropertyNameCaseInsensitive = true 
+        var data = JsonSerializer.Deserialize<SchedulesData>(json, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
         });
 
         if (data?.Schedules != null)
@@ -181,11 +181,9 @@ public class DataSeedingService
                     StartTime = scheduleData.StartTime.TimeOfDay,
                     Duration = scheduleData.Duration,
                     IsRecurring = scheduleData.IsRecurring,
-                    IsCancelled = scheduleData.IsCancelled,
                     CreatedAt = scheduleData.CreatedAt,
                     UpdatedAt = scheduleData.UpdatedAt,
                     Level = scheduleData.Level ?? "Beginner",
-                    Capacity = scheduleData.Capacity ?? 20,
                     InstructorId = !string.IsNullOrEmpty(scheduleData.InstructorId) ? Guid.Parse(scheduleData.InstructorId) : null,
                     RoomId = !string.IsNullOrEmpty(scheduleData.RoomId) ? Guid.Parse(scheduleData.RoomId) : null
                 };
@@ -197,9 +195,9 @@ public class DataSeedingService
 
     private async Task SeedStudentsAsync()
     {
-        var studentsJsonPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", 
+        var studentsJsonPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..",
             "StudioScheduler.Infrastructure", "MockRepositories", "Data", "students.json");
-        
+
         if (!File.Exists(studentsJsonPath))
         {
             _logger.LogWarning("Students JSON file not found at: {Path}", studentsJsonPath);
@@ -207,9 +205,9 @@ public class DataSeedingService
         }
 
         var json = await File.ReadAllTextAsync(studentsJsonPath);
-        var data = JsonSerializer.Deserialize<StudentsData>(json, new JsonSerializerOptions 
-        { 
-            PropertyNameCaseInsensitive = true 
+        var data = JsonSerializer.Deserialize<StudentsData>(json, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
         });
 
         if (data?.Students != null)
@@ -268,9 +266,9 @@ public class DataSeedingService
 
     private async Task SeedEnrollmentsAsync()
     {
-        var enrollmentsJsonPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", 
+        var enrollmentsJsonPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..",
             "StudioScheduler.Infrastructure", "MockRepositories", "Data", "enrollments.json");
-        
+
         if (!File.Exists(enrollmentsJsonPath))
         {
             _logger.LogWarning("Enrollments JSON file not found at: {Path}", enrollmentsJsonPath);
@@ -278,9 +276,9 @@ public class DataSeedingService
         }
 
         var json = await File.ReadAllTextAsync(enrollmentsJsonPath);
-        var data = JsonSerializer.Deserialize<EnrollmentsData>(json, new JsonSerializerOptions 
-        { 
-            PropertyNameCaseInsensitive = true 
+        var data = JsonSerializer.Deserialize<EnrollmentsData>(json, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
         });
 
         if (data?.Enrollments != null)

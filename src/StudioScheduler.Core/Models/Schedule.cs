@@ -17,14 +17,12 @@ public class Schedule
     public required TimeSpan StartTime { get; set; }
     public required int Duration { get; set; }
     public bool IsRecurring { get; set; }
-    public bool IsCancelled { get; set; }
     
     public required string Level { get; set; }
     public Guid? InstructorId { get; set; }
     public User? Instructor { get; set; }
     public Guid? RoomId { get; set; }
     public Room? Room { get; set; }
-    public required int Capacity { get; set; }
     
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
