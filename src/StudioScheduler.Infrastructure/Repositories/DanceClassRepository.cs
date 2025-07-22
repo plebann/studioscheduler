@@ -84,7 +84,7 @@ public class DanceClassRepository : IDanceClassRepository
     public async Task<int> GetCurrentEnrollmentAsync(Guid classId)
     {
         return await _context.Enrollments
-            .Where(e => e.Schedule.DanceClassId == classId)
+            .Where(e => e.Schedule != null && e.Schedule.DanceClassId == classId)
             .CountAsync();
     }
 

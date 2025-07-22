@@ -109,8 +109,7 @@ else
 }
 
 <!-- Context Menu for Desktop -->
-<MudMenu @bind-IsOpen="contextMenuOpen" 
-         AnchorOrigin="Origin.BottomLeft" 
+<MudMenu AnchorOrigin="Origin.BottomLeft" 
          TransformOrigin="Origin.TopLeft"
          Class="context-menu"
          Style="@($"left: {contextMenuX}px; top: {contextMenuY}px;")">
@@ -144,7 +143,6 @@ else
     private WeeklyScheduleDto? weeklySchedule;
     
     // Context menu state
-    private bool contextMenuOpen = false;
     private string selectedScheduleId = string.Empty;
     private double contextMenuX = 0;
     private double contextMenuY = 0;
@@ -261,7 +259,6 @@ else
         selectedScheduleId = scheduleId;
         contextMenuX = e.ClientX;
         contextMenuY = e.ClientY;
-        contextMenuOpen = true;
     }
 
     private List<string> GetAllTimeSlots()
@@ -272,9 +269,11 @@ else
         
         foreach (var day in weeklySchedule.Schedule.Values)
         {
+            if (day == null) continue;
             foreach (var slot in day)
             {
-                allTimeSlots.Add(slot.TimeSlot);
+                if (slot?.TimeSlot != null)
+                    allTimeSlots.Add(slot.TimeSlot);
             }
         }
 
@@ -283,9 +282,9 @@ else
 
     private ScheduleSlotDto? GetClassForTimeSlot(string day, string timeSlot)
     {
-        if (weeklySchedule == null || !weeklySchedule.Schedule.ContainsKey(day))
+        if (weeklySchedule == null || !weeklySchedule.Schedule.ContainsKey(day) || weeklySchedule.Schedule[day] == null)
             return null;
 
-        return weeklySchedule.Schedule[day].FirstOrDefault(s => s.TimeSlot == timeSlot);
+        return weeklySchedule.Schedule[day].FirstOrDefault(s => s != null && s.TimeSlot == timeSlot);
     }
 }

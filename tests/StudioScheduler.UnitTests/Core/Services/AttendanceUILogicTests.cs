@@ -33,17 +33,23 @@ public class AttendanceUILogicTests
                 IsActive = true,
                 IsExpired = false
             },
-            AttendanceHistory = [],
+            AttendanceHistory = new List<AttendanceRecordDto>
+            {
+                new AttendanceRecordDto { ClassDate = today.AddDays(-28), WeekOffset = -3, WasPresent = false, IsEnrolled = true, IsCanceled = true }, // school canceled
+                new AttendanceRecordDto { ClassDate = today.AddDays(-21), WeekOffset = -2, WasPresent = false, IsEnrolled = true, IsCanceled = false },
+                new AttendanceRecordDto { ClassDate = today.AddDays(-14), WeekOffset = -1, WasPresent = false, IsEnrolled = true, IsCanceled = true }, // student canceled
+                new AttendanceRecordDto { ClassDate = today.AddDays(-7), WeekOffset = 0, WasPresent = true, IsEnrolled = true, IsCanceled = false },
+            },
             IsMarkedPresentToday = false,
             CanAttendToday = false
         };
 
         // Act
-        var skipped = anna.AttendanceHistory.FindAll(r => r.IsCanceled && !r.WasPresent);
+        var schoolCanceled = anna.AttendanceHistory.FindAll(r => r.IsCanceled && !r.WasPresent);
         var present = anna.AttendanceHistory.FindAll(r => r.WasPresent && !r.IsCanceled);
 
         // Assert
-        skipped.Should().HaveCount(0, "Anna should have 0 skipped/canceled classes");
-        present.Should().HaveCount(0, "Anna should have 0 present classes (today)");
+        schoolCanceled.Should().HaveCount(2, "Anna should have 2 canceled classes (school and student)");
+        present.Should().HaveCount(1, "Anna should have 1 present class");
     }
 }

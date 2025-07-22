@@ -31,7 +31,7 @@ public class ClassAttendanceService : IClassAttendanceService
         return await _scheduleRepository.GetByIdAsync(scheduleId);
     }
 
-    public async Task<Attendance> MarkAttendanceAsync(Guid scheduleId, Guid studentId, bool isPresent, string? notes = null)
+    public async Task<Attendance> MarkAttendanceAsync(Guid scheduleId, Guid studentId, bool isPresent, string? notes = null, bool isCanceled = false)
     {
         var student = await _studentRepository.GetByIdAsync(studentId);
         if (student == null)
@@ -50,6 +50,7 @@ public class ClassAttendanceService : IClassAttendanceService
             // Update existing attendance
             existingAttendance.WasPresent = isPresent;
             existingAttendance.Notes = notes;
+            existingAttendance.IsCanceled = isCanceled;
             existingAttendance.UpdatedAt = DateTime.UtcNow;
             await _attendanceRepository.UpdateAsync(existingAttendance);
             return existingAttendance;
@@ -64,6 +65,7 @@ public class ClassAttendanceService : IClassAttendanceService
                 ScheduleId = scheduleId,
                 ClassDate = DateTime.Today,
                 WasPresent = isPresent,
+                IsCanceled = isCanceled,
                 Notes = notes,
                 PassUsed = student.CurrentPass?.Id,
                 PassClassNumber = await CalculatePassClassNumber(studentId, scheduleId)
@@ -72,6 +74,35 @@ public class ClassAttendanceService : IClassAttendanceService
             await _attendanceRepository.CreateAsync(newAttendance);
             return newAttendance;
         }
+    }
+
+    // For school-wide cancellation (StudentId = null)
+    public async Task<Attendance> MarkSchoolCancellationAsync(Guid scheduleId, DateTime classDate, string? notes = null)
+    {
+        var schedule = await _scheduleRepository.GetByIdAsync(scheduleId);
+        if (schedule == null)
+            throw new ArgumentException("Schedule not found", nameof(scheduleId));
+
+        // Check if a global cancellation already exists
+        var existing = (await _attendanceRepository.GetByScheduleAndDateAsync(scheduleId, classDate))
+            .FirstOrDefault(a => a.StudentId == null && a.IsCanceled);
+        if (existing != null)
+            return existing;
+
+        var newAttendance = new Attendance
+        {
+            Id = Guid.NewGuid(),
+            StudentId = null,
+            ScheduleId = scheduleId,
+            ClassDate = classDate,
+            WasPresent = false,
+            IsCanceled = true,
+            Notes = notes,
+            PassUsed = null,
+            PassClassNumber = 0
+        };
+        await _attendanceRepository.CreateAsync(newAttendance);
+        return newAttendance;
     }
 
     public async Task<IEnumerable<Student>> SearchStudentsAsync(string searchTerm)

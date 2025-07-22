@@ -54,3 +54,15 @@ Analysis of SalsaMe Dance Studio's actual business model based on their official
   - FULLPASS (350 PLN) → 50 PLN
 
 ---
+
+## Attendance Cancellation Logic (2025 Redesign)
+
+### StudioScheduler Implementation
+
+- **Explicit Cancellation Records**: Attendance cancellations are now tracked using explicit attendance records with an `IsCanceled` flag.
+- **Student-Initiated Cancellation**: When a student cancels their attendance for a class, a record is created for that student and date with `IsCanceled = true`.
+- **School-Initiated Cancellation**: When the school cancels a class, a record is created for that date with `IsCanceled = true` and `StudentId = null` (applies to all students).
+- **Attendance Window Logic**: The system checks for both global (school-wide) and student-specific cancellation records when building the attendance window. If a global cancellation exists for a date, the class is considered canceled for all students. If a student-specific cancellation exists, only that student sees the class as canceled.
+- **Testing & Compliance**: Unit tests cover both cancellation scenarios and edge cases, ensuring the logic aligns with business requirements and is robust against regressions.
+
+---

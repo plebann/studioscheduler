@@ -25,6 +25,44 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudioScheduler.Integration
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudioScheduler.PlaywrightTests", "tests\StudioScheduler.PlaywrightTests\StudioScheduler.PlaywrightTests.csproj", "{E887B011-3204-436B-972D-30C042C359E7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		docs\analysis-schedule-name-removal-2025-07-20_22-01.md = docs\analysis-schedule-name-removal-2025-07-20_22-01.md
+		docs\architecture-analysis-2025-06-20_21-07.md = docs\architecture-analysis-2025-06-20_21-07.md
+		docs\attendance-view-redesign-summary.md = docs\attendance-view-redesign-summary.md
+		docs\attendance-window-uiux-improvements-summary.md = docs\attendance-window-uiux-improvements-summary.md
+		docs\database-model-2025-06-20_23-44.md = docs\database-model-2025-06-20_23-44.md
+		docs\duplicate-prevention-logic-2025-06-20_22-54.md = docs\duplicate-prevention-logic-2025-06-20_22-54.md
+		docs\enrollment-business-rules-2025-06-20_22-54.md = docs\enrollment-business-rules-2025-06-20_22-54.md
+		docs\enrollment-issue-analysis-2025-06-20_22-54.md = docs\enrollment-issue-analysis-2025-06-20_22-54.md
+		docs\enrollment-lifecycle-events-2025-06-20_22-54.md = docs\enrollment-lifecycle-events-2025-06-20_22-54.md
+		docs\execution-prompt-2025-07-20_22-01.md = docs\execution-prompt-2025-07-20_22-01.md
+		docs\executive-summary-2025-06-20_21-07.md = docs\executive-summary-2025-06-20_21-07.md
+		docs\infrastructure-analysis-2025-06-20_23-44.md = docs\infrastructure-analysis-2025-06-20_23-44.md
+		docs\migration-notes-schedule-name-removal-2025-07-20_22-01.md = docs\migration-notes-schedule-name-removal-2025-07-20_22-01.md
+		docs\pass-enrollment-relationship-2025-06-20_22-54.md = docs\pass-enrollment-relationship-2025-06-20_22-54.md
+		docs\phase1-completion-summary-2025-06-20_22-54.md = docs\phase1-completion-summary-2025-06-20_22-54.md
+		docs\plan-2025-06-20_21-07.md = docs\plan-2025-06-20_21-07.md
+		docs\plan-2025-06-20_22-54.md = docs\plan-2025-06-20_22-54.md
+		docs\plan-2025-07-20_22-01.md = docs\plan-2025-07-20_22-01.md
+		docs\plan-2025-07-21_13-36.md = docs\plan-2025-07-21_13-36.md
+		docs\plan-2025-07-21_14-26.md = docs\plan-2025-07-21_14-26.md
+		docs\REAL_WORLD_ARCHITECTURE.md = docs\REAL_WORLD_ARCHITECTURE.md
+		docs\repository-analysis-2025-06-20_21-07.md = docs\repository-analysis-2025-06-20_21-07.md
+		docs\SALSAME_BUSINESS_ANALYSIS.md = docs\SALSAME_BUSINESS_ANALYSIS.md
+		docs\SOLUTION_STRUCTURE.md = docs\SOLUTION_STRUCTURE.md
+		docs\tasks-2025-06-20_21-07.md = docs\tasks-2025-06-20_21-07.md
+		docs\tasks-2025-06-20_22-54.md = docs\tasks-2025-06-20_22-54.md
+		docs\tasks-2025-07-20_22-01.md = docs\tasks-2025-07-20_22-01.md
+		docs\tasks-2025-07-21_13-36.md = docs\tasks-2025-07-21_13-36.md
+		docs\tasks-2025-07-21_14-26.md = docs\tasks-2025-07-21_14-26.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{371FF89C-53E4-4291-A457-7B9163D01993}"
+	ProjectSection(SolutionItems) = preProject
+		.clinerules = .clinerules
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -157,5 +195,8 @@ Global
 		{34036B23-7E79-420C-8103-2A700EF51F16} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{7155708A-0B52-44EC-BE6B-6D25C8D47FA8} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{E887B011-3204-436B-972D-30C042C359E7} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C3B16418-586B-41CE-B9D3-94068CE0B766}
 	EndGlobalSection
 EndGlobal

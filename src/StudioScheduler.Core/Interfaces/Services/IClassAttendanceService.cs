@@ -5,7 +5,8 @@ namespace StudioScheduler.Core.Interfaces.Services;
 public interface IClassAttendanceService
 {
     Task<Schedule?> GetClassAttendanceAsync(Guid scheduleId);
-    Task<Attendance> MarkAttendanceAsync(Guid scheduleId, Guid studentId, bool isPresent, string? notes = null);
+    Task<Attendance> MarkAttendanceAsync(Guid scheduleId, Guid studentId, bool isPresent, string? notes = null, bool isCanceled = false);
+    Task<Attendance> MarkSchoolCancellationAsync(Guid scheduleId, DateTime classDate, string? notes = null);
     Task<IEnumerable<Student>> SearchStudentsAsync(string searchTerm);
     Task<IEnumerable<Attendance>> GetAttendanceHistoryAsync(Guid studentId, Guid scheduleId, int weeks = 3);
 }

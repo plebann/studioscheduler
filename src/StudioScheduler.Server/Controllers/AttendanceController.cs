@@ -97,11 +97,14 @@ public class AttendanceController : ControllerBase
                     // Was the student enrolled for this week?
                     bool isEnrolled = enrollment.EnrolledDate.Date <= classDate.Date && enrollment.IsActive;
 
-                    // Was the class canceled/skipped? (No explicit per-date cancellation, so infer: if no attendance for any student, treat as canceled)
-                    bool isCanceled = false;
-                    var anyAttendance = await _attendanceRepository.GetByScheduleAndDateAsync(scheduleGuid, classDate);
-                    if (!anyAttendance.Any())
-                        isCanceled = true;
+                    // --- New cancellation logic ---
+                    // 1. Check for global (school-wide) cancellation
+                    var allAttendanceForDate = await _attendanceRepository.GetByScheduleAndDateAsync(scheduleGuid, classDate);
+                    bool isCanceled = allAttendanceForDate.Any(a => a.StudentId == null && a.IsCanceled);
+
+                    // 2. If not globally canceled, check for student-specific cancellation
+                    if (!isCanceled)
+                        isCanceled = allAttendanceForDate.Any(a => a.StudentId == enrollment.StudentId && a.IsCanceled);
 
                     // Was the student present?
                     var attendance = attendanceHistory.FirstOrDefault(a => a.ClassDate.Date == classDate.Date);

@@ -212,7 +212,7 @@
         var dialog = await DialogService.ShowAsync<BuyPassModal>("Buy Pass", parameters, options);
         var result = await dialog.Result;
 
-        if (!result.Canceled)
+        if (result is not null && !result.Canceled)
         {
             Snackbar.Add("Pass purchased successfully!", Severity.Success);
             await LoadStudents(); // Refresh the list to update pass status

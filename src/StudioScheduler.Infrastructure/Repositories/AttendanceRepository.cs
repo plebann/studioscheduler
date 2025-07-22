@@ -112,7 +112,7 @@ public class AttendanceRepository : IAttendanceRepository
     public async Task<IEnumerable<Attendance>> GetByClassIdAsync(Guid classId)
     {
         return await _context.Attendances
-            .Where(a => a.Schedule.DanceClassId == classId)
+            .Where(a => a.Schedule != null && a.Schedule.DanceClassId == classId)
             .Include(a => a.Student)
             .Include(a => a.Schedule)
             .ThenInclude(s => s.DanceClass)
@@ -201,7 +201,7 @@ public class AttendanceRepository : IAttendanceRepository
     public async Task<IEnumerable<Attendance>> GetByInstructorAsync(Guid instructorId)
     {
         return await _context.Attendances
-            .Where(a => a.Schedule.InstructorId == instructorId)
+            .Where(a => a.Schedule != null && a.Schedule.InstructorId == instructorId)
             .Include(a => a.Student)
             .Include(a => a.Schedule)
             .ThenInclude(s => s.DanceClass)
@@ -218,7 +218,7 @@ public class AttendanceRepository : IAttendanceRepository
     public async Task<IEnumerable<Attendance>> GetByRoomAsync(Guid roomId)
     {
         return await _context.Attendances
-            .Where(a => a.Schedule.RoomId == roomId)
+            .Where(a => a.Schedule != null && a.Schedule.RoomId == roomId)
             .Include(a => a.Student)
             .Include(a => a.Schedule)
             .ThenInclude(s => s.DanceClass)
@@ -235,7 +235,7 @@ public class AttendanceRepository : IAttendanceRepository
     public async Task<IEnumerable<Attendance>> GetByLocationAsync(Guid locationId)
     {
         return await _context.Attendances
-            .Where(a => a.Schedule.LocationId == locationId)
+            .Where(a => a.Schedule != null && a.Schedule.LocationId == locationId)
             .Include(a => a.Student)
             .Include(a => a.Schedule)
             .ThenInclude(s => s.DanceClass)

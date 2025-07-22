@@ -83,7 +83,7 @@ public class StudentRepository : IStudentRepository
     public async Task<IEnumerable<Student>> GetByScheduleIdAsync(Guid scheduleId)
     {
         return await _context.Students
-            .Where(s => s.Enrollments.Any(e => e.ScheduleId == scheduleId))
+            .Where(s => s.Enrollments != null && s.Enrollments.Any(e => e.ScheduleId == scheduleId))
             .Include(s => s.Passes)
             .Include(s => s.Enrollments)
             .ThenInclude(e => e.Schedule)
@@ -96,7 +96,7 @@ public class StudentRepository : IStudentRepository
     public async Task<IEnumerable<Student>> GetByClassIdAsync(Guid classId)
     {
         return await _context.Students
-            .Where(s => s.Enrollments.Any(e => e.Schedule.DanceClassId == classId))
+            .Where(s => s.Enrollments != null && s.Enrollments.Any(e => e.Schedule != null && e.Schedule.DanceClassId == classId))
             .Include(s => s.Passes)
             .Include(s => s.Enrollments)
             .ThenInclude(e => e.Schedule)

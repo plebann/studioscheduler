@@ -33,7 +33,7 @@ public class AttendanceLogicTests
     }
 
     [Fact]
-    public void Should_Show_GrayRed_Flag_For_Canceled_Week()
+    public void Should_Show_GrayRed_Flag_For_Student_Canceled_Week()
     {
         // Arrange
         var week = new DateTime(2025, 7, 8);
@@ -44,6 +44,24 @@ public class AttendanceLogicTests
             WasPresent = false,
             IsEnrolled = true,
             IsCanceled = true
+        };
+
+        // Act & Assert
+        attendance.IsCanceled.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Should_Show_GrayRed_Flag_For_School_Canceled_Week()
+    {
+        // Arrange
+        var week = new DateTime(2025, 7, 15);
+        var attendance = new AttendanceRecordDto
+        {
+            ClassDate = week,
+            WeekOffset = 0,
+            WasPresent = false,
+            IsEnrolled = true,
+            IsCanceled = true // Simulate school-wide cancellation
         };
 
         // Act & Assert

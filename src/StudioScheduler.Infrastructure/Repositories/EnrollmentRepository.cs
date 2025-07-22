@@ -220,7 +220,7 @@ public class EnrollmentRepository : IEnrollmentRepository
     public async Task<IEnumerable<Enrollment>> GetByClassIdAsync(Guid classId)
     {
         return await _context.Enrollments
-            .Where(e => e.Schedule.DanceClassId == classId)
+            .Where(e => e.Schedule != null && e.Schedule.DanceClassId == classId)
             .Include(e => e.Student)
             .Include(e => e.Schedule)
             .ThenInclude(s => s.DanceClass)
