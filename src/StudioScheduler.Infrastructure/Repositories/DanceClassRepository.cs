@@ -66,21 +66,6 @@ public class DanceClassRepository : IDanceClassRepository
             .ToListAsync();
     }
 
-    public async Task<DanceClass?> GetByNameAsync(string name)
-    {
-        return await _context.DanceClasses
-            .FirstOrDefaultAsync(c => c.Name == name);
-    }
-
-    public async Task<IEnumerable<Schedule>> GetSchedulesAsync(Guid classId)
-    {
-        return await _context.Schedules
-            .Where(s => s.DanceClassId == classId)
-            .Include(s => s.Location)
-            .Include(s => s.DanceClass)
-            .ToListAsync();
-    }
-
     public async Task<int> GetCurrentEnrollmentAsync(Guid classId)
     {
         return await _context.Enrollments

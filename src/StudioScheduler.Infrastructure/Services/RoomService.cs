@@ -46,24 +46,4 @@ public class RoomService : IRoomService
         }
         return result;
     }
-
-    public async Task<bool> ExistsAsync(Guid id)
-    {
-        return await _repository.ExistsAsync(id);
-    }
-
-    public async Task<bool> IsRoomAvailableAsync(Guid roomId, DayOfWeek dayOfWeek, TimeSpan startTime, TimeSpan duration)
-    {
-        return await _repository.IsAvailableAsync(roomId, dayOfWeek, startTime, duration);
-    }
-
-    public async Task<IEnumerable<Schedule>> GetRoomSchedulesAsync(Guid roomId)
-    {
-        return await _repository.GetSchedulesAsync(roomId);
-    }
-
-    public async Task<Room?> GetRoomByLocationAndNameAsync(Guid locationId, string name)
-    {
-        return await _repository.GetByLocationAndNameAsync(locationId, name);
-    }
 }

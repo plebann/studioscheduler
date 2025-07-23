@@ -243,30 +243,4 @@ public class AttendanceController : ControllerBase
             });
         }
     }
-
-    [HttpGet("search")]
-    public async Task<ActionResult> SearchStudents([FromQuery] string searchTerm)
-    {
-        try
-        {
-            if (string.IsNullOrWhiteSpace(searchTerm) || searchTerm.Length < 3)
-            {
-                return BadRequest("Search term must be at least 3 characters long");
-            }
-
-            _logger.LogInformation("Searching for students with term: {SearchTerm}", searchTerm);
-
-            var students = await _classAttendanceService.SearchStudentsAsync(searchTerm);
-            
-            _logger.LogInformation("Found {StudentCount} students matching search term: {SearchTerm}", 
-                students.Count(), searchTerm);
-
-            return Ok(students);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error searching for students with term: {SearchTerm}", searchTerm);
-            return StatusCode(500, new { message = "An error occurred while searching for students", error = ex.Message });
-        }
-    }
 }

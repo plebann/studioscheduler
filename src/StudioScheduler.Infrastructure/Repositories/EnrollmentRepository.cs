@@ -45,23 +45,6 @@ public class EnrollmentRepository : IEnrollmentRepository
         return enrollment;
     }
 
-    public async Task<Enrollment> CreateOrReactivateAsync(Enrollment newEnrollment)
-    {
-        Enrollment? existingEnrollment = await GetExistingEnrollment(newEnrollment.StudentId, newEnrollment.ScheduleId);
-
-        if (existingEnrollment is null)
-        {
-            return await CreateAsync(newEnrollment);
-        }
-        else
-        {
-            // Reactivation logic: just update EnrolledDate and UpdatedAt
-            existingEnrollment.EnrolledDate = newEnrollment.EnrolledDate;
-            existingEnrollment.UpdatedAt = DateTime.UtcNow;
-            return await UpdateAsync(existingEnrollment);
-        }
-    }
-
     private async Task<Enrollment?> GetExistingEnrollment(Guid studentId, Guid scheduleId)
     {
         // Check for ANY existing enrollment
@@ -164,18 +147,20 @@ public class EnrollmentRepository : IEnrollmentRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<Enrollment>> GetValidEnrollmentsForScheduleAsync(Guid scheduleId, DbContext context)
+    public async Task<Enrollment> CreateOrReactivateAsync(Enrollment newEnrollment)
     {
-        // Returns enrollments for a schedule where the linked pass is active and valid
-        return await context.Set<Enrollment>()
-            .Include(e => e.Student)
-            .Include(e => e.Schedule)
-            .Include(e => e.Pass)
-            .Where(e => e.ScheduleId == scheduleId &&
-                        e.Pass != null &&
-                        e.Pass.IsActive &&
-                        e.Pass.StartDate <= DateTime.UtcNow &&
-                        e.Pass.EndDate >= DateTime.UtcNow)
-            .ToListAsync();
+        Enrollment? existingEnrollment = await GetExistingEnrollment(newEnrollment.StudentId, newEnrollment.ScheduleId);
+
+        if (existingEnrollment is null)
+        {
+            return await CreateAsync(newEnrollment);
+        }
+        else
+        {
+            // Reactivation logic: just update EnrolledDate and UpdatedAt
+            existingEnrollment.EnrolledDate = newEnrollment.EnrolledDate;
+            existingEnrollment.UpdatedAt = DateTime.UtcNow;
+            return await UpdateAsync(existingEnrollment);
+        }
     }
 }

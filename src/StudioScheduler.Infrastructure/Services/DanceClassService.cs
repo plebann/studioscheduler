@@ -25,11 +25,6 @@ public class DanceClassService : IDanceClassService
         return await _repository.GetAllAsync();
     }
 
-    public async Task<IEnumerable<DanceClass>> GetByStyleAsync(string style)
-    {
-        return await _repository.GetByStyleAsync(style);
-    }
-
     public async Task<DanceClass> CreateAsync(DanceClass danceClass)
     {
         var created = await _repository.AddAsync(danceClass);
@@ -52,25 +47,5 @@ public class DanceClassService : IDanceClassService
             await _repository.SaveChangesAsync();
         }
         return result;
-    }
-
-    public async Task<bool> ExistsAsync(Guid id)
-    {
-        return await _repository.ExistsAsync(id);
-    }
-
-    public async Task<IEnumerable<Schedule>> GetClassSchedulesAsync(Guid classId)
-    {
-        return await _scheduleRepository.GetByDanceClassAsync(classId);
-    }
-
-    public async Task<bool> IsInstructorAvailableAsync(Guid instructorId, DayOfWeek dayOfWeek, TimeSpan startTime, TimeSpan duration)
-    {
-        return await _repository.IsInstructorAvailableAsync(instructorId, dayOfWeek, startTime, duration);
-    }
-
-    public async Task<int> GetCurrentEnrollmentAsync(Guid classId)
-    {
-        return await _repository.GetCurrentEnrollmentAsync(classId);
     }
 }

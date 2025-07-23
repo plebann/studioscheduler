@@ -27,34 +27,4 @@ public class ScheduleService : IScheduleService
 
     public async Task<bool> DeleteAsync(Guid id)
         => await _scheduleRepository.DeleteAsync(id);
-
-    public async Task<IEnumerable<Schedule>> GetByLocationAsync(Guid locationId)
-        => await _scheduleRepository.GetByLocationAsync(locationId);
-
-    public async Task<IEnumerable<Schedule>> GetByDayOfWeekAsync(DayOfWeek dayOfWeek)
-        => await _scheduleRepository.GetByDayOfWeekAsync(dayOfWeek);
-
-    public async Task<IEnumerable<Schedule>> GetByDanceClassAsync(Guid danceClassId)
-        => await _scheduleRepository.GetByDanceClassAsync(danceClassId);
-
-    public async Task<bool> ExistsAsync(Guid id)
-        => await _scheduleRepository.ExistsAsync(id);
-
-    public async Task<bool> CancelClassAsync(Guid scheduleId)
-        => await _scheduleRepository.CancelScheduleAsync(scheduleId);
-
-    public async Task<bool> IsTimeSlotAvailableAsync(Guid roomId, DayOfWeek dayOfWeek, TimeSpan startTime, TimeSpan duration)
-        => await _scheduleRepository.IsTimeSlotAvailableAsync(roomId, dayOfWeek, startTime, duration);
-
-    public async Task<IEnumerable<Schedule>> GetActiveSchedulesAsync()
-        => await _scheduleRepository.GetActiveSchedulesAsync();
-
-    public async Task<IEnumerable<Schedule>> GetSchedulesByInstructorAsync(Guid instructorId)
-        => await _scheduleRepository.GetByInstructorAsync(instructorId);
-
-    public async Task<int> GetAvailableSpotsAsync(Guid scheduleId)
-        => await _scheduleRepository.GetAvailableSpotsAsync(scheduleId);
-
-    public async Task<bool> IsScheduleConflictAsync(Guid roomId, DayOfWeek dayOfWeek, TimeSpan startTime, TimeSpan duration, Guid? excludeScheduleId = null)
-        => await _scheduleRepository.HasScheduleConflictAsync(roomId, dayOfWeek, startTime, duration, excludeScheduleId);
 }

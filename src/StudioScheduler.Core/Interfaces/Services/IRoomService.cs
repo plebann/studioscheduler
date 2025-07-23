@@ -9,8 +9,4 @@ public interface IRoomService
     Task<Room> CreateAsync(Room room);
     Task<Room> UpdateAsync(Room room);
     Task<bool> DeleteAsync(Guid id);
-    Task<bool> ExistsAsync(Guid id);
-    Task<bool> IsRoomAvailableAsync(Guid roomId, DayOfWeek dayOfWeek, TimeSpan startTime, TimeSpan duration);
-    Task<IEnumerable<Schedule>> GetRoomSchedulesAsync(Guid roomId);
-    Task<Room?> GetRoomByLocationAndNameAsync(Guid locationId, string name);
 }

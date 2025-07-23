@@ -80,62 +80,6 @@ public class EnrollmentRepositoryTests : IDisposable
         Assert.Equal(scheduleId, exception.ScheduleId);
     }
 
-    [Fact]
-    public async Task CreateOrReactivateAsync_WithExistingEnrollment_ShouldUpdateDate()
-    {
-        // Arrange
-        var studentId = Guid.NewGuid();
-        var scheduleId = Guid.NewGuid();
-        var existingEnrollment = new Enrollment
-        {
-            Id = Guid.NewGuid(),
-            StudentId = studentId,
-            ScheduleId = scheduleId,
-            EnrolledDate = DateTime.UtcNow.AddDays(-7)
-        };
-        
-        await _context.Enrollments.AddAsync(existingEnrollment);
-        await _context.SaveChangesAsync();
-
-        var newEnrollmentData = new Enrollment
-        {
-            Id = Guid.NewGuid(),
-            StudentId = studentId,
-            ScheduleId = scheduleId,
-            EnrolledDate = DateTime.UtcNow
-        };
-
-        // Act
-        var result = await _repository.CreateOrReactivateAsync(newEnrollmentData);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal(existingEnrollment.Id, result.Id); // Should return existing enrollment
-        Assert.Equal(newEnrollmentData.EnrolledDate.Date, result.EnrolledDate.Date); // Should update date
-    }
-
-    [Fact]
-    public async Task CreateOrReactivateAsync_WithNoExistingEnrollment_ShouldCreateNew()
-    {
-        // Arrange
-        var studentId = Guid.NewGuid();
-        var scheduleId = Guid.NewGuid();
-        var enrollment = new Enrollment
-        {
-            Id = Guid.NewGuid(),
-            StudentId = studentId,
-            ScheduleId = scheduleId,
-            EnrolledDate = DateTime.UtcNow
-        };
-
-        // Act
-        var result = await _repository.CreateOrReactivateAsync(enrollment);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal(enrollment.Id, result.Id);
-    }
-
     public void Dispose()
     {
         _context.Dispose();

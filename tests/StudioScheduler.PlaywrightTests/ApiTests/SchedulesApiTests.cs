@@ -17,7 +17,7 @@ public class SchedulesApiTests : BaseApiTest
         var weeklySchedule = await DeserializeResponse<WeeklyScheduleDto>(response);
         
         Assert.That(weeklySchedule, Is.Not.Null, "Weekly schedule should not be null");
-        Assert.That(weeklySchedule.Schedule, Is.Not.Null, "Schedule dictionary should not be null");
+        Assert.That(weeklySchedule!.Schedule, Is.Not.Null, "Schedule dictionary should not be null");
         
         // Verify all days of the week are present
         var expectedDays = new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
@@ -40,7 +40,7 @@ public class SchedulesApiTests : BaseApiTest
         Assert.That(weeklySchedule?.Schedule, Is.Not.Null);
         
         // Find a day with classes (should be most days except Saturday based on your data)
-        var dayWithClasses = weeklySchedule.Schedule.FirstOrDefault(kvp => kvp.Value.Any());
+        var dayWithClasses = weeklySchedule!.Schedule.FirstOrDefault(kvp => kvp.Value.Any());
         Assert.That(dayWithClasses.Value, Is.Not.Null, "Should have at least one day with classes");
         
         var firstClass = dayWithClasses.Value.First();
@@ -71,7 +71,7 @@ public class SchedulesApiTests : BaseApiTest
         // Assert
         Assert.That(weeklySchedule?.Schedule, Is.Not.Null);
         
-        var allClasses = weeklySchedule.Schedule.Values.SelectMany(classes => classes).ToList();
+        var allClasses = weeklySchedule!.Schedule.Values.SelectMany(classes => classes).ToList();
         Assert.That(allClasses, Is.Not.Empty, "Should have classes in the schedule");
         
         // Verify we have expected dance styles from SalsaMe studio
@@ -98,7 +98,7 @@ public class SchedulesApiTests : BaseApiTest
         // Assert
         Assert.That(weeklySchedule?.Schedule, Is.Not.Null);
         
-        var allClasses = weeklySchedule.Schedule.Values.SelectMany(classes => classes).ToList();
+        var allClasses = weeklySchedule!.Schedule.Values.SelectMany(classes => classes).ToList();
         
         // Verify color mapping based on dance styles
         foreach (var danceClass in allClasses)
@@ -141,7 +141,7 @@ public class SchedulesApiTests : BaseApiTest
         Assert.That(weeklySchedule?.Schedule, Is.Not.Null);
         
         // Check that classes within each day are ordered by time
-        foreach (var day in weeklySchedule.Schedule)
+        foreach (var day in weeklySchedule!.Schedule)
         {
             if (day.Value.Count <= 1) continue; // Skip days with 0 or 1 class
             
@@ -206,7 +206,7 @@ public class SchedulesApiTests : BaseApiTest
         var schedules = await DeserializeResponse<List<ScheduleSummaryDto>>(response);
         
         Assert.That(schedules, Is.Not.Null, "Schedules list should not be null");
-        Assert.That(schedules.Count, Is.GreaterThan(0), "Should have at least one schedule");
+        Assert.That(schedules!.Count, Is.GreaterThan(0), "Should have at least one schedule");
         
         // Verify first schedule structure
         var firstSchedule = schedules.First();
@@ -239,7 +239,7 @@ public class SchedulesApiTests : BaseApiTest
         var allSchedulesResponse = await ApiContext.GetAsync("/api/schedules");
         await AssertSuccessfulResponse(allSchedulesResponse);
         var schedules = await DeserializeResponse<List<ScheduleSummaryDto>>(allSchedulesResponse);
-        var testScheduleId = schedules.First().Id;
+        var testScheduleId = schedules!.First().Id;
         
         // Act
         var response = await ApiContext.GetAsync($"/api/schedules/{testScheduleId}");
@@ -250,7 +250,7 @@ public class SchedulesApiTests : BaseApiTest
         var schedule = await DeserializeResponse<ScheduleDto>(response);
         
         Assert.That(schedule, Is.Not.Null, "Schedule should not be null");
-        Assert.That(schedule.Id, Is.EqualTo(testScheduleId), "Schedule ID should match requested ID");
+        Assert.That(schedule!.Id, Is.EqualTo(testScheduleId), "Schedule ID should match requested ID");
         Assert.That(schedule.LocationId, Is.Not.EqualTo(Guid.Empty), "Schedule should have location ID");
         Assert.That(schedule.DanceClassId, Is.Not.EqualTo(Guid.Empty), "Schedule should have dance class ID");
         Assert.That(schedule.Level, Is.Not.Null.And.Not.Empty, "Schedule should have level");
@@ -291,12 +291,12 @@ public class SchedulesApiTests : BaseApiTest
         var locationsResponse = await ApiContext.GetAsync("/api/locations");
         await AssertSuccessfulResponse(locationsResponse);
         var locations = await DeserializeResponse<List<LocationDto>>(locationsResponse);
-        var locationId = locations.First().Id;
+        var locationId = locations!.First().Id;
 
         var classesResponse = await ApiContext.GetAsync("/api/classes");
         await AssertSuccessfulResponse(classesResponse);
         var classes = await DeserializeResponse<List<ClassSummaryDto>>(classesResponse);
-        var danceClassId = classes.First().Id;
+        var danceClassId = classes!.First().Id;
 
         var createDto = new CreateScheduleDto
         {
@@ -325,7 +325,7 @@ public class SchedulesApiTests : BaseApiTest
         var schedule = await DeserializeResponse<ScheduleDto>(response);
         
         Assert.That(schedule, Is.Not.Null, "Created schedule should not be null");
-        Assert.That(schedule.Id, Is.Not.EqualTo(Guid.Empty), "Created schedule should have valid ID");
+        Assert.That(schedule!.Id, Is.Not.EqualTo(Guid.Empty), "Created schedule should have valid ID");
         Assert.That(schedule.LocationId, Is.EqualTo(createDto.LocationId), "Location ID should match");
         Assert.That(schedule.DanceClassId, Is.EqualTo(createDto.DanceClassId), "Dance class ID should match");
         Assert.That(schedule.DayOfWeek, Is.EqualTo(createDto.DayOfWeek), "Day of week should match");
@@ -374,7 +374,7 @@ public class SchedulesApiTests : BaseApiTest
         var allSchedulesResponse = await ApiContext.GetAsync("/api/schedules");
         await AssertSuccessfulResponse(allSchedulesResponse);
         var schedules = await DeserializeResponse<List<ScheduleSummaryDto>>(allSchedulesResponse);
-        var testScheduleId = schedules.First().Id;
+        var testScheduleId = schedules!.First().Id;
 
         // Get the full schedule details
         var getResponse = await ApiContext.GetAsync($"/api/schedules/{testScheduleId}");
@@ -407,14 +407,14 @@ public class SchedulesApiTests : BaseApiTest
         var updatedSchedule = await DeserializeResponse<ScheduleDto>(response);
         
         Assert.That(updatedSchedule, Is.Not.Null, "Updated schedule should not be null");
-        Assert.That(updatedSchedule.Id, Is.EqualTo(testScheduleId), "Schedule ID should remain same");
+        Assert.That(updatedSchedule!.Id, Is.EqualTo(testScheduleId), "Schedule ID should remain same");
         Assert.That(updatedSchedule.DayOfWeek, Is.EqualTo(updateDto.DayOfWeek), "Day of week should be updated");
         Assert.That(updatedSchedule.StartTime, Is.EqualTo(updateDto.StartTime), "Start time should be updated");
         Assert.That(updatedSchedule.Duration, Is.EqualTo(updateDto.Duration), "Duration should be updated");
         Assert.That(updatedSchedule.Level, Is.EqualTo(updateDto.Level), "Level should be updated");
         
         // Verify immutable fields are preserved
-        Assert.That(updatedSchedule.LocationId, Is.EqualTo(originalSchedule.LocationId), "Location ID should be preserved");
+        Assert.That(updatedSchedule.LocationId, Is.EqualTo(originalSchedule!.LocationId), "Location ID should be preserved");
         Assert.That(updatedSchedule.DanceClassId, Is.EqualTo(originalSchedule.DanceClassId), "Dance class ID should be preserved");
         Assert.That(updatedSchedule.CreatedAt, Is.EqualTo(originalSchedule.CreatedAt), "Created at should be preserved");
         
@@ -463,12 +463,12 @@ public class SchedulesApiTests : BaseApiTest
         var locationsResponse = await ApiContext.GetAsync("/api/locations");
         await AssertSuccessfulResponse(locationsResponse);
         var locations = await DeserializeResponse<List<LocationDto>>(locationsResponse);
-        var locationId = locations.First().Id;
+        var locationId = locations!.First().Id;
 
         var classesResponse = await ApiContext.GetAsync("/api/classes");
         await AssertSuccessfulResponse(classesResponse);
         var classes = await DeserializeResponse<List<ClassSummaryDto>>(classesResponse);
-        var danceClassId = classes.First().Id;
+        var danceClassId = classes!.First().Id;
 
         var createDto = new CreateScheduleDto
         {
@@ -493,7 +493,7 @@ public class SchedulesApiTests : BaseApiTest
         var createdSchedule = await DeserializeResponse<ScheduleDto>(createResponse);
 
         // Act
-        var deleteResponse = await ApiContext.DeleteAsync($"/api/schedules/{createdSchedule.Id}");
+        var deleteResponse = await ApiContext.DeleteAsync($"/api/schedules/{createdSchedule!.Id}");
 
         // Assert
         await AssertSuccessfulResponse(deleteResponse, HttpStatusCode.NoContent);
