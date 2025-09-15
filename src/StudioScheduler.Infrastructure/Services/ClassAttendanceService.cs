@@ -1,6 +1,7 @@
 using StudioScheduler.Core.Interfaces.Repositories;
 using StudioScheduler.Core.Interfaces.Services;
 using StudioScheduler.Core.Models;
+using Microsoft.Extensions.Logging;
 
 namespace StudioScheduler.Infrastructure.Services;
 
@@ -12,6 +13,7 @@ public class ClassAttendanceService : IClassAttendanceService
     private readonly IEnrollmentRepository _enrollmentRepository;
     private readonly IAttendanceRepository _attendanceRepository;
     private readonly IPassRepository _passRepository;
+    private readonly ILogger<ClassAttendanceService> _logger;
 
     public ClassAttendanceService(
         IScheduleRepository scheduleRepository,
@@ -19,7 +21,8 @@ public class ClassAttendanceService : IClassAttendanceService
         IStudentRepository studentRepository,
         IEnrollmentRepository enrollmentRepository,
         IAttendanceRepository attendanceRepository,
-        IPassRepository passRepository)
+        IPassRepository passRepository,
+        ILogger<ClassAttendanceService> logger)
     {
         _scheduleRepository = scheduleRepository;
         _danceClassRepository = danceClassRepository;
@@ -27,6 +30,7 @@ public class ClassAttendanceService : IClassAttendanceService
         _enrollmentRepository = enrollmentRepository;
         _attendanceRepository = attendanceRepository;
         _passRepository = passRepository;
+        _logger = logger;
     }
 
     public async Task<Schedule?> GetClassAttendanceAsync(Guid scheduleId)
@@ -38,11 +42,17 @@ public class ClassAttendanceService : IClassAttendanceService
     {
         var student = await _studentRepository.GetByIdAsync(studentId);
         if (student == null)
+        {
+            _logger.LogWarning("MarkAttendanceAsync: Student with ID {StudentId} not found", studentId);
             throw new ArgumentException("Student not found", nameof(studentId));
+        }
 
         var schedule = await _scheduleRepository.GetByIdAsync(scheduleId);
         if (schedule == null)
+        {
+            _logger.LogWarning("MarkAttendanceAsync: Schedule with ID {ScheduleId} not found", scheduleId);
             throw new ArgumentException("Schedule not found", nameof(scheduleId));
+        }
 
         // Check if attendance already exists for today
         var existingAttendance = await _attendanceRepository.GetByStudentScheduleAndDateAsync(
@@ -56,6 +66,7 @@ public class ClassAttendanceService : IClassAttendanceService
             existingAttendance.IsCanceled = isCanceled;
             existingAttendance.UpdatedAt = DateTime.UtcNow;
             await _attendanceRepository.UpdateAsync(existingAttendance);
+            _logger.LogInformation("MarkAttendanceAsync: Updated attendance for StudentId {StudentId}, ScheduleId {ScheduleId}", studentId, scheduleId);
             return existingAttendance;
         }
         else
@@ -75,6 +86,7 @@ public class ClassAttendanceService : IClassAttendanceService
             };
 
             await _attendanceRepository.CreateAsync(newAttendance);
+            _logger.LogInformation("MarkAttendanceAsync: Created new attendance for StudentId {StudentId}, ScheduleId {ScheduleId}", studentId, scheduleId);
             return newAttendance;
         }
     }
@@ -84,13 +96,19 @@ public class ClassAttendanceService : IClassAttendanceService
     {
         var schedule = await _scheduleRepository.GetByIdAsync(scheduleId);
         if (schedule == null)
+        {
+            _logger.LogWarning("MarkSchoolCancellationAsync: Schedule with ID {ScheduleId} not found", scheduleId);
             throw new ArgumentException("Schedule not found", nameof(scheduleId));
+        }
 
         // Check if a global cancellation already exists
         var existing = (await _attendanceRepository.GetByScheduleAndDateAsync(scheduleId, classDate))
             .FirstOrDefault(a => a.StudentId == null && a.IsCanceled);
         if (existing != null)
+        {
+            _logger.LogInformation("MarkSchoolCancellationAsync: Existing cancellation found for ScheduleId {ScheduleId} on {ClassDate}", scheduleId, classDate);
             return existing;
+        }
 
         var newAttendance = new Attendance
         {
@@ -105,6 +123,7 @@ public class ClassAttendanceService : IClassAttendanceService
             PassClassNumber = 0
         };
         await _attendanceRepository.CreateAsync(newAttendance);
+        _logger.LogInformation("MarkSchoolCancellationAsync: Created school-wide cancellation for ScheduleId {ScheduleId} on {ClassDate}", scheduleId, classDate);
         return newAttendance;
     }
 

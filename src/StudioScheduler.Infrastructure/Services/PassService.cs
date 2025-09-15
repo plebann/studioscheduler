@@ -3,6 +3,7 @@ using StudioScheduler.Core.Interfaces.Services;
 using StudioScheduler.Core.Models;
 using StudioScheduler.Core.Enums;
 using StudioScheduler.Core.Services;
+using Microsoft.Extensions.Logging;
 
 namespace StudioScheduler.Infrastructure.Services;
 
@@ -12,13 +13,15 @@ public class PassService : IPassService
     private readonly IAttendanceRepository _attendanceRepository;
     private readonly IEnrollmentRepository _enrollmentRepository;
     private readonly IScheduleRepository _scheduleRepository;
+    private readonly ILogger<PassService> _logger;
 
-    public PassService(IPassRepository passRepository, IAttendanceRepository attendanceRepository, IEnrollmentRepository enrollmentRepository, IScheduleRepository scheduleRepository)
+    public PassService(IPassRepository passRepository, IAttendanceRepository attendanceRepository, IEnrollmentRepository enrollmentRepository, IScheduleRepository scheduleRepository, ILogger<PassService> logger)
     {
         _passRepository = passRepository;
         _attendanceRepository = attendanceRepository;
         _enrollmentRepository = enrollmentRepository;
         _scheduleRepository = scheduleRepository;
+        _logger = logger;
     }
 
     public async Task<Pass?> GetByIdAsync(Guid id)
@@ -69,10 +72,13 @@ public class PassService : IPassService
     {
         var existingPass = await _passRepository.GetByIdAsync(pass.Id);
         if (existingPass == null)
+        {
+            _logger.LogWarning("UpdatePassAsync: Pass with ID {PassId} not found", pass.Id);
             throw new ArgumentException($"Pass with ID {pass.Id} not found");
+        }
 
         ValidatePassDates(pass);
-        
+        _logger.LogInformation("Updating pass {PassId}", pass.Id);
         return await _passRepository.UpdateAsync(pass);
     }
 
@@ -80,8 +86,12 @@ public class PassService : IPassService
     {
         var existingPass = await _passRepository.GetByIdAsync(id);
         if (existingPass == null)
+        {
+            _logger.LogWarning("DeletePassAsync: Pass with ID {PassId} not found", id);
             throw new ArgumentException($"Pass with ID {id} not found");
+        }
 
+        _logger.LogInformation("Deleting pass {PassId}", id);
         await _passRepository.DeleteAsync(id);
     }
 
@@ -100,11 +110,14 @@ public class PassService : IPassService
     {
         var pass = await _passRepository.GetByIdAsync(passId);
         if (pass == null)
+        {
+            _logger.LogWarning("ExtendPassAsync: Pass with ID {PassId} not found", passId);
             throw new ArgumentException($"Pass with ID {passId} not found");
+        }
 
         pass.EndDate = pass.EndDate.AddDays(additionalDays);
         pass.UpdatedAt = DateTime.UtcNow;
-
+        _logger.LogInformation("Extended pass {PassId} by {Days} days", passId, additionalDays);
         return await _passRepository.UpdateAsync(pass);
     }
 
@@ -112,11 +125,14 @@ public class PassService : IPassService
     {
         var pass = await _passRepository.GetByIdAsync(passId);
         if (pass == null)
+        {
+            _logger.LogWarning("ActivatePassAsync: Pass with ID {PassId} not found", passId);
             throw new ArgumentException($"Pass with ID {passId} not found");
+        }
 
         pass.IsActive = true;
         pass.UpdatedAt = DateTime.UtcNow;
-
+        _logger.LogInformation("Activated pass {PassId}", passId);
         return await _passRepository.UpdateAsync(pass);
     }
 
@@ -124,11 +140,14 @@ public class PassService : IPassService
     {
         var pass = await _passRepository.GetByIdAsync(passId);
         if (pass == null)
+        {
+            _logger.LogWarning("DeactivatePassAsync: Pass with ID {PassId} not found", passId);
             throw new ArgumentException($"Pass with ID {passId} not found");
+        }
 
         pass.IsActive = false;
         pass.UpdatedAt = DateTime.UtcNow;
-
+        _logger.LogInformation("Deactivated pass {PassId}", passId);
         return await _passRepository.UpdateAsync(pass);
     }
 
@@ -215,39 +234,63 @@ public class PassService : IPassService
     }
 
     // Private helper methods
-    private static void ValidatePassDates(Pass pass)
+    private void ValidatePassDates(Pass pass)
     {
         if (pass.EndDate <= pass.StartDate)
+        {
+            _logger.LogWarning("ValidatePassDates: End date {EndDate} is not after start date {StartDate}", pass.EndDate, pass.StartDate);
             throw new ArgumentException("End date must be after start date");
+        }
 
         if (pass.StartDate < DateTime.Today.AddDays(-1))
+        {
+            _logger.LogWarning("ValidatePassDates: Start date {StartDate} is in the past", pass.StartDate);
             throw new ArgumentException("Start date cannot be in the past");
+        }
     }
 
-    private static void ValidatePassType(Pass pass)
+    private void ValidatePassType(Pass pass)
     {
         // Validate SalsaMe-specific business rules
         switch (pass.Type)
         {
             case PassType.SingleClass:
                 if (pass.TotalClasses != 1)
+                {
+                    _logger.LogWarning("ValidatePassType: Single class pass must have exactly 1 total class, got {TotalClasses}", pass.TotalClasses);
                     throw new ArgumentException("Single class pass must have exactly 1 total class");
+                }
                 if (pass.ClassesPerWeek != 1)
+                {
+                    _logger.LogWarning("ValidatePassType: Single class pass must have exactly 1 class per week, got {ClassesPerWeek}", pass.ClassesPerWeek);
                     throw new ArgumentException("Single class pass must have exactly 1 class per week");
+                }
                 break;
 
             case PassType.Flexi4Classes:
                 if (pass.TotalClasses != 4)
+                {
+                    _logger.LogWarning("ValidatePassType: Flexi 4 class pass must have exactly 4 total classes, got {TotalClasses}", pass.TotalClasses);
                     throw new ArgumentException("Flexi 4 class pass must have exactly 4 total classes");
+                }
                 if (pass.ClassesPerWeek != 1)
+                {
+                    _logger.LogWarning("ValidatePassType: Flexi 4 class pass allows 1 class per week, got {ClassesPerWeek}", pass.ClassesPerWeek);
                     throw new ArgumentException("Flexi 4 class pass allows 1 class per week");
+                }
                 break;
 
             case PassType.Flexi8Classes:
                 if (pass.TotalClasses != 8)
+                {
+                    _logger.LogWarning("ValidatePassType: Flexi 8 class pass must have exactly 8 total classes, got {TotalClasses}", pass.TotalClasses);
                     throw new ArgumentException("Flexi 8 class pass must have exactly 8 total classes");
+                }
                 if (pass.ClassesPerWeek != 2)
+                {
+                    _logger.LogWarning("ValidatePassType: Flexi 8 class pass allows 2 classes per week, got {ClassesPerWeek}", pass.ClassesPerWeek);
                     throw new ArgumentException("Flexi 8 class pass allows 2 classes per week");
+                }
                 break;
 
             case PassType.FullPass:
@@ -258,7 +301,10 @@ public class PassService : IPassService
                 // Regular monthly passes
                 var expectedTotalClasses = pass.ClassesPerWeek * 4; // 28-day periods = 4 weeks
                 if (pass.TotalClasses != expectedTotalClasses)
-                    throw new ArgumentException($"{pass.Type} should have {expectedTotalClasses} total classes (4 weeks × {pass.ClassesPerWeek} classes/week)");
+                {
+                    _logger.LogWarning("ValidatePassType: {PassType} should have {ExpectedTotalClasses} total classes (4 weeks x {ClassesPerWeek} classes/week), got {TotalClasses}", pass.Type, expectedTotalClasses, pass.ClassesPerWeek, pass.TotalClasses);
+                    throw new ArgumentException($"{pass.Type} should have {expectedTotalClasses} total classes (4 weeks x {pass.ClassesPerWeek} classes/week)");
+                }
                 break;
         }
 
@@ -267,20 +313,26 @@ public class PassService : IPassService
         {
             var validityPeriod = (pass.EndDate - pass.StartDate).Days + 1;
             if (validityPeriod != 28)
+            {
+                _logger.LogWarning("ValidatePassType: SalsaMe passes must have exactly 28-day validity period, got {ValidityPeriod} days", validityPeriod);
                 throw new ArgumentException($"SalsaMe passes must have exactly 28-day validity period, got {validityPeriod} days");
+            }
         }
     }
 
     private async Task ValidateStartDateWithSchedules(DateTime startDate, List<Guid> selectedScheduleIds)
     {
         var selectedDays = new List<DayOfWeek>();
-        
+
         foreach (var scheduleId in selectedScheduleIds)
         {
             var schedule = await _scheduleRepository.GetByIdAsync(scheduleId);
             if (schedule == null)
+            {
+                _logger.LogWarning("ValidateStartDateWithSchedules: Schedule with ID {ScheduleId} not found", scheduleId);
                 throw new ArgumentException($"Schedule with ID {scheduleId} not found");
-            
+            }
+
             selectedDays.Add(schedule.DayOfWeek);
         }
 
@@ -288,6 +340,7 @@ public class PassService : IPassService
         if (!selectedDays.Contains(startDate.DayOfWeek))
         {
             var selectedDayNames = string.Join(", ", selectedDays.Select(d => d.ToString()));
+            _logger.LogWarning("ValidateStartDateWithSchedules: Start date {StartDate} is on {StartDayOfWeek}, but selected classes are on: {SelectedDayNames}", startDate, startDate.DayOfWeek, selectedDayNames);
             throw new ArgumentException($"Start date ({startDate:yyyy-MM-dd}) is on {startDate.DayOfWeek}, but selected classes are on: {selectedDayNames}. Start date must match one of the selected class days.");
         }
     }

@@ -47,6 +47,9 @@ app.UseHttpsRedirection();
 // Enable CORS
 app.UseCors("AllowClient");
 
+// Use global exception middleware for centralized error handling
+app.UseMiddleware<StudioScheduler.Server.Middleware.GlobalExceptionMiddleware>();
+
 // Map controllers
 app.MapControllers();
 

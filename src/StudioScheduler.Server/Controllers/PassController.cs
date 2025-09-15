@@ -47,10 +47,20 @@ public class PassController : ControllerBase
             _logger.LogInformation("Retrieved {Count} passes", passDtos.Count);
             return Ok(passDtos);
         }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning("Invalid argument in GetAllPasses: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Invalid operation in GetAllPasses");
+            return StatusCode(500, new { message = ex.Message });
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving all passes");
-            return StatusCode(500, new { message = "An error occurred while retrieving passes" });
+            _logger.LogError(ex, "Unexpected error in GetAllPasses");
+            return StatusCode(500, new { message = "An unexpected error occurred while retrieving passes" });
         }
     }
 
@@ -77,10 +87,20 @@ public class PassController : ControllerBase
             _logger.LogInformation("Successfully retrieved pass {PassId}", id);
             return Ok(passDto);
         }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning("Invalid argument in GetPassById: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Invalid operation in GetPassById");
+            return StatusCode(500, new { message = ex.Message });
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving pass {PassId}", id);
-            return StatusCode(500, new { message = "An error occurred while retrieving the pass" });
+            _logger.LogError(ex, "Unexpected error in GetPassById");
+            return StatusCode(500, new { message = "An unexpected error occurred while retrieving the pass" });
         }
     }
 
@@ -105,10 +125,20 @@ public class PassController : ControllerBase
             _logger.LogInformation("Retrieved {Count} passes for user {UserId}", passDtos.Count, userId);
             return Ok(passDtos);
         }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning("Invalid argument in GetPassesByUserId: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Invalid operation in GetPassesByUserId");
+            return StatusCode(500, new { message = ex.Message });
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving passes for user {UserId}", userId);
-            return StatusCode(500, new { message = "An error occurred while retrieving user passes" });
+            _logger.LogError(ex, "Unexpected error in GetPassesByUserId");
+            return StatusCode(500, new { message = "An unexpected error occurred while retrieving user passes" });
         }
     }
 
@@ -135,10 +165,20 @@ public class PassController : ControllerBase
             _logger.LogInformation("Retrieved current active pass {PassId} for user {UserId}", pass.Id, userId);
             return Ok(passDto);
         }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning("Invalid argument in GetCurrentActivePassForUser: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Invalid operation in GetCurrentActivePassForUser");
+            return StatusCode(500, new { message = ex.Message });
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving current active pass for user {UserId}", userId);
-            return StatusCode(500, new { message = "An error occurred while retrieving the current pass" });
+            _logger.LogError(ex, "Unexpected error in GetCurrentActivePassForUser");
+            return StatusCode(500, new { message = "An unexpected error occurred while retrieving the current pass" });
         }
     }
 
@@ -163,10 +203,20 @@ public class PassController : ControllerBase
             _logger.LogInformation("Retrieved {Count} active passes", passDtos.Count);
             return Ok(passDtos);
         }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning("Invalid argument in GetActivePasses: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Invalid operation in GetActivePasses");
+            return StatusCode(500, new { message = ex.Message });
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving active passes");
-            return StatusCode(500, new { message = "An error occurred while retrieving active passes" });
+            _logger.LogError(ex, "Unexpected error in GetActivePasses");
+            return StatusCode(500, new { message = "An unexpected error occurred while retrieving active passes" });
         }
     }
 
@@ -191,10 +241,20 @@ public class PassController : ControllerBase
             _logger.LogInformation("Retrieved {Count} passes expiring in {Days} days", passDtos.Count, days);
             return Ok(passDtos);
         }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning("Invalid argument in GetPassesExpiringInDays: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Invalid operation in GetPassesExpiringInDays");
+            return StatusCode(500, new { message = ex.Message });
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving passes expiring in {Days} days", days);
-            return StatusCode(500, new { message = "An error occurred while retrieving expiring passes" });
+            _logger.LogError(ex, "Unexpected error in GetPassesExpiringInDays");
+            return StatusCode(500, new { message = "An unexpected error occurred while retrieving expiring passes" });
         }
     }
 
@@ -239,10 +299,20 @@ public class PassController : ControllerBase
             _logger.LogWarning("Invalid pass creation request: {Message}", ex.Message);
             return BadRequest(new { message = ex.Message });
         }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning("Invalid pass creation request: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Invalid operation in CreatePass");
+            return StatusCode(500, new { message = ex.Message });
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating pass");
-            return StatusCode(500, new { message = "An error occurred while creating the pass" });
+            _logger.LogError(ex, "Unexpected error in CreatePass");
+            return StatusCode(500, new { message = "An unexpected error occurred while creating the pass" });
         }
     }
 
@@ -283,10 +353,20 @@ public class PassController : ControllerBase
             _logger.LogWarning("Invalid pass update request: {Message}", ex.Message);
             return BadRequest(new { message = ex.Message });
         }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Invalid operation in UpdatePass");
+            return StatusCode(500, new { message = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning("Invalid pass update request: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error updating pass {PassId}", id);
-            return StatusCode(500, new { message = "An error occurred while updating the pass" });
+            _logger.LogError(ex, "Unexpected error in UpdatePass");
+            return StatusCode(500, new { message = "An unexpected error occurred while updating the pass" });
         }
     }
 
@@ -312,10 +392,15 @@ public class PassController : ControllerBase
             _logger.LogInformation("Successfully deleted pass {PassId}", id);
             return NoContent();
         }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Invalid operation in DeletePass");
+            return StatusCode(500, new { message = ex.Message });
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error deleting pass {PassId}", id);
-            return StatusCode(500, new { message = "An error occurred while deleting the pass" });
+            _logger.LogError(ex, "Unexpected error in DeletePass");
+            return StatusCode(500, new { message = "An unexpected error occurred while deleting the pass" });
         }
     }
 

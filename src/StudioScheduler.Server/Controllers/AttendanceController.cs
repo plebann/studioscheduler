@@ -187,10 +187,20 @@ public class AttendanceController : ControllerBase
             _logger.LogInformation("Successfully retrieved schedule {ScheduleId}", scheduleId);
             return Ok(classAttendanceDto);
         }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning("Invalid argument in GetClassSchedule: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Invalid operation in GetClassSchedule");
+            return StatusCode(500, new { message = ex.Message });
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting schedule for ID {ScheduleId}", scheduleId);
-            return StatusCode(500, new { message = "An error occurred while retrieving schedule", error = ex.Message });
+            _logger.LogError(ex, "Unexpected error in GetClassSchedule");
+            return StatusCode(500, new { message = "An unexpected error occurred while retrieving schedule" });
         }
     }
 
@@ -221,9 +231,19 @@ public class AttendanceController : ControllerBase
             _logger.LogInformation("Successfully marked attendance for student {StudentId}", request.StudentId);
             return Ok(response);
         }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Invalid operation in MarkAttendance");
+            return StatusCode(500, new MarkAttendanceResponseDto 
+            { 
+                Success = false, 
+                Message = ex.Message,
+                UpdatedStudent = null
+            });
+        }
         catch (ArgumentException ex)
         {
-            _logger.LogWarning("Invalid request: {Message}", ex.Message);
+            _logger.LogWarning("Invalid request in MarkAttendance: {Message}", ex.Message);
             return BadRequest(new MarkAttendanceResponseDto 
             { 
                 Success = false, 
@@ -233,12 +253,12 @@ public class AttendanceController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error marking attendance for student {StudentId} in schedule {ScheduleId}", 
+            _logger.LogError(ex, "Unexpected error in MarkAttendance for student {StudentId} in schedule {ScheduleId}", 
                 request.StudentId, request.ScheduleId);
             return StatusCode(500, new MarkAttendanceResponseDto 
             { 
                 Success = false, 
-                Message = "An error occurred while marking attendance",
+                Message = "An unexpected error occurred while marking attendance",
                 UpdatedStudent = null
             });
         }
